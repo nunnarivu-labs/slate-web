@@ -1,10 +1,8 @@
 import NoteCard from '@/components/card/note-card.tsx';
 import { createFileRoute } from '@tanstack/react-router';
 
-const App = () => {
-  return <NoteCard />;
-};
+const Notes = () => <NoteCard />;
 
-export const Route = createFileRoute('/app')({
-  component: App,
+export const Route = createFileRoute('/notes')({
+  component: Notes,
 });
