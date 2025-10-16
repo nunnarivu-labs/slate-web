@@ -6,9 +6,5 @@ export const Route = createFileRoute('/app')({
 });
 
 function App() {
-  return (
-    <>
-      <KeepCard />
-    </>
-  );
+  return <KeepCard />;
 }
