@@ -2,16 +2,16 @@
   {
     "id": "1",
     "title": null,
-    "note": "Hello World"
+    "content": "Hello World"
   },
   {
     "id": "2",
     "title": "Test",
-    "note": "This is a test note"
+    "content": "This is a test note"
   },
   {
     "id": "3",
     "title": null,
-    "note": "Mary had a little lamp."
+    "content": "Mary had a little lamp."
   }
 ]
