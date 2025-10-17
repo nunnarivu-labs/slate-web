@@ -42,7 +42,7 @@ export const NoteModal = ({
   }, [note.content]);
 
   const handleSaveAndClose = () => {
-    if (note.title?.trim() || note.content.trim()) {
+    if (note.title.trim() || note.content.trim()) {
       onSave(note);
     }
     onClose();
