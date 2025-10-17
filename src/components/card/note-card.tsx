@@ -40,7 +40,7 @@ const NoteCard = () => {
 
   return (
     <>
-      <CollapsedCard onClick={openModal} />
+      <CollapsedCard onClick={openModal} note={note} />
 
       {isModalOpen && (
         <div
