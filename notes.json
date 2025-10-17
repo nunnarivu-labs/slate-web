@@ -1,17 +1,17 @@
 [
   {
     "id": "1",
-    "title": null,
-    "content": "Hello World"
+    "title": "Meeting Prep",
+    "content": "Review Q3 financial reports."
   },
   {
     "id": "2",
-    "title": "Test",
-    "content": "This is a test note"
+    "title": "",
+    "content": "First we overlook evil.\nThen we permit evil.\nThen we legalize evil.\nThen we promote evil.\nThen we celebrate evil.\nThen we persecute those who still call it evil.\n\n~ Dwight Longenecker"
   },
   {
     "id": "3",
-    "title": null,
-    "content": "Mary had a little lamp."
+    "title": "Grocery List",
+    "content": "- Milk\n- Bread\n- Coffee"
   }
 ]
