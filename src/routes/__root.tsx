@@ -21,7 +21,7 @@ const RootDocument = ({ children }: { children: React.ReactNode }) => {
         <title />
         <HeadContent />
       </head>
-      <body>
+      <body className="min-h-screen bg-zinc-100 dark:bg-zinc-900">
         {children}
         <TanStackDevtools
           config={{
