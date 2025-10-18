@@ -4,7 +4,7 @@ import * as fs from 'node:fs';
 
 export const fetchNotes = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Note[]> => {
-    const data = await fs.promises.readFile('notes.json', 'utf-8');
+    const data = await fs.promises.readFile('notes-2.json', 'utf-8');
     return JSON.parse(data);
   },
 );
