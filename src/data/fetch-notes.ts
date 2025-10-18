@@ -8,3 +8,17 @@ export const fetchNotes = createServerFn({ method: 'GET' }).handler(
     return JSON.parse(data);
   },
 );
+
+export const fetchNoteById = createServerFn({ method: 'GET' })
+  .inputValidator((data: { id: string }) => data)
+  .handler(async ({ data }): Promise<Note> => {
+    const notes = await fetchNotes();
+
+    const note = notes.find((note) => note.id === data.id);
+
+    if (!note) {
+      throw new Error(`Note with ID ${data.id} is not found`);
+    }
+
+    return note;
+  });
