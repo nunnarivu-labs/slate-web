@@ -1,8 +1,8 @@
-import { CardDialog } from '@/components/card/card-dialog.tsx';
+import { NoteModal } from '@/components/card/note-modal.tsx';
 import { fetchNoteById } from '@/data/fetch-notes.ts';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-const EditNoteRoute = () => <CardDialog note={Route.useLoaderData()} />;
+const EditNoteRoute = () => <NoteModal note={Route.useLoaderData()} />;
 
 export const Route = createFileRoute('/notes/$id')({
   component: EditNoteRoute,
