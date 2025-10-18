@@ -1,12 +1,17 @@
-import { KeepClonePage } from '@/components/card/keep-clone-page.tsx';
+import { NotesApp } from '@/components/notes-app.tsx';
 import { fetchNotes } from '@/data/fetch-notes.ts';
-import { createFileRoute } from '@tanstack/react-router';
+import { Outlet, createFileRoute } from '@tanstack/react-router';
 
-const Notes = () => {
-  return <KeepClonePage />;
+const NotesRoute = () => {
+  return (
+    <>
+      <NotesApp />
+      <Outlet />
+    </>
+  );
 };
 
 export const Route = createFileRoute('/notes')({
-  component: Notes,
+  component: NotesRoute,
   loader: async () => await fetchNotes(),
 });

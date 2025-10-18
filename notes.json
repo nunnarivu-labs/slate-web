@@ -13,5 +13,490 @@
     "id": "3",
     "title": "Grocery List",
     "content": "- Milk\n- Bread\n- Coffee"
+  },
+  {
+    "id": "4",
+    "title": "Project Alpha Status",
+    "content": "Need to finalize wireframes by EOD Tuesday. Assign task to John."
+  },
+  {
+    "id": "5",
+    "title": "",
+    "content": "The only way to do great work is to love what you do. - Steve Jobs"
+  },
+  {
+    "id": "6",
+    "title": "Book Club Selections",
+    "content": "1. 'Dune' by Frank Herbert\n2. 'The Secret History' by Donna Tartt\n3. 'Where the Crawdads Sing' by Delia Owens"
+  },
+  {
+    "id": "7",
+    "title": "",
+    "content": "A river cuts through rock not because of its power but because of its persistence."
+  },
+  {
+    "id": "8",
+    "title": "Weekend Plans",
+    "content": "Farmers market Sunday morning. Call aunt Sarah. Finish painting the guest room."
+  },
+  {
+    "id": "9",
+    "title": "Ideas for Blog Post",
+    "content": "Top 5 productivity hacks for remote workers. Interview with local startup founder. Review of new project management tool."
+  },
+  {
+    "id": "10",
+    "title": "",
+    "content": "An apple a day keeps the doctor away, but an onion a day keeps everyone away."
+  },
+  {
+    "id": "11",
+    "title": "Meditation Goal",
+    "content": "Increase daily meditation time from 10 to 15 minutes starting next week."
+  },
+  {
+    "id": "12",
+    "title": "Client Feedback",
+    "content": "They loved the new color palette but requested a change to the font size on the main CTA button."
+  },
+  {
+    "id": "13",
+    "title": "",
+    "content": "Life is made of ever so many partings welded together. - Charles Dickens"
+  },
+  {
+    "id": "14",
+    "title": "Call List",
+    "content": "- Dentist (re-schedule)\n- Plumber (leaky faucet)\n- Mom (check in)"
+  },
+  {
+    "id": "15",
+    "title": "",
+    "content": "The circumference of the Earth is approximately 40,075 kilometers (24,901 miles)."
+  },
+  {
+    "id": "16",
+    "title": "Dream Fragments",
+    "content": "Saw a white wolf on a snowy mountain. Heard an old, forgotten song."
+  },
+  {
+    "id": "17",
+    "title": "Gym Routine Update",
+    "content": "Add 5 minutes of planking to core day. Increase deadlift weight by 5lbs."
+  },
+  {
+    "id": "18",
+    "title": "",
+    "content": "The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela"
+  },
+  {
+    "id": "19",
+    "title": "Recipe - Pasta Sauce",
+    "content": "2 cans crushed tomatoes, basil, oregano, garlic, a pinch of sugar. Simmer for at least 1 hour."
+  },
+  {
+    "id": "20",
+    "title": "",
+    "content": "Jupiter is the fastest spinning planet in the solar system."
+  },
+  {
+    "id": "21",
+    "title": "Upcoming Travel",
+    "content": "Book flight for London trip (November 12-16). Check hotel availability near British Museum."
+  },
+  {
+    "id": "22",
+    "title": "",
+    "content": "Happiness can be found even in the darkest of times, if one only remembers to turn on the light. - Albus Dumbledore"
+  },
+  {
+    "id": "23",
+    "title": "Errands to Run",
+    "content": "Post office, dry cleaner, pick up prescription."
+  },
+  {
+    "id": "24",
+    "title": "Coding Challenge Idea",
+    "content": "Build a real-time collaborative text editor using WebSockets."
+  },
+  {
+    "id": "25",
+    "title": "",
+    "content": "The sun is a G2 yellow dwarf star."
+  },
+  {
+    "id": "26",
+    "title": "Gifts to Buy",
+    "content": "Sarah: New plant. Mike: Espresso beans. Dad: Wireless headphones."
+  },
+  {
+    "id": "27",
+    "title": "",
+    "content": "Do not go where the path may lead, go instead where there is no path and leave a trail. - Ralph Waldo Emerson"
+  },
+  {
+    "id": "28",
+    "title": "Monthly Budget Review",
+    "content": "Cut down on eating out. Re-evaluate subscription services. Save an extra 10% this month."
+  },
+  {
+    "id": "29",
+    "title": "New Business Card Info",
+    "content": "Phone: 555-123-4567\nEmail: contact@mywebsite.com\nTitle: Senior Developer"
+  },
+  {
+    "id": "30",
+    "title": "",
+    "content": "The journey of a thousand miles begins with a single step. - Lao Tzu"
+  },
+  {
+    "id": "31",
+    "title": "Learn Guitar - Chords",
+    "content": "Practice C, G, D, Am, Em chords. Look up tutorial for 'Wonderwall'."
+  },
+  {
+    "id": "32",
+    "title": "Watering Schedule",
+    "content": "Cactus: Once a month. Fern: Twice a week. Succulents: Every two weeks."
+  },
+  {
+    "id": "33",
+    "title": "",
+    "content": "Be yourself; everyone else is already taken. - Oscar Wilde"
+  },
+  {
+    "id": "34",
+    "title": "Car Maintenance",
+    "content": "Oil change due at 75,000 miles. Check tire pressure."
+  },
+  {
+    "id": "35",
+    "title": "",
+    "content": "A group of flamingos is called a flamboyance."
+  },
+  {
+    "id": "36",
+    "title": "Photography Class Notes",
+    "content": "Aperture controls depth of field. Shutter speed affects motion blur. ISO for light sensitivity."
+  },
+  {
+    "id": "37",
+    "title": "Idea for Mobile Game",
+    "content": "Puzzle game where you match colors to create new elements. 'Alchemy Match'."
+  },
+  {
+    "id": "38",
+    "title": "",
+    "content": "In three words I can sum up everything I've learned about life: it goes on. - Robert Frost"
+  },
+  {
+    "id": "39",
+    "title": "House Hunt Criteria",
+    "content": "3 bedrooms minimum. Backyard access. Near a good school district."
+  },
+  {
+    "id": "40",
+    "title": "Weekly Review - Successes",
+    "content": "Launched the new landing page. Finished reading two books. Didn't hit the snooze button once!"
+  },
+  {
+    "id": "41",
+    "title": "",
+    "content": "Be so good they can't ignore you. - Steve Martin"
+  },
+  {
+    "id": "42",
+    "title": "Investment Research",
+    "content": "Look into clean energy ETFs. Check performance of tech stocks over the last quarter."
+  },
+  {
+    "id": "43",
+    "title": "To Do - Tomorrow",
+    "content": "Prepare presentation slides. Send out meeting agenda. Go for a morning run."
+  },
+  {
+    "id": "44",
+    "title": "",
+    "content": "Failure is the condiment that gives success its flavor. - Truman Capote"
+  },
+  {
+    "id": "45",
+    "title": "Book - Key Takeaways",
+    "content": "Focus on compounding small, consistent efforts. Identify your core values."
+  },
+  {
+    "id": "46",
+    "title": "",
+    "content": "A 'jiffy' is an actual unit of time: 1/100th of a second."
+  },
+  {
+    "id": "47",
+    "title": "Dog Food Order",
+    "content": "Order 2 bags of 'Active Adult' formula. Re-stock chew toys."
+  },
+  {
+    "id": "48",
+    "title": "Language Practice - Spanish",
+    "content": "Practice 'past tense' conjugations. Memorize 10 new verbs."
+  },
+  {
+    "id": "49",
+    "title": "",
+    "content": "The mind is everything. What you think you become. - Buddha"
+  },
+  {
+    "id": "50",
+    "title": "Birthday Party Guest List",
+    "content": "Family: 12. Friends: 20. Colleagues: 5. Total: 37."
+  },
+  {
+    "id": "51",
+    "title": "Fitness Class Ideas",
+    "content": "Try a hot yoga session. Sign up for a spin class."
+  },
+  {
+    "id": "52",
+    "title": "",
+    "content": "It is never too late to be what you might have been. - George Eliot"
+  },
+  {
+    "id": "53",
+    "title": "Database Schema Changes",
+    "content": "Add 'last_login_date' field to 'users' table. Index 'product_name' in 'inventory'."
+  },
+  {
+    "id": "54",
+    "title": "Gardening Notes",
+    "content": "Plant new basil in the small pot. Check soil pH for the tomato plants."
+  },
+  {
+    "id": "55",
+    "title": "",
+    "content": "The average person walks the equivalent of five times around the Earth in a lifetime."
+  },
+  {
+    "id": "56",
+    "title": "Museum Visit - Must See",
+    "content": "Impressionist wing. Roman sculpture exhibit. Gift shop for postcards."
+  },
+  {
+    "id": "57",
+    "title": "Website Copy Edits",
+    "content": "Update the 'About Us' section to include the new mission statement. Shorten the hero headline."
+  },
+  {
+    "id": "58",
+    "title": "",
+    "content": "I can resist everything except temptation. - Oscar Wilde"
+  },
+  {
+    "id": "59",
+    "title": "Ideas for a side hustle",
+    "content": "Freelance web design. Sell handmade jewelry online. Create an educational course."
+  },
+  {
+    "id": "60",
+    "title": "Quote for Inspiration",
+    "content": "The greatest weapon against stress is our ability to choose one thought over another. - William James"
+  },
+  {
+    "id": "61",
+    "title": "",
+    "content": "The shortest complete sentence in the English language is 'I am.'"
+  },
+  {
+    "id": "62",
+    "title": "Birthday Dinner Reservation",
+    "content": "Book table for 4 at 'The Italian Place' for 7:30 PM on May 1st."
+  },
+  {
+    "id": "63",
+    "title": "Remember This",
+    "content": "Always double-check the time zone when scheduling international calls."
+  },
+  {
+    "id": "64",
+    "title": "",
+    "content": "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt"
+  },
+  {
+    "id": "65",
+    "title": "Presentation Points",
+    "content": "1. Problem definition.\n2. Proposed solution.\n3. Implementation timeline.\n4. Q&A."
+  },
+  {
+    "id": "66",
+    "title": "Podcast Recommendations",
+    "content": "1. 'The Daily'\n2. 'Acquired'\n3. 'Stuff You Should Know'"
+  },
+  {
+    "id": "67",
+    "title": "",
+    "content": "Life is like a bicycle. To keep your balance, you must keep moving. - Albert Einstein"
+  },
+  {
+    "id": "68",
+    "title": "Home Repair Supplies",
+    "content": "Roll of white paint tape. Small brush for trim. Spackle."
+  },
+  {
+    "id": "69",
+    "title": "Marketing Campaign Idea",
+    "content": "Run a contest on Instagram. Partner with three micro-influencers."
+  },
+  {
+    "id": "70",
+    "title": "",
+    "content": "A person who never made a mistake never tried anything new. - Albert Einstein"
+  },
+  {
+    "id": "71",
+    "title": "Friend's Contact Info",
+    "content": "Jess: 555-987-6543, jess@email.com, New Address: 123 Oak St."
+  },
+  {
+    "id": "72",
+    "title": "Ideas for a rainy day",
+    "content": "Bake cookies. Start a new puzzle. Watch an old favorite movie."
+  },
+  {
+    "id": "73",
+    "title": "",
+    "content": "Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment. - Buddha"
+  },
+  {
+    "id": "74",
+    "title": "Software Update Checklist",
+    "content": "Backup database. Test on staging server. Notify users of downtime."
+  },
+  {
+    "id": "75",
+    "title": "",
+    "content": "If you don't like the road you're walking, start paving another one. - Dolly Parton"
+  },
+  {
+    "id": "76",
+    "title": "Research Question",
+    "content": "What is the long-term environmental impact of lab-grown meat?"
+  },
+  {
+    "id": "77",
+    "title": "Book Title Ideas",
+    "content": "The Silent Forest. Echoes of the Past. The Five Towers of Aerthos."
+  },
+  {
+    "id": "78",
+    "title": "",
+    "content": "The strongest muscle in the human body is the masseter (jaw muscle)."
+  },
+  {
+    "id": "79",
+    "title": "Monthly Goals",
+    "content": "Complete onboarding for new hire. Run a 10K. Read 'Atomic Habits'."
+  },
+  {
+    "id": "80",
+    "title": "Feedback to Manager",
+    "content": "Request for more structured feedback sessions. Suggest cross-team collaboration."
+  },
+  {
+    "id": "81",
+    "title": "",
+    "content": "Simplicity is the ultimate sophistication. - Leonardo da Vinci"
+  },
+  {
+    "id": "82",
+    "title": "Stock Up List",
+    "content": "Toilet paper, laundry detergent, AA batteries, canned beans."
+  },
+  {
+    "id": "83",
+    "title": "",
+    "content": "Some fish cough to clear particles and bacteria out of their gills."
+  },
+  {
+    "id": "84",
+    "title": "Poem Draft",
+    "content": "The silence of the early hours,\nA soft blue light before the sun,\nA world awaits, unfurling powers,\nBefore the busy day is done."
+  },
+  {
+    "id": "85",
+    "title": "New Hobby Ideas",
+    "content": "Bonsai trimming. Learning to code in Rust. Stand-up paddleboarding."
+  },
+  {
+    "id": "86",
+    "title": "",
+    "content": "You must be the change you wish to see in the world. - Mahatma Gandhi"
+  },
+  {
+    "id": "87",
+    "title": "Team Lunch Location",
+    "content": "Vote between 'Thai Palace' and 'Burger Joint'. Check for dietary restrictions."
+  },
+  {
+    "id": "88",
+    "title": "Hardware Upgrade",
+    "content": "Need 32GB RAM upgrade. New ergonomic keyboard. 4K monitor."
+  },
+  {
+    "id": "89",
+    "title": "",
+    "content": "The opposite of love is not hate, it's indifference. - Elie Wiesel"
+  },
+  {
+    "id": "90",
+    "title": "Recipe Modification",
+    "content": "Use almond milk instead of dairy in the smoothie. Add spinach for extra green."
+  },
+  {
+    "id": "91",
+    "title": "",
+    "content": "The journey is the reward. - Chinese Proverb"
+  },
+  {
+    "id": "92",
+    "title": "Self-Care Checklist",
+    "content": "Take a long bath. Read for an hour. Turn off all screens after 9 PM."
+  },
+  {
+    "id": "93",
+    "title": "Potential Feature Ideas",
+    "content": "Dark mode toggle. Note linking. Trash/archive functionality."
+  },
+  {
+    "id": "94",
+    "title": "",
+    "content": "The only difference between a successful person and others is not a lack of strength, not a lack of knowledge, but rather a lack of will. - Vince Lombardi"
+  },
+  {
+    "id": "95",
+    "title": "Movie Watch List",
+    "content": "Inception, Parasite, Spirited Away, Arrival."
+  },
+  {
+    "id": "96",
+    "title": "Remember to Ask",
+    "content": "Ask Mike about the server configuration before deploying."
+  },
+  {
+    "id": "97",
+    "title": "",
+    "content": "Life is really simple, but we insist on making it complicated. - Confucius"
+  },
+  {
+    "id": "98",
+    "title": "Project Everest Next Steps",
+    "content": "Review legal documents. Schedule kickoff meeting with stakeholders. Draft initial budget."
+  },
+  {
+    "id": "99",
+    "title": "",
+    "content": "The mass of a single cloud can be over a million pounds."
+  },
+  {
+    "id": "100",
+    "title": "Gratitude Journal",
+    "content": "Sunny weather. A productive afternoon. Good cup of tea."
   }
 ]

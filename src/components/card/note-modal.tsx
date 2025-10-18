@@ -15,15 +15,9 @@ type NoteModalProps = {
   noteToEdit: Note | null; // null for a new note, a Note object for editing
   onClose: () => void;
   onSave: (noteToSave: Note) => void;
-  isAnimatingOut: boolean;
 };
 
-export const NoteModal = ({
-  noteToEdit,
-  onClose,
-  onSave,
-  isAnimatingOut,
-}: NoteModalProps) => {
+export const NoteModal = ({ noteToEdit, onClose, onSave }: NoteModalProps) => {
   const [note, setNote] = useState<Note>(noteToEdit || EMPTY_NOTE);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -58,8 +52,7 @@ export const NoteModal = ({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className={`w-full max-w-[600px] rounded-lg bg-white dark:bg-zinc-800 shadow-2xl flex flex-col transition-all duration-200 ease-out
-                 ${isAnimatingOut ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}
+      className="w-full max-w-7xl rounded-lg bg-white dark:bg-zinc-800 shadow-2xl transition-all duration-200 ease-out scale-100 opacity-100"
     >
       <div className="p-4">
         <input
