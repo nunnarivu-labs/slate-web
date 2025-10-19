@@ -16,7 +16,7 @@ export const NotesApp = () => {
 
   return (
     <div className="p-4 md:p-8">
-      <header className="mb-8">
+      <header className="mb-8 flex">
         <AddNoteCard
           onClick={() =>
             navigate({
