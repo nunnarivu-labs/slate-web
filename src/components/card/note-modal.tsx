@@ -1,6 +1,6 @@
 import { saveNote } from '@/data/save-note.ts';
 import { Note } from '@/types/note.ts';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import {
   Archive,
@@ -20,8 +20,17 @@ const createNewNote = (): Note => ({ id: uuid(), title: '', content: '' });
 
 export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const navigate = useNavigate();
+  const router = useRouter();
 
-  const [note, setNote] = useState<Note>(currentNote || createNewNote());
+  const [note, setNote] = useState<Note>(
+    currentNote
+      ? {
+          id: currentNote.id,
+          title: currentNote.title,
+          content: currentNote.content,
+        }
+      : createNewNote(),
+  );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isDirtyRef = useRef(false);
@@ -55,6 +64,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const handleClose = async () => {
     if (isDirtyRef.current) {
       await saveNoteFn({ data: { note } });
+      await router.invalidate();
     }
     await navigate({ to: '/notes' });
   };
