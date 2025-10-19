@@ -7,7 +7,7 @@ import {
   MoreVertical,
   Palette,
 } from 'lucide-react';
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 interface NoteModalProps {
   note: Note | null;
@@ -46,17 +46,16 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     }
   }, [note.content]);
 
-  const handleClose = useCallback(async () => {
+  const handleClose = async () => {
     await navigate({ to: '/notes' });
-  }, []);
+  };
 
-  const handleChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      setNote((prev) => ({ ...prev, [name]: value }));
-    },
-    [],
-  );
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setNote((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div
