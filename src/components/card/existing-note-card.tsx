@@ -9,14 +9,14 @@ export const ExistingNoteCard = ({ note, onClick }: ExistingNoteCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-300 dark:border-zinc-700 cursor-pointer hover:shadow-lg transition-shadow break-words grow basis-80 max-w-md max-h-96 overflow-hidden"
+      className="p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-300 dark:border-zinc-700 cursor-pointer hover:shadow-lg transition-shadow break-words break-inside-avoid overflow-hidden"
     >
       {note.title && (
         <h3 className="font-semibold mb-2 text-zinc-800 dark:text-zinc-200">
           {note.title}
         </h3>
       )}
-      <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+      <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
         {note.content}
       </p>
     </div>
