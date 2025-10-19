@@ -1,11 +1,11 @@
 import { Note } from '@/types/note.ts';
 
-type ExistingNoteCardProps = {
+type NoteCardProps = {
   note: Note;
   onClick: () => void;
 };
 
-export const ExistingNoteCard = ({ note, onClick }: ExistingNoteCardProps) => {
+export const NoteCard = ({ note, onClick }: NoteCardProps) => {
   return (
     <div
       onClick={onClick}
