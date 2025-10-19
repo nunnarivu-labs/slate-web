@@ -1,10 +1,11 @@
+import { FILE_PATH } from '@/data/config.ts';
 import { Note } from '@/types/note.ts';
 import { createServerFn } from '@tanstack/react-start';
 import * as fs from 'node:fs';
 
 export const fetchNotes = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Note[]> => {
-    const data = await fs.promises.readFile('temp-data/notes-3.json', 'utf-8');
+    const data = await fs.promises.readFile(FILE_PATH, 'utf-8');
     return JSON.parse(data);
   },
 );

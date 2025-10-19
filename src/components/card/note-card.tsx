@@ -16,9 +16,11 @@ export const NoteCard = ({ note, onClick }: NoteCardProps) => {
           {note.title}
         </h3>
       )}
-      <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
-        {note.content}
-      </p>
+      {note.content && (
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
+          {note.content}
+        </p>
+      )}
     </div>
   );
 };

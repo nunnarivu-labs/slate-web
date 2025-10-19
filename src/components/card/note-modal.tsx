@@ -1,5 +1,7 @@
+import { saveNote } from '@/data/save-note.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate } from '@tanstack/react-router';
+import { useServerFn } from '@tanstack/react-start';
 import {
   Archive,
   Bell,
@@ -8,19 +10,23 @@ import {
   Palette,
 } from 'lucide-react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 
 interface NoteModalProps {
   note: Note | null;
 }
 
-const EMPTY_NOTE: Note = { id: '', title: '', content: '' };
+const createNewNote = (): Note => ({ id: uuid(), title: '', content: '' });
 
 export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const navigate = useNavigate();
 
-  const [note, setNote] = useState<Note>(currentNote || EMPTY_NOTE);
+  const [note, setNote] = useState<Note>(currentNote || createNewNote());
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isDirtyRef = useRef(false);
+
+  const saveNoteFn = useServerFn(saveNote);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
@@ -47,6 +53,9 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   }, [note.content]);
 
   const handleClose = async () => {
+    if (isDirtyRef.current) {
+      await saveNoteFn({ data: { note } });
+    }
     await navigate({ to: '/notes' });
   };
 
@@ -55,6 +64,10 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   ) => {
     const { name, value } = e.target;
     setNote((prev) => ({ ...prev, [name]: value }));
+
+    if (!isDirtyRef.current) {
+      isDirtyRef.current = true;
+    }
   };
 
   return (
