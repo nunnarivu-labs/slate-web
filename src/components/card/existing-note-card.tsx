@@ -9,7 +9,7 @@ export const ExistingNoteCard = ({ note, onClick }: ExistingNoteCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-300 dark:border-zinc-700 cursor-pointer hover:shadow-lg transition-shadow break-words"
+      className="p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-300 dark:border-zinc-700 cursor-pointer hover:shadow-lg transition-shadow break-words grow basis-80 max-w-md max-h-96 overflow-hidden"
     >
       {note.title && (
         <h3 className="font-semibold mb-2 text-zinc-800 dark:text-zinc-200">

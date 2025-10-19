@@ -12,8 +12,7 @@ export const NotesApp = () => {
       <header className="mb-8">
         <AddNoteCard onClick={() => navigate({ to: '/notes/new' })} />
       </header>
-
-      <main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <main className="flex flex-wrap gap-4">
         {notes.map((note) => (
           <ExistingNoteCard
             key={note.id}
