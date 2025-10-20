@@ -10,13 +10,7 @@ import {
   useRouter,
 } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
-import {
-  Archive,
-  Bell,
-  Image as ImageIcon,
-  MoreVertical,
-  Palette,
-} from 'lucide-react';
+import { Archive, LucideInbox, Trash } from 'lucide-react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -150,21 +144,21 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         </div>
         <div className="flex items-center justify-between mt-2 p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
-            <NoteModalIcon>
-              <Bell size={20} />
-            </NoteModalIcon>
-            <NoteModalIcon>
-              <Palette size={20} />
-            </NoteModalIcon>
-            <NoteModalIcon>
-              <ImageIcon size={20} />
-            </NoteModalIcon>
-            <NoteModalIcon>
-              <Archive size={20} />
-            </NoteModalIcon>
-            <NoteModalIcon>
-              <MoreVertical size={20} />
-            </NoteModalIcon>
+            {note.category !== 'active' && (
+              <NoteModalIcon>
+                <LucideInbox size={20} />
+              </NoteModalIcon>
+            )}
+            {note.category !== 'archive' && (
+              <NoteModalIcon>
+                <Archive size={20} />
+              </NoteModalIcon>
+            )}
+            {note.category !== 'trash' && (
+              <NoteModalIcon>
+                <Trash size={20} />
+              </NoteModalIcon>
+            )}
           </div>
           <button
             onClick={handleClose}
