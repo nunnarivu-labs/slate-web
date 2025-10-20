@@ -1,5 +1,5 @@
 import { FILE_PATH } from '@/data/config.ts';
-import { fetchNotes } from '@/data/fetch-notes.ts';
+import { fetchAllNotes } from '@/data/fetch-notes.ts';
 import { Note } from '@/types/note.ts';
 import { createServerFn } from '@tanstack/react-start';
 import fs from 'node:fs';
@@ -9,7 +9,7 @@ export const saveNote = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { note } = data;
 
-    const notes = await fetchNotes();
+    const notes = await fetchAllNotes();
 
     const noteIndex = notes.findIndex((n) => n.id === note.id);
 

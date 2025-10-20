@@ -10,5 +10,5 @@ export const getFetchNotesQueryKey = (category: NoteCategory) => [
 export const getFetchNotesQuery = (category: NoteCategory) =>
   queryOptions({
     queryKey: getFetchNotesQueryKey(category),
-    queryFn: fetchNotes,
+    queryFn: () => fetchNotes({ data: { category } }),
   });
