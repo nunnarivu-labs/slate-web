@@ -1,11 +1,9 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
-import { saveNote } from '@/data/save-note.ts';
-import { getFetchNoteByIdQueryKey } from '@/query/fetch-note-by-id-query.ts';
-import { getFetchNotesQueryKey } from '@/query/fetch-notes-query.ts';
+import { useSaveNote } from '@/hooks/use-save-note.ts';
 import { Route } from '@/routes/notes/$category/$id.tsx';
+import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
-import { useNavigate, useRouter } from '@tanstack/react-router';
-import { useServerFn } from '@tanstack/react-start';
+import { useNavigate } from '@tanstack/react-router';
 import { Archive, LucideInbox, Trash } from 'lucide-react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -16,12 +14,9 @@ interface NoteModalProps {
 
 export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const navigate = useNavigate();
-  const router = useRouter();
-
   const params = Route.useParams();
-  const { queryClient } = Route.useRouteContext();
 
-  const saveNoteFn = useServerFn(saveNote);
+  const saveNote = useSaveNote();
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -42,7 +37,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        await handleClose();
+        await handleSaveAndClose('save');
       }
     };
 
@@ -64,30 +59,9 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     }
   }, [note.content]);
 
-  const handleClose = async () => {
-    if (isDirtyRef.current) {
-      const isNew = params.id === 'new';
-
-      const dateNow = Date.now();
-
-      if (isNew) {
-        note.createdAt = dateNow;
-      }
-
-      note.updatedAt = dateNow;
-
-      await saveNoteFn({ data: { note } });
-
-      await router.invalidate();
-      await queryClient.invalidateQueries({
-        queryKey: getFetchNotesQueryKey(note.category),
-      });
-
-      if (!isNew) {
-        await queryClient.invalidateQueries({
-          queryKey: getFetchNoteByIdQueryKey(note.id),
-        });
-      }
+  const handleSaveAndClose = async (action: NoteSaveActionType) => {
+    if (action !== 'save' || (action === 'save' && isDirtyRef.current)) {
+      await saveNote({ note, action });
     }
 
     await navigate({
@@ -107,7 +81,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   return (
     <div
-      onClick={handleClose}
+      onClick={() => handleSaveAndClose('save')}
       role="dialog"
       aria-modal="true"
       aria-labelledby="note-modal-title"
@@ -141,23 +115,23 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         <div className="flex items-center justify-between mt-2 p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
             {note.category !== 'active' && (
-              <NoteModalIcon>
+              <NoteModalIcon onClick={() => handleSaveAndClose('active')}>
                 <LucideInbox size={20} />
               </NoteModalIcon>
             )}
             {note.category !== 'archive' && (
-              <NoteModalIcon>
+              <NoteModalIcon onClick={() => handleSaveAndClose('archive')}>
                 <Archive size={20} />
               </NoteModalIcon>
             )}
             {note.category !== 'trash' && (
-              <NoteModalIcon>
+              <NoteModalIcon onClick={() => handleSaveAndClose('trash')}>
                 <Trash size={20} />
               </NoteModalIcon>
             )}
           </div>
           <button
-            onClick={handleClose}
+            onClick={() => handleSaveAndClose('save')}
             className="px-4 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 rounded hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer"
           >
             Close

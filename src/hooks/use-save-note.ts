@@ -1,0 +1,49 @@
+import { saveNote } from '@/data/save-note.ts';
+import { getFetchNoteByIdQueryKey } from '@/query/fetch-note-by-id-query.ts';
+import { getFetchNotesQueryKey } from '@/query/fetch-notes-query.ts';
+import { Route } from '@/routes/notes/$category/$id.tsx';
+import { NoteSaveActionType } from '@/types/note-save-action.ts';
+import { Note } from '@/types/note.ts';
+import { useRouter } from '@tanstack/react-router';
+import { useServerFn } from '@tanstack/react-start';
+
+type SaveNoteArgs = {
+  note: Note;
+  action: NoteSaveActionType;
+};
+
+export const useSaveNote = () => {
+  const router = useRouter();
+  const saveNoteFn = useServerFn(saveNote);
+
+  const { queryClient } = Route.useRouteContext();
+
+  const isNewNote = Route.useParams().id === 'new';
+
+  return async ({ note, action }: SaveNoteArgs) => {
+    const dateNow = Date.now();
+
+    if (isNewNote) {
+      note.createdAt = dateNow;
+    }
+
+    note.updatedAt = dateNow;
+
+    if (action !== 'save') {
+      note.category = action;
+    }
+
+    await saveNoteFn({ data: { note } });
+
+    await router.invalidate();
+    await queryClient.invalidateQueries({
+      queryKey: getFetchNotesQueryKey(note.category),
+    });
+
+    if (!isNewNote) {
+      await queryClient.invalidateQueries({
+        queryKey: getFetchNoteByIdQueryKey(note.id),
+      });
+    }
+  };
+};
