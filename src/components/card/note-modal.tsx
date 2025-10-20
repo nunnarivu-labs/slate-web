@@ -19,8 +19,9 @@ interface NoteModalProps {
 export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const navigate = useNavigate();
   const router = useRouter();
-
   const params = useParams({ from: '/notes/$category' });
+
+  const saveNoteFn = useServerFn(saveNote);
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -37,8 +38,6 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isDirtyRef = useRef(false);
-
-  const saveNoteFn = useServerFn(saveNote);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
@@ -58,6 +57,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   useEffect(() => {
     const textarea = textareaRef.current;
+
     if (textarea) {
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
