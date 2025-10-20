@@ -9,15 +9,15 @@ export const NoteCard = ({ note, onClick }: NoteCardProps) => {
   return (
     <button
       onClick={onClick}
-      className="p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-300 dark:border-zinc-700 cursor-pointer hover:shadow-lg transition-shadow break-words break-inside-avoid overflow-hidden dark:hover:border-zinc-600 text-left"
+      className="cursor-pointer break-inside-avoid overflow-hidden rounded-lg border border-zinc-300 bg-white p-4 text-left break-words transition-shadow hover:shadow-lg dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600"
     >
       {note.title && (
-        <h3 className="font-semibold mb-2 text-zinc-800 dark:text-zinc-200">
+        <h3 className="mb-2 font-semibold text-zinc-800 dark:text-zinc-200">
           {note.title}
         </h3>
       )}
       {note.content && (
-        <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
+        <p className="text-sm break-words whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">
           {note.content}
         </p>
       )}

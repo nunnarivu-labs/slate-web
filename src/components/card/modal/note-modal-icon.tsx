@@ -15,14 +15,11 @@ export const NoteModalIcon = ({
     <button
       disabled={disabled}
       onClick={onClick}
-      className="group relative p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      className="group relative cursor-pointer rounded-full p-2 hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-zinc-700"
     >
       {children}
       {tooltip && (
-        <span
-          className="
-            absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-zinc-700 text-white text-xs rounded-md whitespace-nowrap  opacity-0 group-hover:opacity-100  transition-opacity duration-200 pointer-events-none"
-        >
+        <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-md bg-zinc-700 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           {tooltip}
         </span>
       )}

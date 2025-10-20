@@ -4,7 +4,7 @@ const markdownComponents = {
   p: ({ node, ...props }: any) => {
     return (
       <p
-        className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words"
+        className="text-sm break-words whitespace-pre-wrap text-zinc-700 dark:text-zinc-300"
         {...props}
       />
     );
@@ -13,7 +13,7 @@ const markdownComponents = {
   li: ({ node, ...props }: any) => {
     return (
       <li
-        className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words"
+        className="text-sm break-words whitespace-pre-wrap text-zinc-700 dark:text-zinc-300"
         {...props}
       />
     );
@@ -22,7 +22,7 @@ const markdownComponents = {
   strong: ({ node, ...props }: any) => {
     return (
       <strong
-        className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words"
+        className="text-sm break-words whitespace-pre-wrap text-zinc-700 dark:text-zinc-300"
         {...props}
       />
     );

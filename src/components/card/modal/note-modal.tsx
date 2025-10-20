@@ -113,12 +113,12 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
       aria-modal="true"
       aria-labelledby="note-modal-title"
       className={
-        'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70'
+        'fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'
       }
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-4xl rounded-lg bg-white dark:bg-zinc-800 shadow-2xl scale-100"
+        className="w-full max-w-4xl scale-100 rounded-lg bg-white shadow-2xl dark:bg-zinc-800"
       >
         <div className="p-4">
           <input
@@ -127,7 +127,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
             value={note.title}
             onChange={handleChange}
             placeholder="Title"
-            className="w-full bg-transparent text-lg font-semibold outline-none mb-4 text-zinc-800 dark:text-zinc-200"
+            className="mb-4 w-full bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
           />
           {previewMode ? (
             <Markdown content={note.content} />
@@ -139,11 +139,11 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               value={note.content}
               onChange={handleChange}
               placeholder="Take a note..."
-              className="w-full bg-transparent outline-none resize-none text-zinc-800 dark:text-zinc-200"
+              className="w-full resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
             />
           )}
         </div>
-        <div className="flex items-center justify-between mt-2 p-2">
+        <div className="mt-2 flex items-center justify-between p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
             {note.category !== 'active' && (
               <NoteModalIcon
@@ -185,7 +185,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
           </div>
           <button
             onClick={() => handleSaveAndClose('save')}
-            className="px-4 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 rounded hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer"
+            className="cursor-pointer rounded px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
           >
             Close
           </button>

@@ -12,3 +12,6 @@ count.txt
 .idea
 .vscode
 temp-data
+
+# Local Netlify folder
+.netlify

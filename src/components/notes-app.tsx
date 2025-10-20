@@ -28,7 +28,7 @@ export const NotesApp = () => {
       </header>
       <main className="flex flex-row items-start justify-center gap-4">
         {masonryColumns.map((column, colIndex) => (
-          <div key={colIndex} className="flex flex-col gap-4 w-full">
+          <div key={colIndex} className="flex w-full flex-col gap-4">
             {column.map((note) => (
               <NoteCard
                 key={note.id}
