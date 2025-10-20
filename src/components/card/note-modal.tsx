@@ -90,9 +90,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     const { name, value } = e.target;
     setNote((prev) => ({ ...prev, [name]: value }));
 
-    if (!isDirtyRef.current) {
-      isDirtyRef.current = true;
-    }
+    isDirtyRef.current = true;
   };
 
   return (
