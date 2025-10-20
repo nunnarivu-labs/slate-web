@@ -5,7 +5,13 @@ import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate } from '@tanstack/react-router';
 import { Archive, LucideInbox, Trash } from 'lucide-react';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface NoteModalProps {
@@ -35,6 +41,16 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isDirtyRef = useRef(false);
+
+  const positionCursor = useEffectEvent(() => {
+    const textarea = textareaRef.current;
+
+    if (!textarea || !note.content) return;
+
+    textarea.setSelectionRange(note.content.length, note.content.length);
+  });
+
+  useEffect(() => positionCursor(), []);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
