@@ -1,8 +1,7 @@
-import { FILE_PATH } from '@/data/config.ts';
+import { writeNotes } from '@/data/config.ts';
 import { fetchAllNotes } from '@/data/fetch-notes.ts';
 import { Note } from '@/types/note.ts';
 import { createServerFn } from '@tanstack/react-start';
-import fs from 'node:fs';
 
 export const saveNote = createServerFn({ method: 'POST' })
   .inputValidator((data: { note: Note }) => data)
@@ -19,5 +18,5 @@ export const saveNote = createServerFn({ method: 'POST' })
       notes.unshift(note);
     }
 
-    await fs.promises.writeFile(FILE_PATH, JSON.stringify(notes), 'utf-8');
+    await writeNotes(notes);
   });

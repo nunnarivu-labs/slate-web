@@ -1,14 +1,10 @@
-import { FILE_PATH } from '@/data/config.ts';
+import { readNotes } from '@/data/config.ts';
 import { NoteCategory } from '@/types/note-category.ts';
 import { Note } from '@/types/note.ts';
 import { createServerFn } from '@tanstack/react-start';
-import * as fs from 'node:fs';
 
 export const fetchAllNotes = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Note[]> => {
-    const data = await fs.promises.readFile(FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  },
+  async () => readNotes(),
 );
 
 export const fetchNotes = createServerFn({ method: 'GET' })
