@@ -1,5 +1,4 @@
 import { saveNote } from '@/data/save-note.ts';
-import { NoteCategory } from '@/types/note-category.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
@@ -17,15 +16,6 @@ interface NoteModalProps {
   note: Note | null;
 }
 
-const createNewNote = (category: NoteCategory): Note => ({
-  id: uuid(),
-  title: '',
-  content: '',
-  category,
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-});
-
 export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const navigate = useNavigate();
   const router = useRouter();
@@ -33,7 +23,16 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const params = useParams({ from: '/notes/$category' });
 
   const [note, setNote] = useState<Note>(
-    currentNote ? { ...currentNote } : createNewNote(params.category),
+    currentNote
+      ? { ...currentNote }
+      : {
+          id: uuid(),
+          title: '',
+          content: '',
+          category: params.category,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
   );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
