@@ -1,5 +1,5 @@
 import { NotesApp } from '@/components/notes-app.tsx';
-import { fetchNotes } from '@/data/fetch-notes.ts';
+import { getFetchNotesQuery } from '@/query/fetch-notes-query.ts';
 import {
   NoteCategory,
   isValidNoteCategory,
@@ -30,5 +30,6 @@ export const Route = createFileRoute('/notes/$category')({
     }
   },
   component: NotesRoute,
-  loader: async () => await fetchNotes(),
+  loader: async ({ context: { queryClient }, params: { category } }) =>
+    await queryClient.fetchQuery(getFetchNotesQuery(category)),
 });
