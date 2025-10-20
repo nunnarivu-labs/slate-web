@@ -1,7 +1,14 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { saveNote } from '@/data/save-note.ts';
+import { getFetchNoteByIdQueryKey } from '@/query/fetch-note-by-id-query.ts';
+import { getFetchNotesQueryKey } from '@/query/fetch-notes-query.ts';
 import { Note } from '@/types/note.ts';
-import { useNavigate, useParams, useRouter } from '@tanstack/react-router';
+import {
+  useNavigate,
+  useParams,
+  useRouteContext,
+  useRouter,
+} from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import {
   Archive,
@@ -20,7 +27,9 @@ interface NoteModalProps {
 export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const navigate = useNavigate();
   const router = useRouter();
+
   const params = useParams({ from: '/notes/$category' });
+  const { queryClient } = useRouteContext({ from: '/notes/$category' });
 
   const saveNoteFn = useServerFn(saveNote);
 
@@ -67,16 +76,28 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const handleClose = async () => {
     if (isDirtyRef.current) {
+      const isNew = currentNote === null;
+
       const dateNow = Date.now();
 
-      if (currentNote === null) {
+      if (isNew) {
         note.createdAt = dateNow;
       }
 
       note.updatedAt = dateNow;
 
       await saveNoteFn({ data: { note } });
+
       await router.invalidate();
+      await queryClient.invalidateQueries({
+        queryKey: getFetchNotesQueryKey(note.category),
+      });
+
+      if (!isNew) {
+        await queryClient.invalidateQueries({
+          queryKey: getFetchNoteByIdQueryKey(note.id),
+        });
+      }
     }
 
     await navigate({
