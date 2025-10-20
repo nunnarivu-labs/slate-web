@@ -25,13 +25,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const params = useParams({ from: '/notes/$category' });
 
   const [note, setNote] = useState<Note>(
-    currentNote
-      ? {
-          id: currentNote.id,
-          title: currentNote.title,
-          content: currentNote.content,
-        }
-      : createNewNote(),
+    currentNote ? { ...currentNote } : createNewNote(),
   );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
