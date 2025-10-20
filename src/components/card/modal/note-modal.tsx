@@ -1,10 +1,17 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
+import { Markdown } from '@/components/markdown.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
 import { Route } from '@/routes/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate } from '@tanstack/react-router';
-import { Archive, LucideInbox, Trash } from 'lucide-react';
+import {
+  Archive,
+  LucideInbox,
+  ToggleLeft,
+  ToggleRight,
+  Trash,
+} from 'lucide-react';
 import {
   ChangeEvent,
   useEffect,
@@ -36,6 +43,8 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
           updatedAt: Date.now(),
         },
   );
+
+  const [previewMode, setPreviewMode] = useState(false);
 
   const isNoteEmpty = !note.title && !note.content;
 
@@ -120,15 +129,19 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
             placeholder="Title"
             className="w-full bg-transparent text-lg font-semibold outline-none mb-4 text-zinc-800 dark:text-zinc-200"
           />
-          <textarea
-            autoFocus
-            ref={textareaRef}
-            name="content"
-            value={note.content}
-            onChange={handleChange}
-            placeholder="Take a note..."
-            className="w-full bg-transparent outline-none resize-none text-zinc-800 dark:text-zinc-200"
-          />
+          {previewMode ? (
+            <Markdown content={note.content} />
+          ) : (
+            <textarea
+              autoFocus
+              ref={textareaRef}
+              name="content"
+              value={note.content}
+              onChange={handleChange}
+              placeholder="Take a note..."
+              className="w-full bg-transparent outline-none resize-none text-zinc-800 dark:text-zinc-200"
+            />
+          )}
         </div>
         <div className="flex items-center justify-between mt-2 p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
@@ -136,6 +149,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               <NoteModalIcon
                 disabled={isNoteEmpty}
                 onClick={() => handleSaveAndClose('active')}
+                tooltip="Active"
               >
                 <LucideInbox size={20} />
               </NoteModalIcon>
@@ -144,6 +158,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               <NoteModalIcon
                 disabled={isNoteEmpty}
                 onClick={() => handleSaveAndClose('archive')}
+                tooltip="Archive"
               >
                 <Archive size={20} />
               </NoteModalIcon>
@@ -152,10 +167,21 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               <NoteModalIcon
                 disabled={isNoteEmpty}
                 onClick={() => handleSaveAndClose('trash')}
+                tooltip="Trash"
               >
                 <Trash size={20} />
               </NoteModalIcon>
             )}
+            <NoteModalIcon
+              onClick={() => setPreviewMode((prev) => !prev)}
+              tooltip="Preview Mode"
+            >
+              {previewMode ? (
+                <ToggleRight size={20} className="text-green-600" />
+              ) : (
+                <ToggleLeft size={20} />
+              )}
+            </NoteModalIcon>
           </div>
           <button
             onClick={() => handleSaveAndClose('save')}
