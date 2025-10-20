@@ -59,7 +59,11 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     textarea.setSelectionRange(note.content.length, note.content.length);
   });
 
-  useEffect(() => positionCursor(), []);
+  useEffect(() => {
+    if (!previewMode) {
+      positionCursor();
+    }
+  }, [previewMode]);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
@@ -76,15 +80,6 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
-  useEffect(() => {
-    const textarea = textareaRef.current;
-
-    if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  }, [note.content]);
 
   const handleSaveAndClose = async (action: NoteSaveActionType) => {
     if (action !== 'save' || (action === 'save' && isDirtyRef.current)) {
@@ -118,19 +113,21 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-4xl scale-100 rounded-lg bg-white shadow-2xl dark:bg-zinc-800"
+        className="flex h-[80vh] w-full max-w-4xl scale-100 flex-col rounded-lg bg-white shadow-2xl dark:bg-zinc-800"
       >
-        <div className="p-4">
+        <div className="flex min-h-0 flex-grow flex-col p-4">
           <input
             name="title"
             type="text"
             value={note.title}
             onChange={handleChange}
             placeholder="Title"
-            className="mb-4 w-full bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
+            className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
           />
           {previewMode ? (
-            <Markdown content={note.content} />
+            <div className="flex-grow overflow-y-auto">
+              <Markdown content={note.content} />
+            </div>
           ) : (
             <textarea
               autoFocus
@@ -139,7 +136,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               value={note.content}
               onChange={handleChange}
               placeholder="Take a note..."
-              className="w-full resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
+              className="w-full flex-grow resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
             />
           )}
         </div>

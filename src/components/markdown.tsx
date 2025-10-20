@@ -31,6 +31,8 @@ const markdownComponents = {
 
 export const Markdown = ({ content }: { content: string }) => {
   return (
-    <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
+    <div style={{ whiteSpace: 'pre-wrap' }}>
+      <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
+    </div>
   );
 };
