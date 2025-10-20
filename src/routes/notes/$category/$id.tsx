@@ -1,4 +1,4 @@
-import { NoteModal } from '@/components/card/note-modal.tsx';
+import { NoteModal } from '@/components/card/modal/note-modal.tsx';
 import { getFetchNoteByIdQuery } from '@/query/fetch-note-by-id-query.ts';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 

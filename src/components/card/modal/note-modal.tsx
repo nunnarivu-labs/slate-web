@@ -1,3 +1,4 @@
+import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { saveNote } from '@/data/save-note.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate, useParams, useRouter } from '@tanstack/react-router';
@@ -128,25 +129,25 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         </div>
         <div className="flex items-center justify-between mt-2 p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
-            <button className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700">
+            <NoteModalIcon>
               <Bell size={20} />
-            </button>
-            <button className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700">
+            </NoteModalIcon>
+            <NoteModalIcon>
               <Palette size={20} />
-            </button>
-            <button className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700">
+            </NoteModalIcon>
+            <NoteModalIcon>
               <ImageIcon size={20} />
-            </button>
-            <button className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700">
+            </NoteModalIcon>
+            <NoteModalIcon>
               <Archive size={20} />
-            </button>
-            <button className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700">
+            </NoteModalIcon>
+            <NoteModalIcon>
               <MoreVertical size={20} />
-            </button>
+            </NoteModalIcon>
           </div>
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 rounded hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            className="px-4 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 rounded hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer"
           >
             Close
           </button>

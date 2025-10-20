@@ -1,4 +1,4 @@
-import { NoteModal } from '@/components/card/note-modal.tsx';
+import { NoteModal } from '@/components/card/modal/note-modal.tsx';
 import { createFileRoute } from '@tanstack/react-router';
 
 const NewNoteRoute = () => <NoteModal note={null} />;
