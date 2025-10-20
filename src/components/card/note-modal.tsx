@@ -67,9 +67,18 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const handleClose = async () => {
     if (isDirtyRef.current) {
+      const dateNow = Date.now();
+
+      if (currentNote === null) {
+        note.createdAt = dateNow;
+      }
+
+      note.updatedAt = dateNow;
+
       await saveNoteFn({ data: { note } });
       await router.invalidate();
     }
+
     await navigate({
       to: '/notes/$category',
       params: { category: params.category },
