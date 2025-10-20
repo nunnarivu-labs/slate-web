@@ -2,13 +2,9 @@ import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { saveNote } from '@/data/save-note.ts';
 import { getFetchNoteByIdQueryKey } from '@/query/fetch-note-by-id-query.ts';
 import { getFetchNotesQueryKey } from '@/query/fetch-notes-query.ts';
+import { Route } from '@/routes/notes/$category/$id.tsx';
 import { Note } from '@/types/note.ts';
-import {
-  useNavigate,
-  useParams,
-  useRouteContext,
-  useRouter,
-} from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { Archive, LucideInbox, Trash } from 'lucide-react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
@@ -22,8 +18,8 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const navigate = useNavigate();
   const router = useRouter();
 
-  const params = useParams({ from: '/notes/$category' });
-  const { queryClient } = useRouteContext({ from: '/notes/$category' });
+  const params = Route.useParams();
+  const { queryClient } = Route.useRouteContext();
 
   const saveNoteFn = useServerFn(saveNote);
 
@@ -70,7 +66,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const handleClose = async () => {
     if (isDirtyRef.current) {
-      const isNew = currentNote === null;
+      const isNew = params.id === 'new';
 
       const dateNow = Date.now();
 

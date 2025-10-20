@@ -20,8 +20,8 @@ export const NotesApp = () => {
         <AddNoteCard
           onClick={() =>
             navigate({
-              to: '/notes/$category/new',
-              params: { category: params.category },
+              to: '/notes/$category/$id',
+              params: { category: params.category, id: 'new' },
             })
           }
         />

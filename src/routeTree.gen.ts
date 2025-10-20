@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NotesIndexRouteImport } from './routes/notes/index'
 import { Route as NotesCategoryRouteRouteImport } from './routes/notes/$category/route'
-import { Route as NotesCategoryNewRouteImport } from './routes/notes/$category/new'
 import { Route as NotesCategoryIdRouteImport } from './routes/notes/$category/$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,11 +29,6 @@ const NotesCategoryRouteRoute = NotesCategoryRouteRouteImport.update({
   path: '/notes/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NotesCategoryNewRoute = NotesCategoryNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => NotesCategoryRouteRoute,
-} as any)
 const NotesCategoryIdRoute = NotesCategoryIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -46,14 +40,12 @@ export interface FileRoutesByFullPath {
   '/notes/$category': typeof NotesCategoryRouteRouteWithChildren
   '/notes': typeof NotesIndexRoute
   '/notes/$category/$id': typeof NotesCategoryIdRoute
-  '/notes/$category/new': typeof NotesCategoryNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/notes/$category': typeof NotesCategoryRouteRouteWithChildren
   '/notes': typeof NotesIndexRoute
   '/notes/$category/$id': typeof NotesCategoryIdRoute
-  '/notes/$category/new': typeof NotesCategoryNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,30 +53,13 @@ export interface FileRoutesById {
   '/notes/$category': typeof NotesCategoryRouteRouteWithChildren
   '/notes/': typeof NotesIndexRoute
   '/notes/$category/$id': typeof NotesCategoryIdRoute
-  '/notes/$category/new': typeof NotesCategoryNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/notes/$category'
-    | '/notes'
-    | '/notes/$category/$id'
-    | '/notes/$category/new'
+  fullPaths: '/' | '/notes/$category' | '/notes' | '/notes/$category/$id'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/notes/$category'
-    | '/notes'
-    | '/notes/$category/$id'
-    | '/notes/$category/new'
-  id:
-    | '__root__'
-    | '/'
-    | '/notes/$category'
-    | '/notes/'
-    | '/notes/$category/$id'
-    | '/notes/$category/new'
+  to: '/' | '/notes/$category' | '/notes' | '/notes/$category/$id'
+  id: '__root__' | '/' | '/notes/$category' | '/notes/' | '/notes/$category/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,13 +91,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesCategoryRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/notes/$category/new': {
-      id: '/notes/$category/new'
-      path: '/new'
-      fullPath: '/notes/$category/new'
-      preLoaderRoute: typeof NotesCategoryNewRouteImport
-      parentRoute: typeof NotesCategoryRouteRoute
-    }
     '/notes/$category/$id': {
       id: '/notes/$category/$id'
       path: '/$id'
@@ -135,12 +103,10 @@ declare module '@tanstack/react-router' {
 
 interface NotesCategoryRouteRouteChildren {
   NotesCategoryIdRoute: typeof NotesCategoryIdRoute
-  NotesCategoryNewRoute: typeof NotesCategoryNewRoute
 }
 
 const NotesCategoryRouteRouteChildren: NotesCategoryRouteRouteChildren = {
   NotesCategoryIdRoute: NotesCategoryIdRoute,
-  NotesCategoryNewRoute: NotesCategoryNewRoute,
 }
 
 const NotesCategoryRouteRouteWithChildren =
