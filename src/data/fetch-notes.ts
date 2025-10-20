@@ -15,7 +15,9 @@ export const fetchNotes = createServerFn({ method: 'GET' })
   .inputValidator((data: { category: NoteCategory }) => data)
   .handler(
     async ({ data }): Promise<Note[]> =>
-      (await fetchAllNotes()).filter((note) => note.category === data.category),
+      (await fetchAllNotes())
+        .filter((note) => note.category === data.category)
+        .sort((a, b) => b.updatedAt - a.updatedAt),
   );
 
 export const fetchNoteById = createServerFn({ method: 'GET' })
