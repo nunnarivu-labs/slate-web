@@ -31,6 +31,8 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         },
   );
 
+  const isNoteEmpty = !note.title && !note.content;
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isDirtyRef = useRef(false);
 
@@ -115,17 +117,26 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         <div className="flex items-center justify-between mt-2 p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
             {note.category !== 'active' && (
-              <NoteModalIcon onClick={() => handleSaveAndClose('active')}>
+              <NoteModalIcon
+                disabled={isNoteEmpty}
+                onClick={() => handleSaveAndClose('active')}
+              >
                 <LucideInbox size={20} />
               </NoteModalIcon>
             )}
             {note.category !== 'archive' && (
-              <NoteModalIcon onClick={() => handleSaveAndClose('archive')}>
+              <NoteModalIcon
+                disabled={isNoteEmpty}
+                onClick={() => handleSaveAndClose('archive')}
+              >
                 <Archive size={20} />
               </NoteModalIcon>
             )}
             {note.category !== 'trash' && (
-              <NoteModalIcon onClick={() => handleSaveAndClose('trash')}>
+              <NoteModalIcon
+                disabled={isNoteEmpty}
+                onClick={() => handleSaveAndClose('trash')}
+              >
                 <Trash size={20} />
               </NoteModalIcon>
             )}
