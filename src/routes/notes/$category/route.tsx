@@ -1,9 +1,7 @@
 import { NotesApp } from '@/components/notes-app.tsx';
 import { getFetchNotesQuery } from '@/query/fetch-notes-query.ts';
-import {
-  NoteCategory,
-  isValidNoteCategory,
-} from '@/utils/note-categoty-params.ts';
+import { NoteCategory } from '@/types/note-category.ts';
+import { isValidNoteCategory } from '@/utils/note-categoty-params.ts';
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
 const NotesRoute = () => {

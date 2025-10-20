@@ -1,5 +1,5 @@
 import { fetchNotes } from '@/data/fetch-notes.ts';
-import { NoteCategory } from '@/utils/note-categoty-params.ts';
+import { NoteCategory } from '@/types/note-category.ts';
 import { queryOptions } from '@tanstack/react-query';
 
 export const getFetchNotesQueryKey = (category: NoteCategory) => [
