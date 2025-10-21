@@ -37,9 +37,8 @@ export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
           <nav>
             <ul>
               {tabs.map((tab) => (
-                <li>
+                <li key={tab.category}>
                   <Link
-                    key={tab.category}
                     to="/notes/$category"
                     params={{ category: tab.category }}
                     className="flex items-center gap-3 rounded-md px-3 py-2 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"

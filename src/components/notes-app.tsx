@@ -1,4 +1,3 @@
-import { AddNoteCard } from '@/components/card/add-note-card.tsx';
 import { NoteCard } from '@/components/card/note-card.tsx';
 import { useGetNumberOfNotesPerRow } from '@/hooks/use-get-number-of-notes-per-row.ts';
 import { Route } from '@/routes/notes/$category/route.tsx';
@@ -16,16 +15,6 @@ export const NotesApp = () => {
 
   return (
     <div className="p-4 md:p-8">
-      <div className="mb-8 flex">
-        <AddNoteCard
-          onClick={() =>
-            navigate({
-              to: '/notes/$category/$id',
-              params: { category: params.category, id: 'new' },
-            })
-          }
-        />
-      </div>
       <div className="flex flex-row items-start justify-center gap-4">
         {masonryColumns.map((column, colIndex) => (
           <div key={colIndex} className="flex w-full flex-col gap-4">
