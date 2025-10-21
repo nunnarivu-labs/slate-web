@@ -1,7 +1,11 @@
+// 1. IMPORT THE LAYOUT
+import { AppLayout } from '@/components/layout/app-layout.tsx';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import {
   HeadContent,
+  Outlet,
+  // 2. IMPORT THE OUTLET
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router';
@@ -14,6 +18,7 @@ interface MyRouterContext {
   queryClient: QueryClient;
 }
 
+// Your RootDocument remains completely unchanged.
 const RootDocument = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
@@ -42,6 +47,7 @@ const RootDocument = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  // Your head and links options remain unchanged.
   head: () => ({
     meta: [
       {
@@ -63,5 +69,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
 
+  // Your shellComponent remains unchanged.
   shellComponent: RootDocument,
+
+  // 3. ADD THE COMPONENT PROPERTY
+  // This component will be rendered *inside* your RootDocument's {children}.
+  component: () => (
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
+  ),
 });

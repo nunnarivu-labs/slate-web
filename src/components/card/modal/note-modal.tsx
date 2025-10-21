@@ -5,13 +5,7 @@ import { Route } from '@/routes/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate } from '@tanstack/react-router';
-import {
-  Archive,
-  LucideInbox,
-  ToggleLeft,
-  ToggleRight,
-  Trash,
-} from 'lucide-react';
+import { Archive, Home, ToggleLeft, ToggleRight, Trash } from 'lucide-react';
 import {
   ChangeEvent,
   useEffect,
@@ -148,7 +142,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
                 onClick={() => handleSaveAndClose('active')}
                 tooltip="Active"
               >
-                <LucideInbox size={20} />
+                <Home size={20} />
               </NoteModalIcon>
             )}
             {note.category !== 'archive' && (
