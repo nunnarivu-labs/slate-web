@@ -20,10 +20,10 @@ export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   const isSmallScreen = width <= 576;
 
   useEffect(() => {
-    if (isSmallScreen && isOpen) {
+    if (isSmallScreen) {
       onToggle(false);
     }
-  }, [isSmallScreen, isOpen]);
+  }, [isSmallScreen]);
 
   return (
     <aside
