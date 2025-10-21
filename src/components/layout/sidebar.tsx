@@ -1,12 +1,10 @@
-import { useWindowSize } from '@/hooks/use-window-size.ts';
 import { NoteCategory } from '@/types/note-category.ts';
 import { Link } from '@tanstack/react-router';
 import { Archive, Home, Trash2 } from 'lucide-react';
-import { JSX, useEffect } from 'react';
+import { JSX } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
-  onToggle: (isOpen: boolean) => void;
 }
 
 const tabs: { name: string; category: NoteCategory; Icon: JSX.Element }[] = [
@@ -15,19 +13,10 @@ const tabs: { name: string; category: NoteCategory; Icon: JSX.Element }[] = [
   { name: 'Trash', category: 'trash', Icon: <Trash2 size={20} /> },
 ];
 
-export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
-  const width = useWindowSize();
-  const isSmallScreen = width <= 576;
-
-  useEffect(() => {
-    if (isSmallScreen) {
-      onToggle(false);
-    }
-  }, [isSmallScreen]);
-
+export const Sidebar = ({ isOpen }: SidebarProps) => {
   return (
     <aside
-      className={`flex-shrink-0 overflow-hidden bg-zinc-100 transition-all duration-300 ease-in-out dark:bg-zinc-900 ${isOpen ? 'w-64 p-4' : 'w-0 p-0'} `}
+      className={`h-full flex-shrink-0 overflow-hidden bg-zinc-100 transition-all duration-300 ease-in-out dark:bg-zinc-900 ${isOpen ? 'w-64 p-4' : 'w-0 p-0'} fixed z-20 md:relative ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
     >
       {isOpen && (
         <div className="w-56">

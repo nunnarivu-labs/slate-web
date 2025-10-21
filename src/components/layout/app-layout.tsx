@@ -10,7 +10,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const params = useParams({ from: '/notes/$category' });
   const navigate = useNavigate();
@@ -20,11 +20,14 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-zinc-950">
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onToggle={(isOpen) => setIsSidebarOpen(isOpen)}
-      />
+    <div className="relative flex h-screen bg-white dark:bg-zinc-950">
+      <Sidebar isOpen={isSidebarOpen} />
+      {isSidebarOpen && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 z-10 bg-black/50 md:hidden"
+        />
+      )}
       <div className="flex min-w-0 flex-grow flex-col">
         <header className="flex flex-shrink-0 border-zinc-200 p-4 dark:border-zinc-800">
           <button
@@ -32,7 +35,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             className="mr-2 rounded-md p-2 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
             title="Toggle Menu"
           >
-            <Menu size={24} />
+            <Menu size={25} />
           </button>
           <AddNoteCard
             onClick={() =>
