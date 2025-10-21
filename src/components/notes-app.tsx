@@ -16,7 +16,7 @@ export const NotesApp = () => {
 
   return (
     <div className="p-4 md:p-8">
-      <header className="mb-8 flex">
+      <div className="mb-8 flex">
         <AddNoteCard
           onClick={() =>
             navigate({
@@ -25,8 +25,8 @@ export const NotesApp = () => {
             })
           }
         />
-      </header>
-      <main className="flex flex-row items-start justify-center gap-4">
+      </div>
+      <div className="flex flex-row items-start justify-center gap-4">
         {masonryColumns.map((column, colIndex) => (
           <div key={colIndex} className="flex w-full flex-col gap-4">
             {column.map((note) => (
@@ -43,7 +43,7 @@ export const NotesApp = () => {
             ))}
           </div>
         ))}
-      </main>
+      </div>
     </div>
   );
 };
