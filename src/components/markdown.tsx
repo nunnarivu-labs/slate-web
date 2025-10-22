@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const markdownComponents = {
   p: ({ node, ...props }: any) => {
@@ -32,7 +33,12 @@ const markdownComponents = {
 export const Markdown = ({ content }: { content: string }) => {
   return (
     <div style={{ whiteSpace: 'pre-wrap' }}>
-      <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
+      <ReactMarkdown
+        components={markdownComponents}
+        remarkPlugins={[remarkGfm]}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 };
