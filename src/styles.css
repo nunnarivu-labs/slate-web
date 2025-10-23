@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@import '@mdxeditor/editor/style.css';
+
+@plugin '@tailwindcss/typography';
 
 body {
   @apply m-0;
@@ -12,4 +15,14 @@ body {
 code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose {
+    color: var(--baseTextContrast);
+  }
+
+  .prose li::marker {
+    color: var(--baseTextContrast);
+  }
 }

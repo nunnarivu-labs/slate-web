@@ -1,9 +1,20 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { Markdown } from '@/components/markdown.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
+import { useTheme } from '@/hooks/use-theme.ts';
 import { Route } from '@/routes/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
+import {
+  BoldItalicUnderlineToggles,
+  ListsToggle,
+  MDXEditor,
+  MDXEditorMethods,
+  UndoRedo,
+  listsPlugin,
+  markdownShortcutPlugin,
+  toolbarPlugin,
+} from '@mdxeditor/editor';
 import { useNavigate } from '@tanstack/react-router';
 import { Archive, Home, ToggleLeft, ToggleRight, Trash } from 'lucide-react';
 import {
@@ -25,6 +36,8 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const saveNote = useSaveNote();
 
+  const theme = useTheme();
+
   const [note, setNote] = useState<Note>(
     currentNote
       ? { ...currentNote }
@@ -42,16 +55,12 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const isNoteEmpty = !note.title && !note.content;
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const mdxEditorMethodsRef = useRef<MDXEditorMethods>(null);
   const isDirtyRef = useRef(false);
 
-  const positionCursor = useEffectEvent(() => {
-    const textarea = textareaRef.current;
-
-    if (!textarea || !note.content) return;
-
-    textarea.setSelectionRange(note.content.length, note.content.length);
-  });
+  const positionCursor = useEffectEvent(() =>
+    mdxEditorMethodsRef?.current?.focus(),
+  );
 
   useEffect(() => {
     if (!previewMode) {
@@ -76,8 +85,12 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   }, []);
 
   const handleSaveAndClose = async (action: NoteSaveActionType) => {
-    if (action !== 'save' || (action === 'save' && isDirtyRef.current)) {
-      await saveNote({ note, action });
+    if (
+      (action !== 'save' || (action === 'save' && isDirtyRef.current)) &&
+      mdxEditorMethodsRef.current
+    ) {
+      const md = mdxEditorMethodsRef.current.getMarkdown();
+      await saveNote({ note: { ...note, content: md }, action });
     }
 
     await navigate({
@@ -86,12 +99,12 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     });
   };
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setNote((prev) => ({ ...prev, [name]: value }));
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNote((prev) => ({ ...prev, title: e.target.value }));
+    isDirtyRef.current = true;
+  };
 
+  const handleContentChange = () => {
     isDirtyRef.current = true;
   };
 
@@ -111,10 +124,9 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
       >
         <div className="flex min-h-0 flex-grow flex-col p-4">
           <input
-            name="title"
             type="text"
             value={note.title}
-            onChange={handleChange}
+            onChange={handleTitleChange}
             placeholder="Title"
             className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
           />
@@ -123,15 +135,30 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               <Markdown content={note.content} />
             </div>
           ) : (
-            <textarea
-              autoFocus
-              ref={textareaRef}
-              name="content"
-              value={note.content}
-              onChange={handleChange}
-              placeholder="Take a note..."
-              className="w-full flex-grow resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
-            />
+            <>
+              <MDXEditor
+                ref={mdxEditorMethodsRef}
+                markdown={note.content}
+                onChange={handleContentChange}
+                className={`${theme === 'dark' ? 'dark-theme dark-editor' : ''} grow overflow-y-auto`}
+                contentEditableClassName={`prose ${theme === 'dark' ? 'dark dark-theme dark-editor' : ''}`}
+                plugins={[
+                  listsPlugin(),
+                  toolbarPlugin({
+                    toolbarClassName: 'my-classname',
+                    toolbarContents: () => (
+                      <>
+                        <UndoRedo />
+                        <BoldItalicUnderlineToggles />
+                        <ListsToggle />
+                      </>
+                    ),
+                  }),
+                  markdownShortcutPlugin(),
+                ]}
+                placeholder="Take a note..."
+              />
+            </>
           )}
         </div>
         <div className="mt-2 flex items-center justify-between p-2">
