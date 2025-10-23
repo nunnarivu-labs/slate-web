@@ -1,5 +1,4 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
-import { Markdown } from '@/components/markdown.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
 import { Route } from '@/routes/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
@@ -118,21 +117,15 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
             placeholder="Title"
             className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
           />
-          {previewMode ? (
-            <div className="flex-grow overflow-y-auto">
-              <Markdown content={note.content} />
-            </div>
-          ) : (
-            <textarea
-              autoFocus
-              ref={textareaRef}
-              name="content"
-              value={note.content}
-              onChange={handleChange}
-              placeholder="Take a note..."
-              className="w-full flex-grow resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
-            />
-          )}
+          <textarea
+            autoFocus
+            ref={textareaRef}
+            name="content"
+            value={note.content}
+            onChange={handleChange}
+            placeholder="Take a note..."
+            className="w-full flex-grow resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
+          />
         </div>
         <div className="mt-2 flex items-center justify-between p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
