@@ -16,10 +16,18 @@ code {
 
 .w-md-editor {
   box-shadow: none !important;
+  background-color: inherit !important;
 }
 
 .w-md-editor-toolbar {
   border-bottom: none !important;
   padding: 0 !important;
   margin-bottom: 1rem;
+  background-color: inherit !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wmde-markdown {
+    background-color: inherit;
+  }
 }
