@@ -18,7 +18,11 @@ code {
 }
 
 @media (prefers-color-scheme: dark) {
-  .prose {
+  .prose p {
+    margin: 0;
+  }
+
+  .prose strong {
     color: var(--baseTextContrast);
   }
 

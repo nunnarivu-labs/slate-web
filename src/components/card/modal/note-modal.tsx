@@ -1,29 +1,13 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
-import { Markdown } from '@/components/markdown.tsx';
+import { MarkdownEditor } from '@/components/markdown-editor.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
-import { useTheme } from '@/hooks/use-theme.ts';
 import { Route } from '@/routes/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
-import {
-  BoldItalicUnderlineToggles,
-  ListsToggle,
-  MDXEditor,
-  MDXEditorMethods,
-  UndoRedo,
-  listsPlugin,
-  markdownShortcutPlugin,
-  toolbarPlugin,
-} from '@mdxeditor/editor';
+import { MDXEditorMethods } from '@mdxeditor/editor';
 import { useNavigate } from '@tanstack/react-router';
-import { Archive, Home, ToggleLeft, ToggleRight, Trash } from 'lucide-react';
-import {
-  ChangeEvent,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from 'react';
+import { Archive, Home, Trash } from 'lucide-react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface NoteModalProps {
@@ -35,8 +19,6 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
   const params = Route.useParams();
 
   const saveNote = useSaveNote();
-
-  const theme = useTheme();
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -51,22 +33,12 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         },
   );
 
-  const [previewMode, setPreviewMode] = useState(false);
-
   const isNoteEmpty = !note.title && !note.content;
 
   const mdxEditorMethodsRef = useRef<MDXEditorMethods>(null);
   const isDirtyRef = useRef(false);
 
-  const positionCursor = useEffectEvent(() =>
-    mdxEditorMethodsRef?.current?.focus(),
-  );
-
-  useEffect(() => {
-    if (!previewMode) {
-      positionCursor();
-    }
-  }, [previewMode]);
+  useEffect(() => mdxEditorMethodsRef?.current?.focus(), []);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
@@ -104,7 +76,8 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     isDirtyRef.current = true;
   };
 
-  const handleContentChange = () => {
+  const handleContentChange = (md: string) => {
+    setNote((prev) => ({ ...prev, content: md }));
     isDirtyRef.current = true;
   };
 
@@ -130,36 +103,13 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
             placeholder="Title"
             className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
           />
-          {previewMode ? (
-            <div className="flex-grow overflow-y-auto">
-              <Markdown content={note.content} />
-            </div>
-          ) : (
-            <>
-              <MDXEditor
-                ref={mdxEditorMethodsRef}
-                markdown={note.content}
-                onChange={handleContentChange}
-                className={`${theme === 'dark' ? 'dark-theme dark-editor' : ''} grow overflow-y-auto`}
-                contentEditableClassName={`prose ${theme === 'dark' ? 'dark dark-theme dark-editor' : ''}`}
-                plugins={[
-                  listsPlugin(),
-                  toolbarPlugin({
-                    toolbarClassName: 'my-classname',
-                    toolbarContents: () => (
-                      <>
-                        <UndoRedo />
-                        <BoldItalicUnderlineToggles />
-                        <ListsToggle />
-                      </>
-                    ),
-                  }),
-                  markdownShortcutPlugin(),
-                ]}
-                placeholder="Take a note..."
-              />
-            </>
-          )}
+          <div className="grow overflow-y-auto">
+            <MarkdownEditor
+              ref={mdxEditorMethodsRef}
+              md={note.content}
+              onChange={handleContentChange}
+            />
+          </div>
         </div>
         <div className="mt-2 flex items-center justify-between p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
@@ -190,16 +140,6 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
                 <Trash size={20} />
               </NoteModalIcon>
             )}
-            <NoteModalIcon
-              onClick={() => setPreviewMode((prev) => !prev)}
-              tooltip="Preview Mode"
-            >
-              {previewMode ? (
-                <ToggleRight size={20} className="text-green-600" />
-              ) : (
-                <ToggleLeft size={20} />
-              )}
-            </NoteModalIcon>
           </div>
           <button
             onClick={() => handleSaveAndClose('save')}
