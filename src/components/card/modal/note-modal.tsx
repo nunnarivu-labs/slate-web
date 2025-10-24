@@ -33,7 +33,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         },
   );
 
-  const [previewMode, setPreviewMode] = useState(!!note.content);
+  const [previewMode, setPreviewMode] = useState(false);
 
   const isNoteEmpty = !note.title && !note.content;
 
@@ -102,7 +102,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
           />
           {previewMode ? (
             <button
-              className="w-full grow cursor-pointer resize-none overflow-y-auto text-left"
+              className="w-full resize-none overflow-y-auto text-left"
               onClick={handlePreviewModeToggle}
             >
               <MarkdownPreview md={note.content} />
