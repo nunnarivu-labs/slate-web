@@ -21,7 +21,7 @@ export const NotesApp = () => {
           }
         />
       </div>
-      <div className="flex flex-wrap items-start gap-4">
+      <div className="flex flex-wrap items-start justify-center gap-4">
         {notes.map((note) => (
           <NoteCard
             key={note.id}
