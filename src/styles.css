@@ -28,6 +28,6 @@ code {
 
 @media (prefers-color-scheme: dark) {
   .wmde-markdown {
-    background-color: inherit;
+    background-color: inherit !important;
   }
 }
