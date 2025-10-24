@@ -93,13 +93,16 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         className="flex h-[80vh] w-full max-w-4xl scale-100 flex-col rounded-lg bg-white shadow-2xl dark:bg-zinc-800"
       >
         <div className="flex min-h-0 flex-grow flex-col p-4">
-          <input
-            type="text"
-            value={note.title}
-            onChange={handleTitleChange}
-            placeholder="Title"
-            className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
-          />
+          {(previewMode && note.title) ||
+            (!previewMode && (
+              <input
+                type="text"
+                value={note.title}
+                onChange={handleTitleChange}
+                placeholder="Title"
+                className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
+              />
+            ))}
           {previewMode ? (
             <button
               className="w-full resize-none overflow-y-auto text-left"
@@ -146,6 +149,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               </NoteModalIcon>
             )}
             <NoteModalIcon
+              disabled={isNoteEmpty}
               onClick={handlePreviewModeToggle}
               tooltip="Preview Mode"
             >
