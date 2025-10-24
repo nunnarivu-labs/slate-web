@@ -21,11 +21,10 @@
     "@tanstack/react-start": "^1.132.0",
     "@tanstack/router-plugin": "^1.132.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@uiw/react-md-editor": "^4.0.8",
     "lucide-react": "^0.544.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.0.6",
     "uuid": "^13.0.0",
     "vite-tsconfig-paths": "^5.1.4"
