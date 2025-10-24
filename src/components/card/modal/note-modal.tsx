@@ -7,7 +7,7 @@ import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate } from '@tanstack/react-router';
 import { Archive, Home, ToggleLeft, ToggleRight, Trash } from 'lucide-react';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface NoteModalProps {
@@ -39,13 +39,30 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
 
   const isDirtyRef = useRef(false);
 
-  useEffect(() => {
-    const handleKeyDown = async (event: KeyboardEvent) => {
+  const handleSaveAndClose = useCallback(
+    async (action: NoteSaveActionType) => {
+      if (action !== 'save' || (action === 'save' && isDirtyRef.current)) {
+        await saveNote({ note, action });
+      }
+
+      await navigate({
+        to: '/notes/$category',
+        params: { category: params.category },
+      });
+    },
+    [saveNote, note, navigate, params],
+  );
+
+  const handleKeyDown = useCallback(
+    async (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         await handleSaveAndClose('save');
       }
-    };
+    },
+    [handleSaveAndClose],
+  );
 
+  useEffect(() => {
     document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', handleKeyDown);
 
@@ -53,18 +70,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
       document.body.style.overflow = 'auto';
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
-
-  const handleSaveAndClose = async (action: NoteSaveActionType) => {
-    if (action !== 'save' || (action === 'save' && isDirtyRef.current)) {
-      await saveNote({ note, action });
-    }
-
-    await navigate({
-      to: '/notes/$category',
-      params: { category: params.category },
-    });
-  };
+  }, [handleKeyDown]);
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNote((prev) => ({ ...prev, title: e.target.value }));
