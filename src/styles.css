@@ -13,3 +13,13 @@ code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+.w-md-editor {
+  box-shadow: none !important;
+}
+
+.w-md-editor-toolbar {
+  border-bottom: none !important;
+  padding: 0 !important;
+  margin-bottom: 1rem;
+}

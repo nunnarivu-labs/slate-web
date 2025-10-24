@@ -1,18 +1,13 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
-import { Markdown } from '@/components/markdown.tsx';
+import { MarkdownEditor } from '@/components/markdown/markdown-editor.tsx';
+import { MarkdownPreview } from '@/components/markdown/markdown-preview.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
 import { Route } from '@/routes/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate } from '@tanstack/react-router';
 import { Archive, Home, ToggleLeft, ToggleRight, Trash } from 'lucide-react';
-import {
-  ChangeEvent,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface NoteModalProps {
@@ -38,26 +33,11 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
         },
   );
 
-  const [previewMode, setPreviewMode] = useState(false);
+  const [previewMode, setPreviewMode] = useState(!!note.content);
 
   const isNoteEmpty = !note.title && !note.content;
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isDirtyRef = useRef(false);
-
-  const positionCursor = useEffectEvent(() => {
-    const textarea = textareaRef.current;
-
-    if (!textarea || !note.content) return;
-
-    textarea.setSelectionRange(note.content.length, note.content.length);
-  });
-
-  useEffect(() => {
-    if (!previewMode) {
-      positionCursor();
-    }
-  }, [previewMode]);
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
@@ -86,14 +66,17 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
     });
   };
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setNote((prev) => ({ ...prev, [name]: value }));
-
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNote((prev) => ({ ...prev, title: e.target.value }));
     isDirtyRef.current = true;
   };
+
+  const handleContentChange = (md: string | undefined) => {
+    setNote((prev) => ({ ...prev, content: md ?? '' }));
+    isDirtyRef.current = true;
+  };
+
+  const handlePreviewModeToggle = () => setPreviewMode((prev) => !prev);
 
   return (
     <div
@@ -111,30 +94,29 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
       >
         <div className="flex min-h-0 flex-grow flex-col p-4">
           <input
-            name="title"
             type="text"
             value={note.title}
-            onChange={handleChange}
+            onChange={handleTitleChange}
             placeholder="Title"
             className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
           />
           {previewMode ? (
-            <div className="flex-grow overflow-y-auto">
-              <Markdown content={note.content} />
-            </div>
+            <button
+              className="w-full grow cursor-pointer resize-none overflow-y-auto text-left"
+              onClick={handlePreviewModeToggle}
+            >
+              <MarkdownPreview md={note.content} />
+            </button>
           ) : (
-            <textarea
-              autoFocus
-              ref={textareaRef}
-              name="content"
-              value={note.content}
-              onChange={handleChange}
+            <MarkdownEditor
+              md={note.content}
+              onChange={handleContentChange}
+              autofocusEnd
               placeholder="Take a note..."
-              className="w-full flex-grow resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
             />
           )}
         </div>
-        <div className="mt-2 flex items-center justify-between p-2">
+        <div className="flex items-center justify-between p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
             {note.category !== 'active' && (
               <NoteModalIcon
@@ -164,7 +146,7 @@ export const NoteModal = ({ note: currentNote }: NoteModalProps) => {
               </NoteModalIcon>
             )}
             <NoteModalIcon
-              onClick={() => setPreviewMode((prev) => !prev)}
+              onClick={handlePreviewModeToggle}
               tooltip="Preview Mode"
             >
               {previewMode ? (

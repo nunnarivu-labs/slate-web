@@ -6,7 +6,6 @@ const EditNoteRoute = () => <NoteModal note={Route.useLoaderData()} />;
 
 export const Route = createFileRoute('/notes/$category/$id')({
   component: EditNoteRoute,
-  ssr: false,
   params: {
     parse: (rawParams) => {
       return { id: rawParams.id as 'new' | (string & {}) };
