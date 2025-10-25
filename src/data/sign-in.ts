@@ -7,3 +7,8 @@ export const isEmailAndPasswordValid = createServerFn()
       process.env.USER_EMAIL === data.email &&
       process.env.USER_PASSWORD === data.password,
   );
+
+export const fetchUserDetailFromEnv = createServerFn().handler(() => ({
+  email: process.env.USER_EMAIL ?? '',
+  password: process.env.USER_PASSWORD ?? '',
+}));
