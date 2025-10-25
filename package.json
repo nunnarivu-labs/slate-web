@@ -4,12 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 5173 --host",
+    "convex": "npx convex dev",
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
     "prettier": "npx prettier . --write"
   },
   "dependencies": {
+    "@convex-dev/react-query": "^0.0.0-alpha.11",
     "@mdxeditor/editor": "^3.47.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
@@ -22,6 +24,7 @@
     "@tanstack/router-plugin": "^1.132.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@uiw/react-md-editor": "^4.0.8",
+    "convex": "^1.28.0",
     "lucide-react": "^0.544.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
