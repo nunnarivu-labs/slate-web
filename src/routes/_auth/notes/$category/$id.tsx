@@ -3,18 +3,20 @@ import { docToNote } from '@/utils/doc-note-converter.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
+import { api } from '../../../../../convex/_generated/api';
+import { Id } from '../../../../../convex/_generated/dataModel';
 
 const EditNoteRoute = () => <NoteModal note={Route.useLoaderData()} />;
 
 export const Route = createFileRoute('/_auth/notes/$category/$id')({
   component: EditNoteRoute,
+
   params: {
     parse: (rawParams) => {
       return { id: rawParams.id as 'new' | (string & {}) };
     },
   },
+
   loader: async ({ context: { queryClient }, params: { category, id } }) => {
     if (id === 'new') return null;
 
