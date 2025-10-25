@@ -11,6 +11,7 @@
     "prettier": "npx prettier . --write"
   },
   "dependencies": {
+    "@clerk/tanstack-react-start": "^0.26.4",
     "@convex-dev/react-query": "^0.0.0-alpha.11",
     "@mdxeditor/editor": "^3.47.0",
     "@tailwindcss/vite": "^4.0.6",
@@ -28,9 +29,11 @@
     "lucide-react": "^0.544.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "srvx": "0.8.15",
     "tailwindcss": "^4.0.6",
     "uuid": "^13.0.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@netlify/vite-plugin-tanstack-start": "^1.1.4",
@@ -47,5 +50,10 @@
     "vite": "^7.1.7",
     "vitest": "^3.0.5",
     "web-vitals": "^5.1.0"
+  },
+  "overrides": {
+    "@clerk/tanstack-react-start": {
+      "srvx": "0.8.15"
+    }
   }
 }
