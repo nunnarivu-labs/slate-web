@@ -5,7 +5,7 @@ type AddNoteCardProps = {
 };
 
 export const AddNoteCard = ({ onClick }: AddNoteCardProps) => {
-  const params = useParams({ from: '/notes/$category' });
+  const params = useParams({ from: '/_auth/notes/$category' });
 
   return (
     <button

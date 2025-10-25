@@ -2,7 +2,7 @@ import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { MarkdownEditor } from '@/components/markdown/markdown-editor.tsx';
 import { MarkdownPreview } from '@/components/markdown/markdown-preview.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
-import { Route } from '@/routes/notes/$category/$id.tsx';
+import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { useNavigate } from '@tanstack/react-router';

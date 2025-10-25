@@ -4,7 +4,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 
 const EditNoteRoute = () => <NoteModal note={Route.useLoaderData()} />;
 
-export const Route = createFileRoute('/notes/$category/$id')({
+export const Route = createFileRoute('/_auth/notes/$category/$id')({
   component: EditNoteRoute,
   params: {
     parse: (rawParams) => {

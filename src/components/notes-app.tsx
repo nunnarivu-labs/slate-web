@@ -1,11 +1,11 @@
 import { AddNoteCard } from '@/components/card/add-note-card.tsx';
 import { NoteCard } from '@/components/card/note-card.tsx';
-import { Route } from '@/routes/notes/$category/route.tsx';
+import { Route } from '@/routes/_auth/notes/$category/route.tsx';
 import { useNavigate, useParams } from '@tanstack/react-router';
 
 export const NotesApp = () => {
   const navigate = useNavigate();
-  const params = useParams({ from: '/notes/$category' });
+  const params = useParams({ from: '/_auth/notes/$category' });
 
   const notes = Route.useLoaderData();
 

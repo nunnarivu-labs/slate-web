@@ -9,67 +9,113 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
+import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as NotesIndexRouteImport } from './routes/notes/index'
-import { Route as NotesCategoryRouteRouteImport } from './routes/notes/$category/route'
-import { Route as NotesCategoryIdRouteImport } from './routes/notes/$category/$id'
+import { Route as AuthNotesIndexRouteImport } from './routes/_auth/notes/index'
+import { Route as AuthNotesCategoryRouteRouteImport } from './routes/_auth/notes/$category/route'
+import { Route as AuthNotesCategoryIdRouteImport } from './routes/_auth/notes/$category/$id'
 
+const UnauthorizedRoute = UnauthorizedRouteImport.update({
+  id: '/unauthorized',
+  path: '/unauthorized',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NotesIndexRoute = NotesIndexRouteImport.update({
+const AuthNotesIndexRoute = AuthNotesIndexRouteImport.update({
   id: '/notes/',
   path: '/notes/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthRouteRoute,
 } as any)
-const NotesCategoryRouteRoute = NotesCategoryRouteRouteImport.update({
+const AuthNotesCategoryRouteRoute = AuthNotesCategoryRouteRouteImport.update({
   id: '/notes/$category',
   path: '/notes/$category',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthRouteRoute,
 } as any)
-const NotesCategoryIdRoute = NotesCategoryIdRouteImport.update({
+const AuthNotesCategoryIdRoute = AuthNotesCategoryIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => NotesCategoryRouteRoute,
+  getParentRoute: () => AuthNotesCategoryRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/notes/$category': typeof NotesCategoryRouteRouteWithChildren
-  '/notes': typeof NotesIndexRoute
-  '/notes/$category/$id': typeof NotesCategoryIdRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/notes/$category': typeof AuthNotesCategoryRouteRouteWithChildren
+  '/notes': typeof AuthNotesIndexRoute
+  '/notes/$category/$id': typeof AuthNotesCategoryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/notes/$category': typeof NotesCategoryRouteRouteWithChildren
-  '/notes': typeof NotesIndexRoute
-  '/notes/$category/$id': typeof NotesCategoryIdRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/notes/$category': typeof AuthNotesCategoryRouteRouteWithChildren
+  '/notes': typeof AuthNotesIndexRoute
+  '/notes/$category/$id': typeof AuthNotesCategoryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/notes/$category': typeof NotesCategoryRouteRouteWithChildren
-  '/notes/': typeof NotesIndexRoute
-  '/notes/$category/$id': typeof NotesCategoryIdRoute
+  '/_auth': typeof AuthRouteRouteWithChildren
+  '/unauthorized': typeof UnauthorizedRoute
+  '/_auth/notes/$category': typeof AuthNotesCategoryRouteRouteWithChildren
+  '/_auth/notes/': typeof AuthNotesIndexRoute
+  '/_auth/notes/$category/$id': typeof AuthNotesCategoryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/notes/$category' | '/notes' | '/notes/$category/$id'
+  fullPaths:
+    | '/'
+    | '/unauthorized'
+    | '/notes/$category'
+    | '/notes'
+    | '/notes/$category/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/notes/$category' | '/notes' | '/notes/$category/$id'
-  id: '__root__' | '/' | '/notes/$category' | '/notes/' | '/notes/$category/$id'
+  to:
+    | '/'
+    | '/unauthorized'
+    | '/notes/$category'
+    | '/notes'
+    | '/notes/$category/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_auth'
+    | '/unauthorized'
+    | '/_auth/notes/$category'
+    | '/_auth/notes/'
+    | '/_auth/notes/$category/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  NotesCategoryRouteRoute: typeof NotesCategoryRouteRouteWithChildren
-  NotesIndexRoute: typeof NotesIndexRoute
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  UnauthorizedRoute: typeof UnauthorizedRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unauthorized': {
+      id: '/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -77,45 +123,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/notes/': {
-      id: '/notes/'
+    '/_auth/notes/': {
+      id: '/_auth/notes/'
       path: '/notes'
       fullPath: '/notes'
-      preLoaderRoute: typeof NotesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthNotesIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
-    '/notes/$category': {
-      id: '/notes/$category'
+    '/_auth/notes/$category': {
+      id: '/_auth/notes/$category'
       path: '/notes/$category'
       fullPath: '/notes/$category'
-      preLoaderRoute: typeof NotesCategoryRouteRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthNotesCategoryRouteRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
-    '/notes/$category/$id': {
-      id: '/notes/$category/$id'
+    '/_auth/notes/$category/$id': {
+      id: '/_auth/notes/$category/$id'
       path: '/$id'
       fullPath: '/notes/$category/$id'
-      preLoaderRoute: typeof NotesCategoryIdRouteImport
-      parentRoute: typeof NotesCategoryRouteRoute
+      preLoaderRoute: typeof AuthNotesCategoryIdRouteImport
+      parentRoute: typeof AuthNotesCategoryRouteRoute
     }
   }
 }
 
-interface NotesCategoryRouteRouteChildren {
-  NotesCategoryIdRoute: typeof NotesCategoryIdRoute
+interface AuthNotesCategoryRouteRouteChildren {
+  AuthNotesCategoryIdRoute: typeof AuthNotesCategoryIdRoute
 }
 
-const NotesCategoryRouteRouteChildren: NotesCategoryRouteRouteChildren = {
-  NotesCategoryIdRoute: NotesCategoryIdRoute,
+const AuthNotesCategoryRouteRouteChildren: AuthNotesCategoryRouteRouteChildren =
+  {
+    AuthNotesCategoryIdRoute: AuthNotesCategoryIdRoute,
+  }
+
+const AuthNotesCategoryRouteRouteWithChildren =
+  AuthNotesCategoryRouteRoute._addFileChildren(
+    AuthNotesCategoryRouteRouteChildren,
+  )
+
+interface AuthRouteRouteChildren {
+  AuthNotesCategoryRouteRoute: typeof AuthNotesCategoryRouteRouteWithChildren
+  AuthNotesIndexRoute: typeof AuthNotesIndexRoute
 }
 
-const NotesCategoryRouteRouteWithChildren =
-  NotesCategoryRouteRoute._addFileChildren(NotesCategoryRouteRouteChildren)
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthNotesCategoryRouteRoute: AuthNotesCategoryRouteRouteWithChildren,
+  AuthNotesIndexRoute: AuthNotesIndexRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  NotesCategoryRouteRoute: NotesCategoryRouteRouteWithChildren,
-  NotesIndexRoute: NotesIndexRoute,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
+  UnauthorizedRoute: UnauthorizedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

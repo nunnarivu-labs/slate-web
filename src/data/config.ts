@@ -8,3 +8,5 @@ export const readNotes = async (): Promise<Note[]> =>
 
 export const writeNotes = async (notes: Note[]) =>
   await fs.promises.writeFile(FILE_PATH, JSON.stringify(notes), 'utf-8');
+
+export const LOCAL_STORAGE_USER_KEY = 'slate.user';
