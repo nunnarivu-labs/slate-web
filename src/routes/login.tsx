@@ -1,14 +1,21 @@
 import { authFn } from '@/data/auth.ts';
 import { useSignIn } from '@clerk/clerk-react';
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  redirect,
+  useNavigate,
+  useRouter,
+} from '@tanstack/react-router';
 import { KeyRound, LogIn } from 'lucide-react';
 import { FormEvent, useCallback, useState } from 'react';
+import { z } from 'zod';
 
 const LoginPage = () => {
   const { signIn, setActive } = useSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const router = useRouter();
   const navigate = useNavigate();
 
   const handleLogin = useCallback(
@@ -18,19 +25,18 @@ const LoginPage = () => {
       try {
         const result = await signIn?.create({ identifier: email, password });
 
-        if (!result) throw new Error('Error during signing in');
+        if (result) {
+          const status = result.status;
 
-        const status = result.status;
-
-        if (status === 'complete') {
-          await setActive?.({ session: result.createdSessionId });
-          await navigate({ to: '/notes' });
+          if (status === 'complete') {
+            await setActive?.({ session: result.createdSessionId });
+            await router.invalidate();
+            return;
+          }
         }
-      } catch {
+      } finally {
         await navigate({ to: '/' });
       }
-
-      await navigate({ to: '/' });
     },
     [email, password, signIn, setActive, navigate],
   );
@@ -113,12 +119,16 @@ const LoginPage = () => {
 export const Route = createFileRoute('/login')({
   component: LoginPage,
 
-  beforeLoad: async () => {
+  validateSearch: z.object({
+    redirect: z.string().optional(),
+  }),
+
+  beforeLoad: async ({ search }) => {
     const { isAuthenticated } = await authFn();
 
     if (isAuthenticated)
       throw redirect({
-        to: '/notes/$category',
+        to: search.redirect ?? '/notes/$category',
         params: { category: 'active' },
       });
   },
