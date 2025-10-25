@@ -9,7 +9,7 @@ import { docToNote } from '@/utils/doc-note-converter.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { Navigate, useNavigate, useParams } from '@tanstack/react-router';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
@@ -17,6 +17,8 @@ import { Id } from '../../../../convex/_generated/dataModel';
 export const NoteModalContainer = () => {
   const params = useParams({ from: '/_auth/notes/$category/$id' });
   const navigate = useNavigate();
+
+  const [isSaving, setIsSaving] = useState(false);
 
   const noteModalRef = useRef<NoteModalRef>(null);
 
@@ -30,6 +32,8 @@ export const NoteModalContainer = () => {
 
   const handleSaveAndClose = useCallback(
     async (action: NoteSaveActionType) => {
+      if (isSaving) return;
+
       const modalRef = noteModalRef.current;
 
       if (!modalRef) return;
@@ -39,6 +43,7 @@ export const NoteModalContainer = () => {
       if (note === null) return;
 
       if (action !== 'save' || (action === 'save' && isDirty)) {
+        setIsSaving(true);
         await saveNote({ note, action });
       }
 
@@ -47,7 +52,7 @@ export const NoteModalContainer = () => {
         params: { category: params.category },
       });
     },
-    [saveNote, navigate, params],
+    [saveNote, navigate, params, isSaving],
   );
 
   return (

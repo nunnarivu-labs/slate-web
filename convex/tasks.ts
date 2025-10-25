@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 
-import { query } from './_generated/server';
+import { mutation, query } from './_generated/server';
+import { noteSchema } from './schema.ts';
 
 export const fetchNotes = query({
   args: {
@@ -23,4 +24,25 @@ export const fetchNotes = query({
 export const fetchNote = query({
   args: { id: v.id('notes') },
   handler: async (ctx, args) => await ctx.db.get(args.id),
+});
+
+export const saveNote = mutation({
+  args: { ...noteSchema },
+  handler: async (ctx, args) => await ctx.db.insert('notes', args),
+});
+
+export const updateNote = mutation({
+  args: { ...noteSchema, id: v.id('notes') },
+  handler: async (ctx, args) =>
+    await ctx.db.replace(args.id, {
+      title: args.title,
+      content: args.content,
+      category: args.category,
+      updatedAt: args.updatedAt,
+    }),
+});
+
+export const deleteNote = mutation({
+  args: { id: v.id('notes') },
+  handler: async (ctx, args) => await ctx.db.delete(args.id),
 });
