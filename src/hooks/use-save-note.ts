@@ -2,7 +2,7 @@ import { deleteNoteEntry } from '@/data/delete-note-entry.ts';
 import { saveNote } from '@/data/save-note.ts';
 import { getFetchNoteByIdQueryKey } from '@/query/fetch-note-by-id-query.ts';
 import { getFetchNotesQueryKey } from '@/query/fetch-notes-query.ts';
-import { Route } from '@/routes/notes/$category/$id.tsx';
+import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { useRouter } from '@tanstack/react-router';

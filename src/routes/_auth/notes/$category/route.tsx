@@ -13,7 +13,7 @@ const NotesRoute = () => {
   );
 };
 
-export const Route = createFileRoute('/notes/$category')({
+export const Route = createFileRoute('/_auth/notes/$category')({
   params: {
     parse: (rawParams) => ({
       category: rawParams.category as NoteCategory,
