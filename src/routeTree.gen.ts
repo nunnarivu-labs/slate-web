@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,11 +16,6 @@ import { Route as AuthNotesIndexRouteImport } from './routes/_auth/notes/index'
 import { Route as AuthNotesCategoryRouteRouteImport } from './routes/_auth/notes/$category/route'
 import { Route as AuthNotesCategoryIdRouteImport } from './routes/_auth/notes/$category/$id'
 
-const UnauthorizedRoute = UnauthorizedRouteImport.update({
-  id: '/unauthorized',
-  path: '/unauthorized',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -55,7 +49,6 @@ const AuthNotesCategoryIdRoute = AuthNotesCategoryIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/unauthorized': typeof UnauthorizedRoute
   '/notes/$category': typeof AuthNotesCategoryRouteRouteWithChildren
   '/notes': typeof AuthNotesIndexRoute
   '/notes/$category/$id': typeof AuthNotesCategoryIdRoute
@@ -63,7 +56,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/unauthorized': typeof UnauthorizedRoute
   '/notes/$category': typeof AuthNotesCategoryRouteRouteWithChildren
   '/notes': typeof AuthNotesIndexRoute
   '/notes/$category/$id': typeof AuthNotesCategoryIdRoute
@@ -73,7 +65,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/unauthorized': typeof UnauthorizedRoute
   '/_auth/notes/$category': typeof AuthNotesCategoryRouteRouteWithChildren
   '/_auth/notes/': typeof AuthNotesIndexRoute
   '/_auth/notes/$category/$id': typeof AuthNotesCategoryIdRoute
@@ -83,24 +74,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
-    | '/unauthorized'
     | '/notes/$category'
     | '/notes'
     | '/notes/$category/$id'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/login'
-    | '/unauthorized'
-    | '/notes/$category'
-    | '/notes'
-    | '/notes/$category/$id'
+  to: '/' | '/login' | '/notes/$category' | '/notes' | '/notes/$category/$id'
   id:
     | '__root__'
     | '/'
     | '/_auth'
     | '/login'
-    | '/unauthorized'
     | '/_auth/notes/$category'
     | '/_auth/notes/'
     | '/_auth/notes/$category/$id'
@@ -110,18 +93,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
-  UnauthorizedRoute: typeof UnauthorizedRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/unauthorized': {
-      id: '/unauthorized'
-      path: '/unauthorized'
-      fullPath: '/unauthorized'
-      preLoaderRoute: typeof UnauthorizedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -199,7 +174,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   LoginRoute: LoginRoute,
-  UnauthorizedRoute: UnauthorizedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
