@@ -17,7 +17,6 @@ import { Id } from '../../../../convex/_generated/dataModel';
 
 export const NoteModalContainer = () => {
   const params = Route.useParams();
-  const { userId } = Route.useRouteContext();
   const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -27,7 +26,6 @@ export const NoteModalContainer = () => {
   const noteQuery = useQuery({
     ...convexQuery(api.tasks.fetchNote, {
       id: params.id as Id<'notes'>,
-      userId,
     }),
     enabled: params.id !== 'new',
     select: (data) => (data === null ? null : docToNote(data)),

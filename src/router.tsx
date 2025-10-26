@@ -29,7 +29,7 @@ export const getRouter = () => {
 
   const router = createRouter({
     routeTree,
-    context: { queryClient },
+    context: { queryClient, convexClient: convexQueryClient.convexClient },
     defaultPreload: 'intent',
     Wrap: (props: { children: React.ReactNode }) => {
       return (

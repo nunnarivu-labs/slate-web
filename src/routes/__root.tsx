@@ -1,6 +1,6 @@
 // 1. IMPORT THE LAYOUT
 import { AppLayout } from '@/components/layout/app-layout.tsx';
-import { ClerkProvider } from '@clerk/tanstack-react-start';
+import { ClerkProvider, useAuth } from '@clerk/tanstack-react-start';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import {
@@ -11,40 +11,47 @@ import {
   createRootRouteWithContext,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { ConvexReactClient } from 'convex/react';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';
 
 interface MyRouterContext {
   queryClient: QueryClient;
+  convexClient: ConvexReactClient;
 }
 
 // Your RootDocument remains completely unchanged.
 const RootDocument = ({ children }: { children: React.ReactNode }) => {
+  const context = Route.useRouteContext();
+
   return (
     <ClerkProvider>
-      <html lang="en">
-        <head>
-          <title />
-          <HeadContent />
-        </head>
-        <body className="min-h-screen bg-zinc-100 dark:bg-zinc-900">
-          {children}
-          <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              TanStackQueryDevtools,
-            ]}
-          />
-          <Scripts />
-        </body>
-      </html>
+      <ConvexProviderWithClerk client={context.convexClient} useAuth={useAuth}>
+        <html lang="en">
+          <head>
+            <title />
+            <HeadContent />
+          </head>
+          <body className="min-h-screen bg-zinc-100 dark:bg-zinc-900">
+            {children}
+            <TanStackDevtools
+              config={{
+                position: 'bottom-right',
+              }}
+              plugins={[
+                {
+                  name: 'Tanstack Router',
+                  render: <TanStackRouterDevtoolsPanel />,
+                },
+                TanStackQueryDevtools,
+              ]}
+            />
+            <Scripts />
+          </body>
+        </html>
+      </ConvexProviderWithClerk>
     </ClerkProvider>
   );
 };
