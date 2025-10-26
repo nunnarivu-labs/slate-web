@@ -12,10 +12,9 @@ import { api } from '../../convex/_generated/api';
 export const NotesApp = () => {
   const navigate = useNavigate();
   const params = Route.useParams();
-  const { userId } = Route.useRouteContext();
 
   const notesQuery = useQuery({
-    ...convexQuery(api.tasks.fetchNotes, { category: params.category, userId }),
+    ...convexQuery(api.tasks.fetchNotes, { category: params.category }),
     select: (data) => data.map(docToNote),
   });
 
