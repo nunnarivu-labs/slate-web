@@ -4,18 +4,20 @@ import {
 } from '@/components/card/modal/note-modal.tsx';
 import { Loader } from '@/components/loader.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
+import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { docToNote } from '@/utils/doc-note-converter.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
-import { Navigate, useNavigate, useParams } from '@tanstack/react-router';
+import { Navigate, useNavigate } from '@tanstack/react-router';
 import { useCallback, useRef, useState } from 'react';
 
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
 export const NoteModalContainer = () => {
-  const params = useParams({ from: '/_auth/notes/$category/$id' });
+  const params = Route.useParams();
+  const { userId } = Route.useRouteContext();
   const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -23,7 +25,10 @@ export const NoteModalContainer = () => {
   const noteModalRef = useRef<NoteModalRef>(null);
 
   const noteQuery = useQuery({
-    ...convexQuery(api.tasks.fetchNote, { id: params.id as Id<'notes'> }),
+    ...convexQuery(api.tasks.fetchNote, {
+      id: params.id as Id<'notes'>,
+      userId,
+    }),
     enabled: params.id !== 'new',
     select: (data) => (data === null ? null : docToNote(data)),
   });

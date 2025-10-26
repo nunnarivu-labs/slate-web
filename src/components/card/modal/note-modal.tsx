@@ -32,12 +32,14 @@ export const NoteModal = ({
   onClose,
 }: NoteModalProps) => {
   const params = Route.useParams();
+  const { userId } = Route.useRouteContext();
 
   const [note, setNote] = useState<Note>(
     currentNote
       ? { ...currentNote }
       : {
           id: uuid(),
+          userId,
           title: '',
           content: '',
           category: params.category,

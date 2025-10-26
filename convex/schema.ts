@@ -2,6 +2,7 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 export const noteSchema = {
+  userId: v.string(),
   category: v.union(
     v.literal('active'),
     v.literal('archive'),
@@ -13,7 +14,8 @@ export const noteSchema = {
 };
 
 export default defineSchema({
-  notes: defineTable(noteSchema).index('by_category_and_updated_at', [
+  notes: defineTable(noteSchema).index('by_user_id_category_and_updated_at', [
+    'userId',
     'category',
     'updatedAt',
   ]),

@@ -1,19 +1,21 @@
 import { AddNoteCard } from '@/components/card/add-note-card.tsx';
 import { NoteCard } from '@/components/card/note-card.tsx';
 import { Loader } from '@/components/loader.tsx';
+import { Route } from '@/routes/_auth/notes/$category/route.tsx';
 import { docToNote } from '@/utils/doc-note-converter.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 
 import { api } from '../../convex/_generated/api';
 
 export const NotesApp = () => {
   const navigate = useNavigate();
-  const params = useParams({ from: '/_auth/notes/$category' });
+  const params = Route.useParams();
+  const { userId } = Route.useRouteContext();
 
   const notesQuery = useQuery({
-    ...convexQuery(api.tasks.fetchNotes, { category: params.category }),
+    ...convexQuery(api.tasks.fetchNotes, { category: params.category, userId }),
     select: (data) => data.map(docToNote),
   });
 
