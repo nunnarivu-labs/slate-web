@@ -1,3 +1,4 @@
+import { Logout } from '@/components/layout/logout.tsx';
 import { NoteCategory } from '@/types/note-category.ts';
 import { Link } from '@tanstack/react-router';
 import { Archive, Home, Trash2 } from 'lucide-react';
@@ -5,6 +6,7 @@ import { JSX } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
+  onToggle: (toggle?: boolean) => void;
 }
 
 const tabs: { name: string; category: NoteCategory; Icon: JSX.Element }[] = [
@@ -13,13 +15,13 @@ const tabs: { name: string; category: NoteCategory; Icon: JSX.Element }[] = [
   { name: 'Trash', category: 'trash', Icon: <Trash2 size={20} /> },
 ];
 
-export const Sidebar = ({ isOpen }: SidebarProps) => {
-  return (
-    <aside
-      className={`h-full flex-shrink-0 overflow-hidden bg-zinc-100 transition-all duration-300 ease-in-out dark:bg-zinc-900 ${isOpen ? 'w-64 p-4' : 'w-0 p-0'} fixed z-20 md:relative ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
-    >
-      {isOpen && (
-        <div className="w-56">
+export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => (
+  <aside
+    className={`h-full flex-shrink-0 overflow-hidden bg-zinc-100 transition-all duration-300 ease-in-out dark:bg-zinc-900 ${isOpen ? 'w-64 p-4' : 'w-0 p-0'} fixed z-20 md:relative ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+  >
+    {isOpen && (
+      <div className="flex h-full w-56 flex-col justify-between">
+        <div>
           <h2 className="mb-6 text-xl font-bold text-zinc-800 dark:text-zinc-200">
             Slate
           </h2>
@@ -44,7 +46,8 @@ export const Sidebar = ({ isOpen }: SidebarProps) => {
             </ul>
           </nav>
         </div>
-      )}
-    </aside>
-  );
-};
+        <Logout onLogout={() => onToggle(false)} />
+      </div>
+    )}
+  </aside>
+);
