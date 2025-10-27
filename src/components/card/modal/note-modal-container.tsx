@@ -84,7 +84,9 @@ export const NoteModalContainer = () => {
             onClose={handleSaveAndClose}
           />
         )}
-        {params.id !== 'new' && noteQuery.isLoading && <Loader />}
+        {params.id !== 'new' && noteQuery.isLoading && (
+          <Loader text="Loading note" />
+        )}
         {params.id !== 'new' && noteQuery.isError && (
           <Navigate
             to="/notes/$category"

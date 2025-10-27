@@ -17,7 +17,7 @@ export const NotesApp = () => {
   );
 
   if (notesQuery.isFetching) {
-    return <Loader />;
+    return <Loader text={`Loading ${params.category} notes`} />;
   } else if (notesQuery.isSuccess) {
     const notes = notesQuery.data;
 
@@ -51,5 +51,5 @@ export const NotesApp = () => {
     );
   }
 
-  return null;
+  return <Loader />;
 };
