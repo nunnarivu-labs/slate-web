@@ -1,16 +1,40 @@
-import { GenericDataModel, GenericQueryCtx } from 'convex/server';
+import { docToNote } from '@/utils/doc-note-converter.ts';
 import { v } from 'convex/values';
 
-import { mutation, query } from './_generated/server';
-import { noteSchema } from './schema.ts';
+import { Id } from './_generated/dataModel';
+import { MutationCtx, QueryCtx, mutation, query } from './_generated/server';
+import { draftNoteSchema } from './schema.ts';
 
-const getUserId = async <T extends GenericDataModel>(
-  ctx: GenericQueryCtx<T>,
-) => {
+const getUser = async (ctx: MutationCtx | QueryCtx) => {
   const identity = await ctx.auth.getUserIdentity();
 
-  if (identity === null) throw new Error('User not authenticated');
-  return identity.subject;
+  if (!identity) throw new Error('User is not authenticated');
+
+  const user = await ctx.db
+    .query('users')
+    .withIndex('by_auth_provider_user_id', (q) =>
+      q.eq('authProviderUserId', identity.subject),
+    )
+    .unique();
+
+  if (!user) throw new Error('User not found');
+
+  return user;
+};
+
+const getNote = async (
+  ctx: QueryCtx | MutationCtx,
+  args: {
+    noteId: Id<'notes'>;
+    userId: Id<'users'>;
+  },
+) => {
+  const note = await ctx.db.get(args.noteId);
+
+  if (note === null || note.userId !== args.userId)
+    throw new Error('Requested note does not belong to the user');
+
+  return note;
 };
 
 export const fetchNotes = query({
@@ -22,50 +46,60 @@ export const fetchNotes = query({
     ),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const user = await getUser(ctx);
 
-    return await ctx.db
+    const notes = await ctx.db
       .query('notes')
       .withIndex('by_user_id_category_and_updated_at', (q) =>
-        q.eq('userId', userId).eq('category', args.category),
+        q.eq('userId', user._id).eq('category', args.category),
       )
       .order('desc')
       .collect();
+
+    return notes.map(docToNote);
   },
 });
 
 export const fetchNote = query({
   args: { id: v.id('notes') },
   handler: async (ctx, args) => {
-    const note = await ctx.db.get(args.id);
-    const userId = await getUserId(ctx);
+    const user = await getUser(ctx);
 
-    if (note === null || note.userId !== userId)
+    const note = await getNote(ctx, { noteId: args.id, userId: user._id });
+
+    if (note === null || note.userId !== user._id)
       throw new Error('Requested note does not belong to the user');
-    return note;
+
+    return docToNote(note);
   },
 });
 
 export const saveNote = mutation({
-  args: { ...noteSchema },
-  handler: async (ctx, args) =>
-    await ctx.db.insert('notes', { ...args, userId: await getUserId(ctx) }),
+  args: { ...draftNoteSchema },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+
+    return await ctx.db.insert('notes', {
+      ...args,
+      userId: user._id,
+      updatedAt: Date.now(),
+    });
+  },
 });
 
 export const updateNote = mutation({
-  args: { ...noteSchema, id: v.id('notes') },
+  args: { note: v.object({ ...draftNoteSchema }), id: v.id('notes') },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const user = await getUser(ctx);
+    const note = await getNote(ctx, { noteId: args.id, userId: user._id });
 
-    if (userId !== args.userId)
-      throw new Error('User not authorized to update this note');
+    if (user._id !== note.userId)
+      throw new Error('Note does not belong to the user');
 
     await ctx.db.replace(args.id, {
-      userId: args.userId,
-      title: args.title,
-      content: args.content,
-      category: args.category,
-      updatedAt: args.updatedAt,
+      ...args.note,
+      userId: user._id,
+      updatedAt: Date.now(),
     });
   },
 });
@@ -73,10 +107,10 @@ export const updateNote = mutation({
 export const deleteNote = mutation({
   args: { id: v.id('notes') },
   handler: async (ctx, args) => {
-    const note = await ctx.db.get(args.id);
-    const userId = await getUserId(ctx);
+    const user = await getUser(ctx);
+    const note = await getNote(ctx, { noteId: args.id, userId: user._id });
 
-    if (note === null || note.userId !== userId)
+    if (user._id !== note.userId)
       throw new Error('Note does not belong to the user');
 
     await ctx.db.delete(args.id);
