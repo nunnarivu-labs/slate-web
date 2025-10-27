@@ -13,7 +13,6 @@
   "dependencies": {
     "@clerk/tanstack-react-start": "^0.26.4",
     "@convex-dev/react-query": "^0.0.0-alpha.11",
-    "@mdxeditor/editor": "^3.47.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-query": "^5.66.5",
@@ -24,7 +23,6 @@
     "@tanstack/react-start": "^1.132.0",
     "@tanstack/router-plugin": "^1.132.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@uiw/react-md-editor": "^4.0.8",
     "convex": "^1.28.0",
     "lucide-react": "^0.544.0",
     "react": "^19.0.0",

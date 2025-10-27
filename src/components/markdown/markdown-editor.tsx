@@ -1,6 +1,3 @@
-import { components } from '@/components/markdown/markdown-utils.tsx';
-import MDEditor from '@uiw/react-md-editor';
-
 type MarkdownEditorProps = {
   md: string;
   onChange: (md?: string) => void;
@@ -15,16 +12,12 @@ export const MarkdownEditor = ({
   placeholder = '',
 }: MarkdownEditorProps) => {
   return (
-    <MDEditor
-      preview="edit"
+    <textarea
       value={md}
-      onChange={onChange}
-      autoFocusEnd={autofocusEnd}
-      previewOptions={{
-        components,
-      }}
-      textareaProps={{ placeholder }}
-      className="w-full grow resize-none shadow-none"
+      onChange={(event) => onChange(event.target.value)}
+      autoFocus={autofocusEnd}
+      placeholder={placeholder}
+      className="w-full flex-grow resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
     />
   );
 };
