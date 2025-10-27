@@ -27,6 +27,4 @@ export const Route = createFileRoute('/_auth/notes/$category')({
   },
 
   component: NotesRoute,
-
-  ssr: false,
 });

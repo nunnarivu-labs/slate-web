@@ -146,7 +146,7 @@ export const NoteModal = ({
             </NoteModalIcon>
           )}
           <NoteModalIcon
-            disabled={isNoteEmpty}
+            disabled
             onClick={handlePreviewModeToggle}
             tooltip="Preview Mode"
           >
