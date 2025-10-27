@@ -6,7 +6,6 @@ import { Loader } from '@/components/loader.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
-import { docToNote } from '@/utils/doc-note-converter.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { Navigate, useNavigate } from '@tanstack/react-router';
@@ -28,7 +27,6 @@ export const NoteModalContainer = () => {
       id: params.id as Id<'notes'>,
     }),
     enabled: params.id !== 'new',
-    select: (data) => (data === null ? null : docToNote(data)),
   });
 
   const saveNote = useSaveNote();

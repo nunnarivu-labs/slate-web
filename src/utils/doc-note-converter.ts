@@ -4,10 +4,7 @@ import { Doc } from '../../convex/_generated/dataModel';
 
 export const docToNote = (doc: Doc<'notes'>): Note => ({
   id: doc._id,
-  userId: doc.userId,
   title: doc.title,
   content: doc.content,
   category: doc.category,
-  createdAt: doc._creationTime,
-  updatedAt: doc.updatedAt,
 });

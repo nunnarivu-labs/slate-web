@@ -33,20 +33,18 @@ export const useSaveNote = () => {
 
     if (isNewNote) {
       await saveNoteMutation({
-        userId: note.userId,
         title: note.title,
         content: note.content,
         category: note.category,
-        updatedAt: Date.now(),
       });
     } else {
       await updateNoteMutation({
         id: note.id as Id<'notes'>,
-        userId: note.userId,
-        title: note.title,
-        content: note.content,
-        category: note.category,
-        updatedAt: Date.now(),
+        note: {
+          title: note.title,
+          content: note.content,
+          category: note.category,
+        },
       });
     }
   };
