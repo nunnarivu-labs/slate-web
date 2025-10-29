@@ -176,13 +176,6 @@ export const NoteModal = ({
             </NoteModalIcon>
           )}
           <NoteModalIcon
-            disabled={isNoteEmpty || isTagInputOpen}
-            onClick={() => setIsTagInputOpen((prev) => !prev)}
-            tooltip="Tag"
-          >
-            <Tag size={20} />
-          </NoteModalIcon>
-          <NoteModalIcon
             disabled={isNoteEmpty}
             onClick={handlePreviewModeToggle}
             tooltip="Preview Mode"
@@ -194,6 +187,16 @@ export const NoteModal = ({
             )}
           </NoteModalIcon>
           <div ref={tagsPopoverRef} className="relative">
+            <NoteModalIcon
+              disabled={isNoteEmpty}
+              onClick={(ev) => {
+                ev.stopPropagation();
+                setIsTagInputOpen((prev) => !prev);
+              }}
+              tooltip="Manage Tags"
+            >
+              <Tag size={20} />
+            </NoteModalIcon>
             {isTagInputOpen && (
               <TagInputPopover
                 onAddTag={handleAddTag}

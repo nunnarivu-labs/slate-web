@@ -6,6 +6,16 @@ interface TagInputPopoverProps {
   onClose: () => void;
 }
 
+const mockTags = [
+  { id: '1', name: 'work', checked: true },
+  { id: '2', name: 'ideas', checked: false },
+  { id: '3', name: 'personal', checked: false },
+  { id: '4', name: 'project-alpha', checked: true },
+  { id: '5', name: 'urgent', checked: false },
+  { id: '6', name: 'reading-list', checked: false },
+  { id: '7', name: 'later', checked: false },
+];
+
 export const TagInputPopover = ({
   onAddTag,
   onClose,
@@ -23,7 +33,7 @@ export const TagInputPopover = ({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="absolute bottom-3 left-1/2 mb-2 w-64 max-w-[90vw] -translate-x-1/2 rounded-lg border bg-white p-3 shadow-xl md:right-auto md:left-auto md:w-64 md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
+      className="absolute bottom-8 left-1/2 mb-2 w-64 max-w-[90vw] -translate-x-1/2 rounded-lg border bg-white p-3 shadow-xl md:right-auto md:left-auto md:w-64 md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
     >
       <div className="mb-2 flex items-center justify-between">
         <label
@@ -56,6 +66,36 @@ export const TagInputPopover = ({
           Add
         </button>
       </form>
+      <div className="mt-3 border-t pt-2 dark:border-zinc-600">
+        <h4 className="mb-1 px-1 text-xs font-bold text-zinc-500 uppercase dark:text-zinc-400">
+          Existing Tags
+        </h4>
+        {/*
+          Container for the scrollable list.
+          - `max-h-52`: Sets the max height. This is roughly 5 items high.
+          - `overflow-y-auto`: Adds a scrollbar ONLY if the content exceeds the max height.
+        */}
+        <div className="max-h-52 overflow-y-auto pr-1">
+          <div className="space-y-1">
+            {mockTags.map((tag) => (
+              <label
+                key={tag.id}
+                className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-600"
+              >
+                <input
+                  type="checkbox"
+                  defaultChecked={tag.checked}
+                  // You'll wire up an `onChange` handler here later
+                  className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-zinc-700 dark:text-zinc-200">
+                  {tag.name}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
