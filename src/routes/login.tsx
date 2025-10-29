@@ -42,7 +42,7 @@ const LoginPage = () => {
   );
 
   return (
-    <div className="flex h-full items-center justify-center bg-zinc-100 p-4 dark:bg-zinc-900">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-100 p-4 dark:bg-zinc-900">
       <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-xl dark:bg-zinc-800">
         <div className="text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">

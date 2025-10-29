@@ -1,5 +1,6 @@
+import { AppLayout } from '@/components/layout/app-layout.tsx';
 import { authFn } from '@/data/auth.ts';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_auth')({
   beforeLoad: async ({ location }) => {
@@ -9,4 +10,10 @@ export const Route = createFileRoute('/_auth')({
       throw redirect({ to: '/login', search: { redirect: location.href } });
     return { userId };
   },
+
+  component: () => (
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
+  ),
 });
