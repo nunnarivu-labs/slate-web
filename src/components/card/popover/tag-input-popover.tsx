@@ -23,7 +23,7 @@ export const TagInputPopover = ({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="absolute bottom-full left-1/2 mb-2 w-64 max-w-[90vw] -translate-x-1/2 rounded-lg border bg-white p-3 shadow-xl md:right-auto md:left-auto md:w-64 md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
+      className="absolute bottom-3 left-1/2 mb-2 w-64 max-w-[90vw] -translate-x-1/2 rounded-lg border bg-white p-3 shadow-xl md:right-auto md:left-auto md:w-64 md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
     >
       <div className="mb-2 flex items-center justify-between">
         <label

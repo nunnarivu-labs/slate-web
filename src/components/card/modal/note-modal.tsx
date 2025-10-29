@@ -8,7 +8,6 @@ import { Note } from '@/types/note.ts';
 import {
   Archive,
   Home,
-  MoreVertical,
   Tag,
   ToggleLeft,
   ToggleRight,
@@ -43,9 +42,8 @@ export const NoteModal = ({
 }: NoteModalProps) => {
   const params = Route.useParams();
 
-  const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false);
   const [isTagInputOpen, setIsTagInputOpen] = useState(false);
-  const moreOptionsRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection
+  const tagsPopoverRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -67,7 +65,7 @@ export const NoteModal = ({
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        await onClose('save');
+        onClose('save');
       }
     },
     [onClose],
@@ -98,12 +96,11 @@ export const NoteModal = ({
   useImperativeHandle(ref, () => ({ note, isDirty }), [note, isDirty]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | KeyboardEvent) => {
       if (
-        moreOptionsRef.current &&
-        !moreOptionsRef.current.contains(event.target as Node)
+        tagsPopoverRef.current &&
+        !tagsPopoverRef.current.contains(event.target as Node)
       ) {
-        setIsMoreOptionsOpen(false);
         setIsTagInputOpen(false);
       }
     };
@@ -179,7 +176,7 @@ export const NoteModal = ({
             </NoteModalIcon>
           )}
           <NoteModalIcon
-            disabled={isNoteEmpty}
+            disabled={isNoteEmpty || isTagInputOpen}
             onClick={() => setIsTagInputOpen((prev) => !prev)}
             tooltip="Tag"
           >
@@ -196,35 +193,7 @@ export const NoteModal = ({
               <ToggleLeft size={20} />
             )}
           </NoteModalIcon>
-          <div ref={moreOptionsRef} className="relative">
-            <NoteModalIcon
-              onClick={() => setIsMoreOptionsOpen((prev) => !prev)}
-              tooltip="More options"
-            >
-              <MoreVertical size={20} />
-            </NoteModalIcon>
-
-            {/* The "More Options" Dropdown */}
-            {isMoreOptionsOpen && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="absolute right-0 bottom-full mb-2 w-48 rounded-lg border bg-white p-2 shadow-xl dark:border-zinc-600 dark:bg-zinc-700"
-              >
-                <button
-                  onClick={() => {
-                    setIsMoreOptionsOpen(false); // Close this menu
-                    setIsTagInputOpen(true); // Open the tag input
-                  }}
-                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
-                >
-                  <Tag size={16} />
-                  <span>Add Tags</span>
-                </button>
-                {/* You can add more options here in the future */}
-              </div>
-            )}
-
-            {/* The Tag Input Popover */}
+          <div ref={tagsPopoverRef} className="relative">
             {isTagInputOpen && (
               <TagInputPopover
                 onAddTag={handleAddTag}
