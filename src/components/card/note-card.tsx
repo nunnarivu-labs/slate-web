@@ -1,4 +1,4 @@
-import { MarkdownPreview } from '@/components/markdown/markdown-preview.tsx';
+import { Markdown } from '@/components/content/markdown.tsx';
 import { Note } from '@/types/note.ts';
 
 type NoteCardProps = {
@@ -16,6 +16,6 @@ export const NoteCard = ({ note, onClick }: NoteCardProps) => (
         {note.title}
       </h3>
     )}
-    {note.content && <MarkdownPreview md={note.content} />}
+    {note.content && <Markdown md={note.content} />}
   </button>
 );

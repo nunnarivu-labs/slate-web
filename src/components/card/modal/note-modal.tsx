@@ -1,6 +1,6 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
-import { MarkdownEditor } from '@/components/markdown/markdown-editor.tsx';
-import { MarkdownPreview } from '@/components/markdown/markdown-preview.tsx';
+import { ContentEditor } from '@/components/content/content-editor.tsx';
+import { Markdown } from '@/components/content/markdown.tsx';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
@@ -101,15 +101,10 @@ export const NoteModal = ({
           </h3>
         )}
         {previewMode ? (
-          <button
-            className="w-full resize-none overflow-y-auto text-left"
-            onClick={handlePreviewModeToggle}
-          >
-            <MarkdownPreview md={note.content} />
-          </button>
+          <Markdown md={note.content} className="md-preview overflow-y-auto" />
         ) : (
-          <MarkdownEditor
-            md={note.content}
+          <ContentEditor
+            content={note.content}
             onChange={handleContentChange}
             autofocusEnd
             placeholder="Take a note..."
@@ -146,7 +141,7 @@ export const NoteModal = ({
             </NoteModalIcon>
           )}
           <NoteModalIcon
-            disabled
+            disabled={isNoteEmpty}
             onClick={handlePreviewModeToggle}
             tooltip="Preview Mode"
           >

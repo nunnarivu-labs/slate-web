@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 body {
   @apply m-0;
@@ -9,25 +10,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+.prose {
+  max-width: 100ch !important;
 }
 
-.w-md-editor {
-  box-shadow: none !important;
-  background-color: inherit !important;
-}
-
-.w-md-editor-toolbar {
-  border-bottom: none !important;
-  padding: 0 !important;
-  margin-bottom: 1rem;
-  background-color: inherit !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  .wmde-markdown {
-    background-color: inherit !important;
-  }
+.md-preview {
+  padding: 1rem;
 }
