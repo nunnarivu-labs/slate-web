@@ -1,16 +1,26 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
+import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
 import { ContentEditor } from '@/components/content/content-editor.tsx';
 import { Markdown } from '@/components/content/markdown.tsx';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
-import { Archive, Home, ToggleLeft, ToggleRight, Trash } from 'lucide-react';
+import {
+  Archive,
+  Home,
+  MoreVertical,
+  Tag,
+  ToggleLeft,
+  ToggleRight,
+  Trash,
+} from 'lucide-react';
 import {
   ChangeEvent,
   RefObject,
   useCallback,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -32,6 +42,10 @@ export const NoteModal = ({
   onClose,
 }: NoteModalProps) => {
   const params = Route.useParams();
+
+  const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false);
+  const [isTagInputOpen, setIsTagInputOpen] = useState(false);
+  const moreOptionsRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -82,6 +96,30 @@ export const NoteModal = ({
   const handlePreviewModeToggle = () => setPreviewMode((prev) => !prev);
 
   useImperativeHandle(ref, () => ({ note, isDirty }), [note, isDirty]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        moreOptionsRef.current &&
+        !moreOptionsRef.current.contains(event.target as Node)
+      ) {
+        setIsMoreOptionsOpen(false);
+        setIsTagInputOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // 5. Placeholder function for your tag logic
+  const handleAddTag = (tag: string) => {
+    console.log('Adding tag:', tag);
+    // Here you will update your `note` state with the new tag
+    // e.g., setNote(prev => ({...prev, tags: [...prev.tags, tag]}));
+    setIsTagInputOpen(false); // Close popover after adding
+  };
 
   return (
     <>
@@ -142,6 +180,13 @@ export const NoteModal = ({
           )}
           <NoteModalIcon
             disabled={isNoteEmpty}
+            onClick={() => setIsTagInputOpen((prev) => !prev)}
+            tooltip="Tag"
+          >
+            <Tag size={20} />
+          </NoteModalIcon>
+          <NoteModalIcon
+            disabled={isNoteEmpty}
             onClick={handlePreviewModeToggle}
             tooltip="Preview Mode"
           >
@@ -151,6 +196,42 @@ export const NoteModal = ({
               <ToggleLeft size={20} />
             )}
           </NoteModalIcon>
+          <div ref={moreOptionsRef} className="relative">
+            <NoteModalIcon
+              onClick={() => setIsMoreOptionsOpen((prev) => !prev)}
+              tooltip="More options"
+            >
+              <MoreVertical size={20} />
+            </NoteModalIcon>
+
+            {/* The "More Options" Dropdown */}
+            {isMoreOptionsOpen && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute right-0 bottom-full mb-2 w-48 rounded-lg border bg-white p-2 shadow-xl dark:border-zinc-600 dark:bg-zinc-700"
+              >
+                <button
+                  onClick={() => {
+                    setIsMoreOptionsOpen(false); // Close this menu
+                    setIsTagInputOpen(true); // Open the tag input
+                  }}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                >
+                  <Tag size={16} />
+                  <span>Add Tags</span>
+                </button>
+                {/* You can add more options here in the future */}
+              </div>
+            )}
+
+            {/* The Tag Input Popover */}
+            {isTagInputOpen && (
+              <TagInputPopover
+                onAddTag={handleAddTag}
+                onClose={() => setIsTagInputOpen(false)}
+              />
+            )}
+          </div>
         </div>
         <button
           onClick={() => onClose('save')}
