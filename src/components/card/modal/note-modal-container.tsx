@@ -23,10 +23,14 @@ export const NoteModalContainer = () => {
   const noteModalRef = useRef<NoteModalRef>(null);
 
   const noteQuery = useQuery({
-    ...convexQuery(api.tasks.fetchNote, {
-      id: params.id as Id<'notes'>,
-    }),
-    enabled: params.id !== 'new',
+    ...convexQuery(
+      api.tasks.fetchNote,
+      params.id === 'new'
+        ? 'skip'
+        : {
+            id: params.id as Id<'notes'>,
+          },
+    ),
   });
 
   const saveNote = useSaveNote();
