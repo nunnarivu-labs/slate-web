@@ -1,8 +1,10 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      readonly USER_EMAIL: string;
-      readonly USER_PASSWORD: string;
+      readonly CONVEX_DEPLOYMENT: string;
+      readonly VITE_CONVEX_URL: string;
+      readonly VITE_CLERK_PUBLISHABLE_KEY: string;
+      readonly CLERK_SECRET_KEY: string;
     }
   }
 }
