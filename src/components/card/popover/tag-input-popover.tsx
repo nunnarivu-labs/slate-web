@@ -56,7 +56,7 @@ export const TagInputPopover = ({
           value={tag}
           onChange={(e) => setTag(e.target.value)}
           placeholder="e.g., #work, #ideas"
-          className="w-full flex-grow rounded-md bg-zinc-100 px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800"
+          className="w-full flex-grow rounded-md bg-zinc-100 px-2 py-1 text-sm text-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:text-zinc-100"
           autoFocus
         />
         <button
