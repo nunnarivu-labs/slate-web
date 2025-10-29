@@ -70,11 +70,6 @@ export const TagInputPopover = ({
         <h4 className="mb-1 px-1 text-xs font-bold text-zinc-500 uppercase dark:text-zinc-400">
           Existing Tags
         </h4>
-        {/*
-          Container for the scrollable list.
-          - `max-h-52`: Sets the max height. This is roughly 5 items high.
-          - `overflow-y-auto`: Adds a scrollbar ONLY if the content exceeds the max height.
-        */}
         <div className="max-h-52 overflow-y-auto pr-1">
           <div className="space-y-1">
             {mockTags.map((tag) => (
@@ -85,7 +80,6 @@ export const TagInputPopover = ({
                 <input
                   type="checkbox"
                   defaultChecked={tag.checked}
-                  // You'll wire up an `onChange` handler here later
                   className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-blue-500"
                 />
                 <span className="ml-2 text-sm text-zinc-700 dark:text-zinc-200">

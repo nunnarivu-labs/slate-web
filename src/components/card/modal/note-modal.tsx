@@ -110,12 +110,9 @@ export const NoteModal = ({
     };
   }, []);
 
-  // 5. Placeholder function for your tag logic
   const handleAddTag = (tag: string) => {
     console.log('Adding tag:', tag);
-    // Here you will update your `note` state with the new tag
-    // e.g., setNote(prev => ({...prev, tags: [...prev.tags, tag]}));
-    setIsTagInputOpen(false); // Close popover after adding
+    setIsTagInputOpen(false);
   };
 
   return (
