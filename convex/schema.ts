@@ -17,7 +17,10 @@ export const noteSchema = {
   updatedAt: v.float64(),
 };
 
-export const tableSchema = { authProviderUserId: v.string() };
+export const userSchema = { authProviderUserId: v.string() };
+
+export const tagSchema = { name: v.string(), userId: v.id('users') };
+export const tagNoteSchema = { tagId: v.id('tags'), noteId: v.id('notes') };
 
 export default defineSchema({
   notes: defineTable(noteSchema).index('by_user_id_category_and_updated_at', [
@@ -25,7 +28,14 @@ export default defineSchema({
     'category',
     'updatedAt',
   ]),
-  users: defineTable(tableSchema).index('by_auth_provider_user_id', [
+
+  users: defineTable(userSchema).index('by_auth_provider_user_id', [
     'authProviderUserId',
   ]),
+
+  tags: defineTable(tagSchema).index('by_user_id', ['userId']),
+
+  tagNote: defineTable(tagNoteSchema)
+    .index('by_tag_id', ['tagId'])
+    .index('by_note_id', ['noteId']),
 });
