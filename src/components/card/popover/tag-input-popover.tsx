@@ -1,26 +1,45 @@
+import { TagWithStatus } from '@/types/tag.ts';
+import { convexQuery } from '@convex-dev/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from '@tanstack/react-router';
 import { X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
 
 interface TagInputPopoverProps {
   onAddTag: (tag: string) => void;
   onClose: () => void;
 }
 
-const mockTags = [
-  { id: '1', name: 'work', checked: true },
-  { id: '2', name: 'ideas', checked: false },
-  { id: '3', name: 'personal', checked: false },
-  { id: '4', name: 'project-alpha', checked: true },
-  { id: '5', name: 'urgent', checked: false },
-  { id: '6', name: 'reading-list', checked: false },
-  { id: '7', name: 'later', checked: false },
-];
-
 export const TagInputPopover = ({
   onAddTag,
   onClose,
 }: TagInputPopoverProps) => {
   const [tag, setTag] = useState('');
+  const [noteTags, setNoteTags] = useState<TagWithStatus[]>([]);
+
+  const params = useParams({ from: '/_auth/notes/$category/$id' });
+
+  const allTagsQuery = useQuery(convexQuery(api.tasks.fetchAllTags, {}));
+  const noteTagsQuery = useQuery(
+    convexQuery(
+      api.tasks.fetchNoteTags,
+      params.id === 'new' ? 'skip' : { noteId: params.id as Id<'notes'> },
+    ),
+  );
+
+  useEffect(() => {
+    if (noteTagsQuery.isSuccess) {
+      setNoteTags(
+        noteTagsQuery.data.map((noteTag) => ({
+          ...noteTag,
+          status: 'ALREADY_ADDED',
+        })),
+      );
+    }
+  }, [noteTagsQuery.isSuccess]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,21 +91,24 @@ export const TagInputPopover = ({
         </h4>
         <div className="max-h-52 overflow-y-auto pr-1">
           <div className="space-y-1">
-            {mockTags.map((tag) => (
-              <label
-                key={tag.id}
-                className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-600"
-              >
-                <input
-                  type="checkbox"
-                  defaultChecked={tag.checked}
-                  className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-zinc-700 dark:text-zinc-200">
-                  {tag.name}
-                </span>
-              </label>
-            ))}
+            {allTagsQuery.isSuccess && noteTagsQuery.isSuccess
+              ? allTagsQuery.data.map((tag) => (
+                  <label
+                    key={tag.id}
+                    className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-600"
+                  >
+                    <input
+                      type="checkbox"
+                      defaultChecked={false}
+                      checked={!!noteTags.find((nt) => nt.id === tag.id)}
+                      className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-zinc-700 dark:text-zinc-200">
+                      {tag.name}
+                    </span>
+                  </label>
+                ))
+              : null}
           </div>
         </div>
       </div>

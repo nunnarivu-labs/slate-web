@@ -1,4 +1,4 @@
-import { docToNote } from '@/utils/doc-note-converter.ts';
+import { docToNote, docToTag } from '@/utils/convex-type-converters.ts';
 import { v } from 'convex/values';
 
 import { Id } from './_generated/dataModel';
@@ -114,5 +114,38 @@ export const deleteNote = mutation({
       throw new Error('Note does not belong to the user');
 
     await ctx.db.delete(args.id);
+  },
+});
+
+export const fetchAllTags = query({
+  handler: async (ctx) => {
+    const user = await getUser(ctx);
+
+    const tags = await ctx.db
+      .query('tags')
+      .withIndex('by_user_id', (q) => q.eq('userId', user._id))
+      .collect();
+
+    return tags.map(docToTag);
+  },
+});
+
+export const fetchNoteTags = query({
+  args: { noteId: v.id('notes') },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+
+    const tagNotes = await ctx.db
+      .query('tagNote')
+      .withIndex('by_note_id', (q) => q.eq('noteId', args.noteId))
+      .collect();
+
+    const allTags = await Promise.all(
+      tagNotes.map(async (tagNote) => await ctx.db.get(tagNote.tagId)),
+    );
+
+    return allTags
+      .filter((tag) => !!tag && tag.userId === user._id)
+      .map((tag) => docToTag(tag!));
   },
 });
