@@ -9,3 +9,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.prose {
+  max-width: 100ch !important;
+}
+
+.md-preview {
+  padding: 1rem;
+}
