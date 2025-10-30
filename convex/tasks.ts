@@ -149,3 +149,29 @@ export const fetchNoteTags = query({
       .map((tag) => docToTag(tag!));
   },
 });
+
+/*
+export const addTagsToNote = mutation({
+  args: v.array(
+    v.union(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        status: v.literal('NEWLY_CREATED'),
+      }),
+      v.object({
+        id: v.id('tags'),
+        name: v.string(),
+        status: v.union(v.literal('NEWLY_ADDED'), v.literal('REMOVED')),
+      }),
+    ),
+  ),
+  handler: async (ctx, args) => {
+    args.forEach((tag) => {
+      if (tag.status === 'NEWLY_CREATED') {
+        const tagId = ctx.db.insert('tags');
+      }
+    });
+  },
+});
+*/

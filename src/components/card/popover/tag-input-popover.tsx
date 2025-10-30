@@ -1,158 +1,53 @@
-import {
-  Tag,
-  TagWithCheckedStatus,
-  TagWithStatus,
-  TagWithUpdatedStatus,
-} from '@/types/tag.ts';
-import { convexQuery } from '@convex-dev/react-query';
-import { useQuery } from '@tanstack/react-query';
-import { useParams } from '@tanstack/react-router';
+import { TagWithCheckedStatus } from '@/types/tag.ts';
 import { X } from 'lucide-react';
-import React, {
-  RefObject,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
-
-export type TagsToUpdateRef = { tagsToUpdate: TagWithUpdatedStatus[] };
+import { FormEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 type TagInputPopoverProps = {
   onClose: () => void;
-  ref: RefObject<TagsToUpdateRef | null>;
+  onTagAdd: (tag: string) => void;
+  onTagCheck: (tagId: string, checked: boolean) => void;
+  tags: TagWithCheckedStatus[];
 };
 
-export const TagInputPopover = ({ onClose, ref }: TagInputPopoverProps) => {
+export const TagInputPopover = ({
+  onClose,
+  tags,
+  onTagAdd,
+  onTagCheck,
+}: TagInputPopoverProps) => {
   const [tag, setTag] = useState('');
-
-  const [uiTags, setUiTags] = useState<TagWithCheckedStatus[]>([]);
-  const [tagsWithStatus, setTagsWithStatus] = useState<TagWithStatus[]>([]);
 
   const tagInputRef = useRef<HTMLInputElement>(null);
 
-  const params = useParams({ from: '/_auth/notes/$category/$id' });
-
-  const allTagsQuery = useQuery(convexQuery(api.tasks.fetchAllTags, {}));
-  const noteTagsQuery = useQuery(
-    convexQuery(
-      api.tasks.fetchNoteTags,
-      params.id === 'new' ? 'skip' : { noteId: params.id as Id<'notes'> },
-    ),
-  );
-
-  useEffect(() => {
-    if (allTagsQuery.isSuccess) {
-      setUiTags(allTagsQuery.data.map((t) => ({ ...t, checked: false })));
-    }
-  }, [allTagsQuery.isSuccess, allTagsQuery.data]);
-
-  useEffect(() => {
-    if (noteTagsQuery.isSuccess) {
-      setUiTags((prev) =>
-        prev.map((t) => ({
-          ...t,
-          checked: !!noteTagsQuery.data.find((nt) => nt.id === t.id),
-        })),
-      );
-
-      setTagsWithStatus(
-        noteTagsQuery.data.map((ntq) => ({ ...ntq, status: 'ALREADY_ADDED' })),
-      );
-    }
-  }, [noteTagsQuery.isSuccess, noteTagsQuery.data]);
-
   const filteredAllTags: TagWithCheckedStatus[] = useMemo(() => {
-    if (uiTags.length === 0) return [];
-    if (!tag) return uiTags;
-    return uiTags.filter(
+    if (tags.length === 0) return [];
+    if (!tag) return tags;
+    return tags.filter(
       (t) => t.name.toLocaleLowerCase().search(tag.toLowerCase()) !== -1,
     );
-  }, [uiTags, tag]);
+  }, [tags, tag]);
 
   const tagHasExactMatch: boolean = useMemo(() => {
-    if (!allTagsQuery.isSuccess) return false;
+    if (tags.length === 0) return false;
     if (!tag) return false;
-    return allTagsQuery.data.some((t) => t.name === tag);
-  }, [allTagsQuery.isSuccess, allTagsQuery.data, tag]);
+    return tags.some((t) => t.name === tag);
+  }, [tags, tag]);
 
   const addNewTag = useCallback(
-    (e: React.FormEvent) => {
+    (e: FormEvent) => {
       e.preventDefault();
 
-      const trimmedTag = tag.trim();
+      onTagAdd(tag);
 
-      if (trimmedTag) {
-        const newTag: Tag = {
-          id: Math.random().toString(36),
-          name: trimmedTag,
-        };
-
-        setUiTags((prev) => [{ ...newTag, checked: true }, ...prev]);
-
-        setTagsWithStatus((prev) => [
-          ...prev,
-          { ...newTag, status: 'NEWLY_CREATED' },
-        ]);
-
-        setTag('');
-
-        tagInputRef.current?.focus();
-      }
+      setTag('');
+      tagInputRef.current?.focus();
     },
     [tag],
   );
 
   const toggleTagCheck = useCallback(
-    (tagId: string, checked: boolean) => {
-      const updatedUiTags: TagWithCheckedStatus[] = uiTags.map((t) =>
-        t.id !== tagId ? t : { ...t, checked },
-      );
-
-      setUiTags(updatedUiTags);
-
-      tagInputRef.current?.focus();
-
-      if (checked) {
-        const currentTag = uiTags.find((t) => t.id === tagId);
-
-        if (!tagsWithStatus.find((t) => t.id === tag) && !!currentTag) {
-          setTagsWithStatus((prev) => [
-            ...prev,
-            { id: currentTag.id, name: currentTag.name, status: 'NEWLY_ADDED' },
-          ]);
-        }
-      } else {
-        const uncheckedTag = tagsWithStatus.find((t) => t.id === tagId);
-
-        if (
-          uncheckedTag?.status === 'NEWLY_CREATED' ||
-          uncheckedTag?.status === 'NEWLY_ADDED'
-        ) {
-          setTagsWithStatus((prev) => prev.filter((t) => t.id !== tagId));
-        } else if (uncheckedTag?.status === 'ALREADY_ADDED') {
-          setTagsWithStatus((prev) =>
-            prev.map((t) => (t.id !== tagId ? t : { ...t, status: 'REMOVED' })),
-          );
-        }
-      }
-    },
-    [uiTags, tagsWithStatus],
-  );
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      tagsToUpdate: tagsWithStatus.filter(
-        (t) => t.status !== 'ALREADY_ADDED',
-      ) as TagWithUpdatedStatus[],
-    }),
-    [tagsWithStatus],
+    (tagId: string, checked: boolean) => onTagCheck(tagId, checked),
+    [onTagCheck],
   );
 
   return (
@@ -200,7 +95,7 @@ export const TagInputPopover = ({ onClose, ref }: TagInputPopoverProps) => {
           </h4>
           <div className="max-h-52 overflow-y-auto pr-1">
             <div className="space-y-1">
-              {allTagsQuery.isSuccess && noteTagsQuery.isSuccess
+              {filteredAllTags.length > 0
                 ? filteredAllTags.map((t) => (
                     <label
                       key={t.id}
