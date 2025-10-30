@@ -1,6 +1,7 @@
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
+import { TagWithStatus } from '@/types/tag.ts';
 import { useMutation } from 'convex/react';
 
 import { api } from '../../convex/_generated/api';
@@ -8,6 +9,7 @@ import { Id } from '../../convex/_generated/dataModel';
 
 type SaveNoteArgs = {
   note: Note;
+  tags: TagWithStatus[];
   action: NoteSaveActionType;
 };
 
@@ -18,7 +20,7 @@ export const useSaveNote = () => {
   const updateNoteMutation = useMutation(api.tasks.updateNote);
   const deleteNoteMutation = useMutation(api.tasks.deleteNote);
 
-  return async ({ note, action }: SaveNoteArgs) => {
+  return async ({ note, tags, action }: SaveNoteArgs) => {
     const isNoteEmpty = !note.title && !note.content;
 
     if (isNewNote && isNoteEmpty) return;
@@ -33,9 +35,12 @@ export const useSaveNote = () => {
 
     if (isNewNote) {
       await saveNoteMutation({
-        title: note.title,
-        content: note.content,
-        category: note.category,
+        note: {
+          title: note.title,
+          content: note.content,
+          category: note.category,
+        },
+        tags,
       });
     } else {
       await updateNoteMutation({
@@ -45,6 +50,7 @@ export const useSaveNote = () => {
           content: note.content,
           category: note.category,
         },
+        tags,
       });
     }
   };

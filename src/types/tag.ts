@@ -3,14 +3,8 @@ export type Tag = {
   name: string;
 };
 
-type UpdatedStatus = 'NEWLY_ADDED' | 'NEWLY_CREATED' | 'REMOVED';
-
-export type TagWithUpdatedStatus = Tag & {
-  status: UpdatedStatus;
-};
-
 export type TagWithStatus = Tag & {
-  status: 'ALREADY_ADDED' | UpdatedStatus;
+  status: 'ALREADY_ADDED' | 'NEWLY_ADDED' | 'NEWLY_CREATED' | 'REMOVED';
 };
 
 export type TagWithCheckedStatus = Tag & {

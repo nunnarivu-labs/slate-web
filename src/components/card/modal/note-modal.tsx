@@ -7,11 +7,7 @@ import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
 import { Tag as TagType } from '@/types/tag.ts';
-import {
-  TagWithCheckedStatus,
-  TagWithStatus,
-  TagWithUpdatedStatus,
-} from '@/types/tag.ts';
+import { TagWithCheckedStatus, TagWithStatus } from '@/types/tag.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -87,18 +83,22 @@ export const NoteModal = ({
 
   useEffect(() => {
     if (noteTagsQuery.isSuccess) {
+      setTagsWithStatus(
+        noteTagsQuery.data.map((ntq) => ({ ...ntq, status: 'ALREADY_ADDED' })),
+      );
+    }
+  }, [noteTagsQuery.isSuccess, noteTagsQuery.data]);
+
+  useEffect(() => {
+    if (allTagsQuery.isSuccess && noteTagsQuery.isSuccess) {
       setUiTags((prev) =>
         prev.map((t) => ({
           ...t,
           checked: !!noteTagsQuery.data.find((nt) => nt.id === t.id),
         })),
       );
-
-      setTagsWithStatus(
-        noteTagsQuery.data.map((ntq) => ({ ...ntq, status: 'ALREADY_ADDED' })),
-      );
     }
-  }, [noteTagsQuery.isSuccess, noteTagsQuery.data]);
+  }, [allTagsQuery.isSuccess, noteTagsQuery.isSuccess, noteTagsQuery.data]);
 
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
@@ -136,11 +136,9 @@ export const NoteModal = ({
     () => ({
       note,
       isDirty,
-      tags: tagsWithStatus.filter(
-        (t) => t.status !== 'ALREADY_ADDED',
-      ) as TagWithUpdatedStatus[],
+      tags: tagsWithStatus,
     }),
-    [note, isDirty],
+    [note, isDirty, tagsWithStatus],
   );
 
   useEffect(() => {

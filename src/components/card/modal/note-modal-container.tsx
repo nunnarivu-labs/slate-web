@@ -41,13 +41,17 @@ export const NoteModalContainer = () => {
 
       if (!modalRef) return;
 
-      const { note, isDirty } = modalRef;
+      const { note, isDirty, tags } = modalRef;
 
       if (note === null) return;
 
-      if (action !== 'save' || (action === 'save' && isDirty)) {
+      if (
+        action !== 'save' ||
+        (action === 'save' &&
+          (isDirty || tags.some((tag) => tag.status !== 'ALREADY_ADDED')))
+      ) {
         setIsSaving(true);
-        await saveNote({ note, action });
+        await saveNote({ note, tags, action });
       }
 
       await navigate({
