@@ -1,5 +1,8 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
-import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
+import {
+  TagInputPopover,
+  TagsToUpdateRef,
+} from '@/components/card/popover/tag-input-popover.tsx';
 import { ContentEditor } from '@/components/content/content-editor.tsx';
 import { Markdown } from '@/components/content/markdown.tsx';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
@@ -43,7 +46,9 @@ export const NoteModal = ({
   const params = Route.useParams();
 
   const [isTagInputOpen, setIsTagInputOpen] = useState(false);
-  const tagsPopoverRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection
+
+  const tagsPopoverRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection\
+  const tagsToUpdateRef = useRef<TagsToUpdateRef>(null);
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -61,6 +66,11 @@ export const NoteModal = ({
   const isNoteEmpty = !note.title && !note.content;
 
   const [isDirty, setIsDirty] = useState(false);
+
+  const toggleTagInput = useCallback((isOpen: boolean) => {
+    setIsTagInputOpen(isOpen);
+    console.log(tagsToUpdateRef.current?.tagsToUpdate);
+  }, []);
 
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
@@ -101,14 +111,14 @@ export const NoteModal = ({
         tagsPopoverRef.current &&
         !tagsPopoverRef.current.contains(event.target as Node)
       ) {
-        setIsTagInputOpen(false);
+        toggleTagInput(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [toggleTagInput]);
 
   return (
     <>
@@ -183,14 +193,17 @@ export const NoteModal = ({
               disabled={isNoteEmpty}
               onClick={(ev) => {
                 ev.stopPropagation();
-                setIsTagInputOpen((prev) => !prev);
+                toggleTagInput(!isTagInputOpen);
               }}
               tooltip="Manage Tags"
             >
               <Tag size={20} />
             </NoteModalIcon>
             {isTagInputOpen && (
-              <TagInputPopover onClose={() => setIsTagInputOpen(false)} />
+              <TagInputPopover
+                onClose={() => toggleTagInput(false)}
+                ref={tagsToUpdateRef}
+              />
             )}
           </div>
         </div>

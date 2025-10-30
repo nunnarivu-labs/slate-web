@@ -1,11 +1,18 @@
-import { Tag, TagWithCheckedStatus, TagWithStatus } from '@/types/tag.ts';
+import {
+  Tag,
+  TagWithCheckedStatus,
+  TagWithStatus,
+  TagWithUpdatedStatus,
+} from '@/types/tag.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { X } from 'lucide-react';
 import React, {
+  RefObject,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -14,12 +21,16 @@ import React, {
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
-interface TagInputPopoverProps {
-  onClose: () => void;
-}
+export type TagsToUpdateRef = { tagsToUpdate: TagWithUpdatedStatus[] };
 
-export const TagInputPopover = ({ onClose }: TagInputPopoverProps) => {
+type TagInputPopoverProps = {
+  onClose: () => void;
+  ref: RefObject<TagsToUpdateRef | null>;
+};
+
+export const TagInputPopover = ({ onClose, ref }: TagInputPopoverProps) => {
   const [tag, setTag] = useState('');
+
   const [uiTags, setUiTags] = useState<TagWithCheckedStatus[]>([]);
   const [tagsWithStatus, setTagsWithStatus] = useState<TagWithStatus[]>([]);
 
@@ -132,6 +143,16 @@ export const TagInputPopover = ({ onClose }: TagInputPopoverProps) => {
       }
     },
     [uiTags, tagsWithStatus],
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      tagsToUpdate: tagsWithStatus.filter(
+        (t) => t.status !== 'ALREADY_ADDED',
+      ) as TagWithUpdatedStatus[],
+    }),
+    [tagsWithStatus],
   );
 
   return (
