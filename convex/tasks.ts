@@ -3,22 +3,9 @@ import { v } from 'convex/values';
 
 import { Id } from './_generated/dataModel';
 import { MutationCtx, QueryCtx, mutation, query } from './_generated/server';
-import { draftNoteSchema } from './schema.ts';
+import { draftNoteSchema, tagsArg } from './schema.ts';
 
-const tagsArg = v.array(
-  v.object({
-    id: v.string(),
-    name: v.string(),
-    status: v.union(
-      v.literal('NEWLY_ADDED'),
-      v.literal('REMOVED'),
-      v.literal('NEWLY_CREATED'),
-      v.literal('ALREADY_ADDED'),
-    ),
-  }),
-);
-
-const getUser = async (ctx: MutationCtx | QueryCtx) => {
+export const getUser = async (ctx: MutationCtx | QueryCtx) => {
   const identity = await ctx.auth.getUserIdentity();
 
   if (!identity) throw new Error('User is not authenticated');

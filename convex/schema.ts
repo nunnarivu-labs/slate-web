@@ -22,6 +22,19 @@ export const userSchema = { authProviderUserId: v.string() };
 export const tagSchema = { name: v.string(), userId: v.id('users') };
 export const tagNoteSchema = { tagId: v.id('tags'), noteId: v.id('notes') };
 
+export const tagsArg = v.array(
+  v.object({
+    id: v.string(),
+    name: v.string(),
+    status: v.union(
+      v.literal('NEWLY_ADDED'),
+      v.literal('REMOVED'),
+      v.literal('NEWLY_CREATED'),
+      v.literal('ALREADY_ADDED'),
+    ),
+  }),
+);
+
 export default defineSchema({
   notes: defineTable(noteSchema).index('by_user_id_category_and_updated_at', [
     'userId',
