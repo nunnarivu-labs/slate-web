@@ -110,11 +110,6 @@ export const NoteModal = ({
     };
   }, []);
 
-  const handleAddTag = (tag: string) => {
-    console.log('Adding tag:', tag);
-    setIsTagInputOpen(false);
-  };
-
   return (
     <>
       <div className="flex min-h-0 flex-grow flex-col p-4">
@@ -195,10 +190,7 @@ export const NoteModal = ({
               <Tag size={20} />
             </NoteModalIcon>
             {isTagInputOpen && (
-              <TagInputPopover
-                onAddTag={handleAddTag}
-                onClose={() => setIsTagInputOpen(false)}
-              />
+              <TagInputPopover onClose={() => setIsTagInputOpen(false)} />
             )}
           </div>
         </div>

@@ -15,14 +15,13 @@ import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
 interface TagInputPopoverProps {
-  onAddTag: (tag: string) => void;
   onClose: () => void;
 }
 
 export const TagInputPopover = ({ onClose }: TagInputPopoverProps) => {
   const [tag, setTag] = useState('');
-  const [allUiTags, setAllUiTags] = useState<TagWithCheckedStatus[]>([]);
-  const [_, setNoteTagsWithStatus] = useState<TagWithStatus[]>([]);
+  const [uiTags, setUiTags] = useState<TagWithCheckedStatus[]>([]);
+  const [tagsWithStatus, setTagsWithStatus] = useState<TagWithStatus[]>([]);
 
   const tagInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,31 +37,32 @@ export const TagInputPopover = ({ onClose }: TagInputPopoverProps) => {
 
   useEffect(() => {
     if (allTagsQuery.isSuccess) {
-      setAllUiTags(allTagsQuery.data.map((t) => ({ ...t, checked: false })));
+      setUiTags(allTagsQuery.data.map((t) => ({ ...t, checked: false })));
     }
   }, [allTagsQuery.isSuccess, allTagsQuery.data]);
 
   useEffect(() => {
     if (noteTagsQuery.isSuccess) {
-      setAllUiTags((prev) =>
+      setUiTags((prev) =>
         prev.map((t) => ({
           ...t,
           checked: !!noteTagsQuery.data.find((nt) => nt.id === t.id),
         })),
       );
-      setNoteTagsWithStatus(
+
+      setTagsWithStatus(
         noteTagsQuery.data.map((ntq) => ({ ...ntq, status: 'ALREADY_ADDED' })),
       );
     }
   }, [noteTagsQuery.isSuccess, noteTagsQuery.data]);
 
   const filteredAllTags: TagWithCheckedStatus[] = useMemo(() => {
-    if (allUiTags.length === 0) return [];
-    if (!tag) return allUiTags;
-    return allUiTags.filter(
+    if (uiTags.length === 0) return [];
+    if (!tag) return uiTags;
+    return uiTags.filter(
       (t) => t.name.toLocaleLowerCase().search(tag.toLowerCase()) !== -1,
     );
-  }, [allUiTags, tag]);
+  }, [uiTags, tag]);
 
   const tagHasExactMatch: boolean = useMemo(() => {
     if (!allTagsQuery.isSuccess) return false;
@@ -74,15 +74,17 @@ export const TagInputPopover = ({ onClose }: TagInputPopoverProps) => {
     (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (tag.trim()) {
+      const trimmedTag = tag.trim();
+
+      if (trimmedTag) {
         const newTag: Tag = {
           id: Math.random().toString(36),
-          name: tag.trim(),
+          name: trimmedTag,
         };
 
-        setAllUiTags((prev) => [{ ...newTag, checked: true }, ...prev]);
+        setUiTags((prev) => [{ ...newTag, checked: true }, ...prev]);
 
-        setNoteTagsWithStatus((prev) => [
+        setTagsWithStatus((prev) => [
           ...prev,
           { ...newTag, status: 'NEWLY_CREATED' },
         ]);
@@ -95,16 +97,42 @@ export const TagInputPopover = ({ onClose }: TagInputPopoverProps) => {
     [tag],
   );
 
-  const toggleTagCheck = useCallback((tagId: string) => {
-    setAllUiTags((prev) => {
-      return prev.map((t) => {
-        return t.id !== tagId ? t : { ...t, checked: !t.checked };
-      });
-    });
-  }, []);
+  const toggleTagCheck = useCallback(
+    (tagId: string, checked: boolean) => {
+      const updatedUiTags: TagWithCheckedStatus[] = uiTags.map((t) =>
+        t.id !== tagId ? t : { ...t, checked },
+      );
 
-  console.log(allUiTags);
-  console.log(filteredAllTags);
+      setUiTags(updatedUiTags);
+
+      tagInputRef.current?.focus();
+
+      if (checked) {
+        const currentTag = uiTags.find((t) => t.id === tagId);
+
+        if (!tagsWithStatus.find((t) => t.id === tag) && !!currentTag) {
+          setTagsWithStatus((prev) => [
+            ...prev,
+            { id: currentTag.id, name: currentTag.name, status: 'NEWLY_ADDED' },
+          ]);
+        }
+      } else {
+        const uncheckedTag = tagsWithStatus.find((t) => t.id === tagId);
+
+        if (
+          uncheckedTag?.status === 'NEWLY_CREATED' ||
+          uncheckedTag?.status === 'NEWLY_ADDED'
+        ) {
+          setTagsWithStatus((prev) => prev.filter((t) => t.id !== tagId));
+        } else if (uncheckedTag?.status === 'ALREADY_ADDED') {
+          setTagsWithStatus((prev) =>
+            prev.map((t) => (t.id !== tagId ? t : { ...t, status: 'REMOVED' })),
+          );
+        }
+      }
+    },
+    [uiTags, tagsWithStatus],
+  );
 
   return (
     <div
@@ -158,7 +186,7 @@ export const TagInputPopover = ({ onClose }: TagInputPopoverProps) => {
                       className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-600"
                     >
                       <input
-                        onChange={() => toggleTagCheck(t.id)}
+                        onChange={() => toggleTagCheck(t.id, !t.checked)}
                         type="checkbox"
                         defaultChecked={false}
                         checked={t.checked}
