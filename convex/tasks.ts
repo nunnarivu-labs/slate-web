@@ -123,7 +123,7 @@ export const saveNote = mutation({
               noteId,
               tagId: tag.id as Id<'tags'>,
             });
-          } else {
+          } else if (tag.status === 'REMOVED') {
             const tagNote = await ctx.db
               .query('tagNote')
               .withIndex('by_tag_id', (q) =>
@@ -175,7 +175,7 @@ export const updateNote = mutation({
               noteId: args.id,
               tagId: tag.id as Id<'tags'>,
             });
-          } else {
+          } else if (tag.status === 'REMOVED') {
             const tagNote = await ctx.db
               .query('tagNote')
               .withIndex('by_tag_id', (q) =>
@@ -233,5 +233,41 @@ export const fetchNoteTags = query({
     return allTags
       .filter((tag) => !!tag && tag.userId === user._id)
       .map((tag) => docToTag(tag!));
+  },
+});
+
+export const updateTags = mutation({
+  args: { tags: tagsArg, noteId: v.id('notes') },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+
+    await Promise.all(
+      args.tags
+        .filter((tag) => tag.status !== 'ALREADY_ADDED')
+        .map(async (tag) => {
+          if (tag.status === 'NEWLY_CREATED') {
+            const tagId = await ctx.db.insert('tags', {
+              name: tag.name,
+              userId: user._id,
+            });
+
+            await ctx.db.insert('tagNote', { noteId: args.noteId, tagId });
+          } else if (tag.status === 'NEWLY_ADDED') {
+            await ctx.db.insert('tagNote', {
+              noteId: args.noteId,
+              tagId: tag.id as Id<'tags'>,
+            });
+          } else if (tag.status === 'REMOVED') {
+            const tagNote = await ctx.db
+              .query('tagNote')
+              .withIndex('by_tag_id', (q) =>
+                q.eq('tagId', tag.id as Id<'tags'>),
+              )
+              .first();
+
+            if (tagNote) await ctx.db.delete(tagNote._id);
+          }
+        }),
+    );
   },
 });

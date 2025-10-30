@@ -45,14 +45,8 @@ export const NoteModalContainer = () => {
 
       if (note === null) return;
 
-      if (
-        action !== 'save' ||
-        (action === 'save' &&
-          (isDirty || tags.some((tag) => tag.status !== 'ALREADY_ADDED')))
-      ) {
-        setIsSaving(true);
-        await saveNote({ note, tags, action });
-      }
+      setIsSaving(true);
+      await saveNote({ note, tags, action, isNoteDirty: isDirty });
 
       await navigate({
         to: '/notes/$category',
