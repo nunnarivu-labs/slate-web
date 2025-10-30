@@ -1,24 +1,36 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
+import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
 import { ContentEditor } from '@/components/content/content-editor.tsx';
 import { Markdown } from '@/components/content/markdown.tsx';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
+import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
-import { Archive, Home, ToggleLeft, ToggleRight, Trash } from 'lucide-react';
+import { Tag as TagType } from '@/types/tag.ts';
+import { TagWithCheckedStatus, TagWithStatus } from '@/types/tag.ts';
+import { convexQuery } from '@convex-dev/react-query';
+import { useQuery } from '@tanstack/react-query';
+import {
+  Archive,
+  Home,
+  Tag,
+  ToggleLeft,
+  ToggleRight,
+  Trash,
+} from 'lucide-react';
 import {
   ChangeEvent,
   RefObject,
   useCallback,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from 'react';
 import { v4 as uuid } from 'uuid';
 
-export type NoteModalRef = {
-  note: Note | null;
-  isDirty: boolean;
-};
+import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
 
 type NoteModalProps = {
   note: Note | null;
@@ -33,6 +45,15 @@ export const NoteModal = ({
 }: NoteModalProps) => {
   const params = Route.useParams();
 
+  const tagsPopoverRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection\
+
+  const [isTagInputOpen, setIsTagInputOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
+
+  const [uiTags, setUiTags] = useState<TagWithCheckedStatus[]>([]);
+  const [tagsWithStatus, setTagsWithStatus] = useState<TagWithStatus[]>([]);
+
   const [note, setNote] = useState<Note>(
     currentNote
       ? { ...currentNote }
@@ -44,16 +65,45 @@ export const NoteModal = ({
         },
   );
 
-  const [previewMode, setPreviewMode] = useState(false);
-
   const isNoteEmpty = !note.title && !note.content;
 
-  const [isDirty, setIsDirty] = useState(false);
+  const allTagsQuery = useQuery(convexQuery(api.tasks.fetchAllTags, {}));
+  const noteTagsQuery = useQuery(
+    convexQuery(
+      api.tasks.fetchNoteTags,
+      params.id === 'new' ? 'skip' : { noteId: params.id as Id<'notes'> },
+    ),
+  );
+
+  useEffect(() => {
+    if (allTagsQuery.isSuccess) {
+      setUiTags(allTagsQuery.data.map((t) => ({ ...t, checked: false })));
+    }
+  }, [allTagsQuery.isSuccess, allTagsQuery.data]);
+
+  useEffect(() => {
+    if (noteTagsQuery.isSuccess) {
+      setTagsWithStatus(
+        noteTagsQuery.data.map((ntq) => ({ ...ntq, status: 'ALREADY_ADDED' })),
+      );
+    }
+  }, [noteTagsQuery.isSuccess, noteTagsQuery.data]);
+
+  useEffect(() => {
+    if (allTagsQuery.isSuccess && noteTagsQuery.isSuccess) {
+      setUiTags((prev) =>
+        prev.map((t) => ({
+          ...t,
+          checked: !!noteTagsQuery.data.find((nt) => nt.id === t.id),
+        })),
+      );
+    }
+  }, [allTagsQuery.isSuccess, noteTagsQuery.isSuccess, noteTagsQuery.data]);
 
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        await onClose('save');
+        onClose('save');
       }
     },
     [onClose],
@@ -81,7 +131,83 @@ export const NoteModal = ({
 
   const handlePreviewModeToggle = () => setPreviewMode((prev) => !prev);
 
-  useImperativeHandle(ref, () => ({ note, isDirty }), [note, isDirty]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      note,
+      isDirty,
+      tags: tagsWithStatus,
+    }),
+    [note, isDirty, tagsWithStatus],
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | KeyboardEvent) => {
+      if (
+        tagsPopoverRef.current &&
+        !tagsPopoverRef.current.contains(event.target as Node)
+      ) {
+        setIsTagInputOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const addNewTag = useCallback((tag: string) => {
+    const trimmedTag = tag.trim();
+
+    if (trimmedTag) {
+      const newTag: TagType = {
+        id: Math.random().toString(36),
+        name: trimmedTag,
+      };
+
+      setUiTags((prev) => [{ ...newTag, checked: true }, ...prev]);
+
+      setTagsWithStatus((prev) => [
+        ...prev,
+        { ...newTag, status: 'NEWLY_CREATED' },
+      ]);
+    }
+  }, []);
+
+  const toggleTagCheck = useCallback(
+    (tagId: string, checked: boolean) => {
+      const updatedUiTags: TagWithCheckedStatus[] = uiTags.map((t) =>
+        t.id !== tagId ? t : { ...t, checked },
+      );
+
+      setUiTags(updatedUiTags);
+
+      if (checked) {
+        const currentTag = updatedUiTags.find((t) => t.id === tagId);
+
+        if (!tagsWithStatus.find((t) => t.id === tagId) && !!currentTag) {
+          setTagsWithStatus((prev) => [
+            ...prev,
+            { id: currentTag.id, name: currentTag.name, status: 'NEWLY_ADDED' },
+          ]);
+        }
+      } else {
+        const uncheckedTag = tagsWithStatus.find((t) => t.id === tagId);
+
+        if (
+          uncheckedTag?.status === 'NEWLY_CREATED' ||
+          uncheckedTag?.status === 'NEWLY_ADDED'
+        ) {
+          setTagsWithStatus((prev) => prev.filter((t) => t.id !== tagId));
+        } else if (uncheckedTag?.status === 'ALREADY_ADDED') {
+          setTagsWithStatus((prev) =>
+            prev.map((t) => (t.id !== tagId ? t : { ...t, status: 'REMOVED' })),
+          );
+        }
+      }
+    },
+    [uiTags, tagsWithStatus],
+  );
 
   return (
     <>
@@ -151,6 +277,26 @@ export const NoteModal = ({
               <ToggleLeft size={20} />
             )}
           </NoteModalIcon>
+          <div ref={tagsPopoverRef} className="relative">
+            <NoteModalIcon
+              disabled={isNoteEmpty}
+              onClick={(ev) => {
+                ev.stopPropagation();
+                setIsTagInputOpen((prev) => !prev);
+              }}
+              tooltip="Manage Tags"
+            >
+              <Tag size={20} />
+            </NoteModalIcon>
+            {isTagInputOpen && (
+              <TagInputPopover
+                onClose={() => setIsTagInputOpen(false)}
+                tags={uiTags}
+                onTagAdd={addNewTag}
+                onTagCheck={toggleTagCheck}
+              />
+            )}
+          </div>
         </div>
         <button
           onClick={() => onClose('save')}

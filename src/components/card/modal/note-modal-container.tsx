@@ -1,10 +1,8 @@
-import {
-  NoteModal,
-  NoteModalRef,
-} from '@/components/card/modal/note-modal.tsx';
+import { NoteModal } from '@/components/card/modal/note-modal.tsx';
 import { Loader } from '@/components/loader.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
+import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
@@ -43,14 +41,12 @@ export const NoteModalContainer = () => {
 
       if (!modalRef) return;
 
-      const { note, isDirty } = modalRef;
+      const { note, isDirty, tags } = modalRef;
 
       if (note === null) return;
 
-      if (action !== 'save' || (action === 'save' && isDirty)) {
-        setIsSaving(true);
-        await saveNote({ note, action });
-      }
+      setIsSaving(true);
+      await saveNote({ note, tags, action, isNoteDirty: isDirty });
 
       await navigate({
         to: '/notes/$category',

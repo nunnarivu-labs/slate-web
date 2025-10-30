@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { MouseEvent, ReactNode } from 'react';
 
 export const NoteModalIcon = ({
   children,
@@ -7,7 +7,7 @@ export const NoteModalIcon = ({
   tooltip,
 }: {
   children: ReactNode;
-  onClick: () => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   tooltip?: string;
 }) => {
