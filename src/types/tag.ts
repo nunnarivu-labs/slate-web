@@ -6,3 +6,7 @@ export type Tag = {
 export type TagWithStatus = Tag & {
   status: 'ALREADY_ADDED' | 'NEWLY_ADDED' | 'NEWLY_CREATED' | 'REMOVED';
 };
+
+export type TagWithCheckedStatus = Tag & {
+  checked: boolean;
+};
