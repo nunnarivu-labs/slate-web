@@ -36,11 +36,13 @@ export const tagsArg = v.array(
 );
 
 export default defineSchema({
-  notes: defineTable(noteSchema).index('by_user_id_category_and_updated_at', [
-    'userId',
-    'category',
-    'updatedAt',
-  ]),
+  notes: defineTable(noteSchema)
+    .index('by_user_id_category_and_updated_at', [
+      'userId',
+      'category',
+      'updatedAt',
+    ])
+    .index('by_category_and_updated_at', ['category', 'updatedAt']),
 
   users: defineTable(userSchema).index('by_auth_provider_user_id', [
     'authProviderUserId',
