@@ -1,14 +1,14 @@
 import { docToNote, docToTag } from '@/utils/convex-type-converters.ts';
 import { v } from 'convex/values';
 
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import { draftNoteSchema, tagsArg } from './schema.ts';
 import {
   updateTags as doUpdateTags,
   getNote,
   getNoteTagsData,
   getUser,
-} from './task-helpers.ts';
+} from './taskHelpers.ts';
 
 export const fetchNotes = query({
   args: {
@@ -137,4 +137,30 @@ export const updateTags = mutation({
   args: { tags: tagsArg, noteId: v.id('notes') },
   handler: async (ctx, args) =>
     await doUpdateTags(ctx, { tags: args.tags, noteId: args.noteId }),
+});
+
+export const deleteAllMessages = internalMutation({
+  handler: async (ctx) => {
+    const deletedNotes = await ctx.db
+      .query('notes')
+      .withIndex('by_category_and_updated_at', (q) =>
+        q
+          .eq('category', 'trash')
+          .lte('updatedAt', Date.now() - 24 * 60 * 60 * 1000),
+      )
+      .collect();
+
+    const noteIds = deletedNotes.map((note) => note._id);
+
+    await Promise.all(
+      noteIds.map(async (noteId) => {
+        const noteTags = await getNoteTagsData(ctx, noteId);
+        await Promise.all(
+          noteTags.map(async (noteTag) => await ctx.db.delete(noteTag._id)),
+        );
+      }),
+    );
+
+    await Promise.all(noteIds.map(async (id) => await ctx.db.delete(id)));
+  },
 });

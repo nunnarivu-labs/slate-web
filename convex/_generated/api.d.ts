@@ -8,7 +8,8 @@
  * @module
  */
 
-import type * as task_helpers from "../task-helpers.js";
+import type * as crons from "../crons.js";
+import type * as taskHelpers from "../taskHelpers.js";
 import type * as tasks from "../tasks.js";
 
 import type {
@@ -26,7 +27,8 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  "task-helpers": typeof task_helpers;
+  crons: typeof crons;
+  taskHelpers: typeof taskHelpers;
   tasks: typeof tasks;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
