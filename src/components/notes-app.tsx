@@ -5,15 +5,20 @@ import { Route } from '@/routes/_auth/notes/$category/route.tsx';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { Id } from 'convex/_generated/dataModel';
 
 import { api } from '../../convex/_generated/api';
 
 export const NotesApp = () => {
   const navigate = useNavigate();
   const params = Route.useParams();
+  const search = Route.useSearch();
 
   const notesQuery = useQuery(
-    convexQuery(api.tasks.fetchNotes, { category: params.category }),
+    convexQuery(api.tasks.fetchNotes, {
+      category: params.category,
+      tagIds: search.tags as Id<'tags'>[] | undefined,
+    }),
   );
 
   if (notesQuery.isFetching) {
@@ -29,6 +34,7 @@ export const NotesApp = () => {
               navigate({
                 to: '/notes/$category/$id',
                 params: { category: params.category, id: 'new' },
+                search,
               })
             }
           />
@@ -42,6 +48,7 @@ export const NotesApp = () => {
                 navigate({
                   to: '/notes/$category/$id',
                   params: { id: note.id, category: params.category },
+                  search,
                 })
               }
             />

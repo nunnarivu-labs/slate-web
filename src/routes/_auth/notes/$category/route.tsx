@@ -17,11 +17,16 @@ export const Route = createFileRoute('/_auth/notes/$category')({
     }),
   },
 
-  beforeLoad: ({ params }) => {
+  validateSearch: (rawSearch) => ({
+    tags: rawSearch.tags ? (rawSearch.tags as string[]) : undefined,
+  }),
+
+  beforeLoad: ({ params, search }) => {
     if (!isValidNoteCategory(params.category)) {
       throw redirect({
         to: '/notes/$category',
         params: { category: 'active' },
+        search,
       });
     }
   },
