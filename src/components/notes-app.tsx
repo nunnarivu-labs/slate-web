@@ -39,7 +39,7 @@ export const NotesApp = () => {
             }
           />
         </div>
-        <div className="col-auto grid grid-cols-2 justify-center gap-4 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="col-auto grid grid-cols-2 justify-center gap-4 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5">
           {notes.map((note) => (
             <NoteCard
               key={note.id}
