@@ -6,7 +6,7 @@ import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
-import { Navigate, useNavigate } from '@tanstack/react-router';
+import { Navigate, useNavigate, useSearch } from '@tanstack/react-router';
 import { useCallback, useRef, useState } from 'react';
 
 import { api } from '../../../../convex/_generated/api';
@@ -15,6 +15,7 @@ import { Id } from '../../../../convex/_generated/dataModel';
 export const NoteModalContainer = () => {
   const params = Route.useParams();
   const navigate = useNavigate();
+  const search = useSearch({ from: '/_auth/notes/$category' });
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -51,6 +52,7 @@ export const NoteModalContainer = () => {
       await navigate({
         to: '/notes/$category',
         params: { category: params.category },
+        search,
       });
     },
     [saveNote, navigate, params, isSaving],
@@ -91,6 +93,7 @@ export const NoteModalContainer = () => {
           <Navigate
             to="/notes/$category"
             params={{ category: params.category }}
+            search={search}
           />
         )}
       </div>

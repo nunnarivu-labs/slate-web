@@ -1,6 +1,7 @@
 import { docToNote, docToTag } from '@/utils/convex-type-converters.ts';
 import { v } from 'convex/values';
 
+import { Id } from './_generated/dataModel';
 import { internalMutation, mutation, query } from './_generated/server';
 import { draftNoteSchema, tagsArg } from './schema.ts';
 import {
@@ -17,9 +18,37 @@ export const fetchNotes = query({
       v.literal('archive'),
       v.literal('trash'),
     ),
+    tagIds: v.optional(v.array(v.id('tags'))),
   },
   handler: async (ctx, args) => {
     const user = await getUser(ctx);
+
+    if (args.tagIds && args.tagIds.length > 0) {
+      const tagNotes = await Promise.all(
+        args.tagIds.map(
+          async (tagId) =>
+            await ctx.db
+              .query('tagNote')
+              .withIndex('by_tag_id', (q) => q.eq('tagId', tagId))
+              .collect(),
+        ),
+      );
+      const noteIds = Array.from(
+        new Set<Id<'notes'>>(tagNotes.flatMap((tn) => tn.map((t) => t.noteId))),
+      );
+
+      const allNotes = await Promise.all(
+        noteIds.map(async (noteId) => await ctx.db.get(noteId)),
+      );
+      const filteredNotes = allNotes.filter(
+        (note) =>
+          note && note.userId === user._id && note.category === args.category,
+      ) as NonNullable<(typeof allNotes)[number]>[];
+
+      filteredNotes.sort((a, b) => b.updatedAt - a.updatedAt);
+
+      return filteredNotes.map(docToNote);
+    }
 
     const notes = await ctx.db
       .query('notes')

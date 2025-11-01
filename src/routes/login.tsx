@@ -5,6 +5,7 @@ import {
   redirect,
   useNavigate,
   useRouter,
+  useSearch,
 } from '@tanstack/react-router';
 import { KeyRound, LogIn } from 'lucide-react';
 import { FormEvent, useCallback, useState } from 'react';
@@ -17,6 +18,7 @@ const LoginPage = () => {
 
   const router = useRouter();
   const navigate = useNavigate();
+  const search = useSearch({ from: '/login' });
 
   const handleLogin = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -35,7 +37,7 @@ const LoginPage = () => {
           }
         }
       } finally {
-        await navigate({ to: '/' });
+        await navigate({ to: '/', search: { tags: search.tags } });
       }
     },
     [email, password, signIn, setActive, navigate],
@@ -121,6 +123,7 @@ export const Route = createFileRoute('/login')({
 
   validateSearch: z.object({
     redirect: z.string().optional(),
+    tags: z.array(z.string()).optional(),
   }),
 
   beforeLoad: async ({ search }) => {
@@ -130,6 +133,7 @@ export const Route = createFileRoute('/login')({
       throw redirect({
         to: search.redirect ?? '/notes/$category',
         params: { category: 'active' },
+        search: { tags: search.tags },
       });
   },
 });
