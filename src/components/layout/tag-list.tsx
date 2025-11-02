@@ -49,8 +49,6 @@ export const TagList = () => {
     [navigate, search],
   );
 
-  if (!allTagsQuery.isSuccess) return null;
-
   return (
     <div className="mt-4 min-h-0 grow overflow-y-auto border-t border-zinc-200 pt-4 dark:border-zinc-700">
       <h3 className="mb-2 px-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
@@ -58,26 +56,28 @@ export const TagList = () => {
       </h3>
       <nav>
         <ul>
-          {allTagsQuery.data.map((tag) => {
-            const isSelected = search.tags?.includes(tag.id) ?? false;
+          {allTagsQuery.isSuccess
+            ? allTagsQuery.data.map((tag) => {
+                const isSelected = search.tags?.includes(tag.id) ?? false;
 
-            return (
-              <li key={tag.id} className="mb-1">
-                <button
-                  type="button"
-                  onClick={() => onTagClick(tag.id)}
-                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800 ${
-                    isSelected
-                      ? 'bg-blue-100 font-semibold text-blue-600 dark:bg-blue-900/50 dark:text-blue-400'
-                      : ''
-                  } `}
-                >
-                  <Tag size={20} />
-                  <span>{tag.name}</span>
-                </button>
-              </li>
-            );
-          })}
+                return (
+                  <li key={tag.id} className="mb-1">
+                    <button
+                      type="button"
+                      onClick={() => onTagClick(tag.id)}
+                      className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800 ${
+                        isSelected
+                          ? 'bg-blue-100 font-semibold text-blue-600 dark:bg-blue-900/50 dark:text-blue-400'
+                          : ''
+                      } `}
+                    >
+                      <Tag size={20} />
+                      <span>{tag.name}</span>
+                    </button>
+                  </li>
+                );
+              })
+            : null}
         </ul>
       </nav>
     </div>
