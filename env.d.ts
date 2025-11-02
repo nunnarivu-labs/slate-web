@@ -5,6 +5,7 @@ declare global {
       readonly VITE_CONVEX_URL: string;
       readonly VITE_CLERK_PUBLISHABLE_KEY: string;
       readonly CLERK_SECRET_KEY: string;
+      readonly GEMINI_API_KEY: string;
     }
   }
 }
