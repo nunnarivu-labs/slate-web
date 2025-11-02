@@ -1,7 +1,9 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
+import { SummaryDisplay } from '@/components/card/modal/summary-display.tsx';
 import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
 import { ContentEditor } from '@/components/content/content-editor.tsx';
 import { Markdown } from '@/components/content/markdown.tsx';
+import { extractActionItems, summarize } from '@/data/ai.ts';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
@@ -10,9 +12,14 @@ import { Tag as TagType } from '@/types/tag.ts';
 import { TagWithCheckedStatus, TagWithStatus } from '@/types/tag.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
+import { useServerFn } from '@tanstack/react-start';
 import {
   Archive,
+  CheckSquare,
+  FileText,
   Home,
+  Loader2,
+  Sparkles,
   Tag,
   ToggleLeft,
   ToggleRight,
@@ -43,9 +50,14 @@ export const NoteModal = ({
   ref,
   onClose,
 }: NoteModalProps) => {
+  const summarizeFn = useServerFn(summarize);
+  const extractActionItemsFn = useServerFn(extractActionItems);
+
   const params = Route.useParams();
 
-  const tagsPopoverRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection\
+  const aiMenuRef = useRef<HTMLDivElement>(null);
+  const tagsPopoverRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [isTagInputOpen, setIsTagInputOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -53,6 +65,11 @@ export const NoteModal = ({
 
   const [uiTags, setUiTags] = useState<TagWithCheckedStatus[]>([]);
   const [tagsWithStatus, setTagsWithStatus] = useState<TagWithStatus[]>([]);
+
+  const [isAiMenuOpen, setIsAiMenuOpen] = useState(false);
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
+
+  const [aiContent, setAiContent] = useState('');
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -99,6 +116,20 @@ export const NoteModal = ({
       );
     }
   }, [allTagsQuery.isSuccess, noteTagsQuery.isSuccess, noteTagsQuery.data]);
+
+  const focusEnd = useCallback(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(
+        note.content.length,
+        note.content.length,
+      );
+    }
+  }, [note.content]);
+
+  useEffect(() => {
+    focusEnd();
+  }, []);
 
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
@@ -148,6 +179,21 @@ export const NoteModal = ({
         !tagsPopoverRef.current.contains(event.target as Node)
       ) {
         setIsTagInputOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | KeyboardEvent) => {
+      if (
+        aiMenuRef.current &&
+        !aiMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsAiMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -209,8 +255,59 @@ export const NoteModal = ({
     [uiTags, tagsWithStatus],
   );
 
+  const handleSummarize = useCallback(async () => {
+    setIsAiMenuOpen(false);
+    setIsAiProcessing(true);
+
+    try {
+      const content = await summarizeFn({ data: { note: note.content } });
+
+      if (content) {
+        setAiContent(content);
+      }
+    } finally {
+      setIsAiProcessing(false);
+    }
+  }, [note.content, summarizeFn]);
+
+  const handleExtractActionItems = useCallback(async () => {
+    setIsAiMenuOpen(false);
+    setIsAiProcessing(true);
+
+    try {
+      const content = await extractActionItemsFn({
+        data: { note: note.content },
+      });
+
+      if (content) {
+        setAiContent(content);
+      }
+    } finally {
+      setIsAiProcessing(false);
+    }
+  }, [note.content, extractActionItemsFn]);
+
+  const onInsertAiContent = useCallback(
+    (content: string) => {
+      setNote((prev) => ({ ...prev, content: prev.content + content }));
+      setAiContent('');
+
+      focusEnd();
+    },
+    [focusEnd],
+  );
+
+  const isNoteTooShort = note.content.length < 100;
+
   return (
     <>
+      {aiContent ? (
+        <SummaryDisplay
+          summaryText={aiContent}
+          onClose={() => setAiContent('')}
+          onInsert={onInsertAiContent}
+        />
+      ) : null}
       <div className="flex min-h-0 flex-grow flex-col p-4">
         {!previewMode && (
           <input
@@ -230,9 +327,9 @@ export const NoteModal = ({
           <Markdown md={note.content} className="md-preview overflow-y-auto" />
         ) : (
           <ContentEditor
+            ref={textareaRef}
             content={note.content}
             onChange={handleContentChange}
-            autofocusEnd
             placeholder="Take a note..."
           />
         )}
@@ -296,6 +393,41 @@ export const NoteModal = ({
                 onTagCheck={toggleTagCheck}
               />
             )}
+          </div>
+          <div ref={aiMenuRef} className="relative">
+            <NoteModalIcon
+              onClick={() => setIsAiMenuOpen((prev) => !prev)}
+              disabled={isAiProcessing}
+              tooltip="AI Actions"
+            >
+              {isAiProcessing ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : (
+                <Sparkles size={20} />
+              )}
+            </NoteModalIcon>
+            {isAiMenuOpen ? (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute bottom-full left-1/2 mb-2 w-56 -translate-x-1/2 rounded-lg border bg-white p-2 shadow-xl md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
+              >
+                <button
+                  onClick={handleSummarize}
+                  disabled={isNoteTooShort}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                >
+                  <FileText size={16} />
+                  <span>Summarize note</span>
+                </button>
+                <button
+                  onClick={handleExtractActionItems}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                >
+                  <CheckSquare size={16} />
+                  <span>Extract action items</span>
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
         <button

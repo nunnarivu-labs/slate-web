@@ -1,4 +1,7 @@
+import { RefObject } from 'react';
+
 type ContentEditorProps = {
+  ref?: RefObject<HTMLTextAreaElement | null>;
   content: string;
   onChange: (md?: string) => void;
   autofocusEnd?: boolean;
@@ -6,15 +9,15 @@ type ContentEditorProps = {
 };
 
 export const ContentEditor = ({
+  ref,
   content,
   onChange,
-  autofocusEnd = true,
   placeholder = '',
 }: ContentEditorProps) => (
   <textarea
+    ref={ref}
     value={content}
     onChange={(event) => onChange(event.target.value)}
-    autoFocus={autofocusEnd}
     placeholder={placeholder}
     className="w-full flex-grow resize-none bg-transparent text-zinc-800 outline-none dark:text-zinc-200"
   />
