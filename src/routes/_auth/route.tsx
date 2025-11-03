@@ -21,7 +21,10 @@ export const Route = createFileRoute('/_auth')({
         to: '/login',
         search: { redirect: location.href, tags: search.tags },
       });
-    return { userId };
+    return {
+      userId,
+      isGuestUser: userId === import.meta.env.VITE_GUEST_USER_ID,
+    };
   },
 
   component: () => {

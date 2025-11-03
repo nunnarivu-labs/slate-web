@@ -12,6 +12,7 @@ import { Tag as TagType } from '@/types/tag.ts';
 import { TagWithCheckedStatus, TagWithStatus } from '@/types/tag.ts';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
+import { useRouteContext } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import {
   Archive,
@@ -50,6 +51,10 @@ export const NoteModal = ({
   ref,
   onClose,
 }: NoteModalProps) => {
+  const { isGuestUser } = useRouteContext({
+    from: '/_auth/notes/$category/$id',
+  });
+
   const summarizeFn = useServerFn(summarize);
   const extractActionItemsFn = useServerFn(extractActionItems);
 
@@ -394,41 +399,43 @@ export const NoteModal = ({
               />
             )}
           </div>
-          <div ref={aiMenuRef} className="relative">
-            <NoteModalIcon
-              onClick={() => setIsAiMenuOpen((prev) => !prev)}
-              disabled={isAiProcessing}
-              tooltip="AI Actions"
-            >
-              {isAiProcessing ? (
-                <Loader2 size={20} className="animate-spin" />
-              ) : (
-                <Sparkles size={20} />
-              )}
-            </NoteModalIcon>
-            {isAiMenuOpen ? (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="absolute bottom-full left-1/2 mb-2 w-56 -translate-x-1/2 rounded-lg border bg-white p-2 shadow-xl md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
+          {!isGuestUser ? (
+            <div ref={aiMenuRef} className="relative">
+              <NoteModalIcon
+                onClick={() => setIsAiMenuOpen((prev) => !prev)}
+                disabled={isAiProcessing}
+                tooltip="AI Actions"
               >
-                <button
-                  onClick={handleSummarize}
-                  disabled={isNoteTooShort}
-                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                {isAiProcessing ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <Sparkles size={20} />
+                )}
+              </NoteModalIcon>
+              {isAiMenuOpen ? (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute bottom-full left-1/2 mb-2 w-56 -translate-x-1/2 rounded-lg border bg-white p-2 shadow-xl md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
                 >
-                  <FileText size={16} />
-                  <span>Summarize note</span>
-                </button>
-                <button
-                  onClick={handleExtractActionItems}
-                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
-                >
-                  <CheckSquare size={16} />
-                  <span>Extract action items</span>
-                </button>
-              </div>
-            ) : null}
-          </div>
+                  <button
+                    onClick={handleSummarize}
+                    disabled={isNoteTooShort}
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                  >
+                    <FileText size={16} />
+                    <span>Summarize note</span>
+                  </button>
+                  <button
+                    onClick={handleExtractActionItems}
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                  >
+                    <CheckSquare size={16} />
+                    <span>Extract action items</span>
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
         <button
           onClick={() => onClose('save')}

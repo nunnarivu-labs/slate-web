@@ -147,6 +147,12 @@ const LoginPage = () => {
             </div>
           </div>
         </form>
+        <div className="mt-6 text-center">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Guest access showcases the core note-taking experience. Powerful AI
+            features are available to be shown in a live demo.
+          </p>
+        </div>
       </div>
     </div>
   );

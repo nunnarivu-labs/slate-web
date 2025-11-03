@@ -19,16 +19,17 @@ The application, built with React and TanStack Start, features a responsive, car
 ## 3. Key Features
 
 *   **Intuitive Card-Based Interface:** A responsive, grid-based layout for a clean and visual way to view, create, and edit notes.
-*   **Rich Text Formatting with Smart Markdown:** Notes are automatically rendered as formatted HTML if they contain Markdown syntax but look like plain text otherwise. This keeps the editing experience simple while allowing for powerful formatting.
-*   **Flexible Tag-Based Organization:** Instead of rigid folders, Slate uses a flexible tagging system. Assign multiple tags to a single note for powerful, multi-dimensional organization.
+*   **Rich Text Formatting with Smart Markdown:** Notes are automatically rendered as formatted HTML, keeping the editing experience simple while allowing for powerful formatting.
+*   **Flexible Tag-Based Organization:** A flexible tagging system for powerful, multi-dimensional organization.
 *   **Real-Time Sync Across Devices:** Built on the Convex real-time database, notes are automatically and instantly synced across all logged-in sessions.
 
-#### Upcoming Features (In Development)
+#### Exclusive AI Capabilities (Available for Live Demo)
+This project also includes a seamless integration with the Google Gemini API. These premium features are available to be demonstrated in a live walkthrough:
+*   **One-Click Summarization:** Generate a concise summary of long notes.
+*   **Action-Item Extraction:** Automatically create a Markdown checklist from unstructured text.
 
-*   **Unobtrusive AI Integration (Gemini):** A subtle icon in the editor will unlock powerful AI assistance on demand, including:
-    *   Summarizing long notes.
-    *   Extracting action items into a checklist.
-    *   Suggesting relevant tags based on the note's content.
+#### Upcoming Features (In Development)
+*   AI-Powered Tag Suggestions
 
 ## 4. Tech Stack
 
@@ -37,8 +38,11 @@ The application, built with React and TanStack Start, features a responsive, car
 *   **Authentication:** Clerk
 *   **Styling:** Tailwind CSS
 *   **Routing & State Management:** TanStack Router, TanStack Query
+*   **AI (Live Demo):** Google Gemini
 *   **Deployment:** Netlify
 
 ## 5. Challenges & Lessons Learned
 
-A key UX challenge was implementing Markdown support without making the app feel complicated for users who just want to write plain text. The solution was to create a "smart rendering" system. When a note is being viewed, the application checks for Markdown syntax and renders it as styled HTML. When a user clicks to edit, the note reverts to a simple `<textarea>` with the raw Markdown. This approach preserves the minimalist feel of the application while still providing powerful formatting capabilities for those who need it.
+A key strategic decision for this portfolio piece was how to demonstrate the powerful, API-driven AI features without enabling them in the public guest demo.
+
+I chose to showcase the robust core functionality of the app, while positioning the AI capabilities as a premium feature set available for a live walkthrough. This approach protects backend resources and reduces API costs, while creating a compelling reason for interested clients to initiate a conversation.
