@@ -7,7 +7,7 @@ import {
   useRouter,
   useSearch,
 } from '@tanstack/react-router';
-import { KeyRound, LogIn, User } from 'lucide-react';
+import { KeyRound, Loader2, LogIn, User } from 'lucide-react';
 import { FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 
@@ -16,6 +16,8 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [disableSignInButton, setDisableSignInButton] = useState(false);
+
   const router = useRouter();
   const navigate = useNavigate();
   const search = useSearch({ from: '/login' });
@@ -23,6 +25,8 @@ const LoginPage = () => {
   const handleLogin = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+
+      setDisableSignInButton(true);
 
       try {
         const result = await signIn?.create({ identifier: email, password });
@@ -37,6 +41,7 @@ const LoginPage = () => {
           }
         }
       } finally {
+        setDisableSignInButton(false);
         await navigate({ to: '/', search: { tags: search.tags } });
       }
     },
@@ -47,6 +52,8 @@ const LoginPage = () => {
     if (!signIn || !setActive) {
       return;
     }
+
+    setDisableSignInButton(true);
 
     const guestEmail = 'johnsonabraham@nunnarivulabs.in';
     const guestPassword = 'XkeX5?qo@N$k9YyJ';
@@ -63,6 +70,7 @@ const LoginPage = () => {
         return;
       }
     } finally {
+      setDisableSignInButton(false);
       await navigate({ to: '/', search: { tags: search.tags } });
     }
   }, [signIn, setActive, navigate, router, search.tags]);
@@ -130,18 +138,28 @@ const LoginPage = () => {
           <div>
             <div className="space-y-3 pt-2">
               <button
+                disabled={disableSignInButton}
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:bg-blue-400"
               >
-                <LogIn className="h-4 w-4" aria-hidden="true" />
-                Sign In
+                {disableSignInButton ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LogIn className="h-4 w-4" />
+                )}
+                {disableSignInButton ? 'Signing In...' : 'Sign In'}
               </button>
               <button
+                disabled={disableSignInButton}
                 type="button"
                 onClick={handleGuestLogin}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
               >
-                <User className="h-4 w-4" aria-hidden="true" />
+                {disableSignInButton ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <User className="h-4 w-4" />
+                )}
                 Log in as Guest
               </button>
             </div>
