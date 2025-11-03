@@ -1,6 +1,12 @@
 import { AppLayout } from '@/components/layout/app-layout.tsx';
 import { authFn } from '@/data/auth.ts';
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
+import { useUser } from '@clerk/shared/react';
+import {
+  Navigate,
+  Outlet,
+  createFileRoute,
+  redirect,
+} from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_auth')({
   validateSearch: (rawSearch) => ({
@@ -18,9 +24,17 @@ export const Route = createFileRoute('/_auth')({
     return { userId };
   },
 
-  component: () => (
-    <AppLayout>
-      <Outlet />
-    </AppLayout>
-  ),
+  component: () => {
+    const user = useUser();
+
+    if (!user.isSignedIn && user.isLoaded) {
+      return <Navigate to="/login" search={{ redirect: location.href }} />;
+    }
+
+    return (
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    );
+  },
 });
