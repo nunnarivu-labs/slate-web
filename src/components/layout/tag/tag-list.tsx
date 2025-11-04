@@ -1,10 +1,10 @@
-import { Route } from '@/routes/_auth/notes/$category/route';
+import { Route } from '@/routes/_auth/notes/$category/route.tsx';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { Tag } from 'lucide-react';
 import { useCallback, useEffect } from 'react';
 
-import { api } from '../../../convex/_generated/api';
+import { api } from '../../../../convex/_generated/api';
 
 export const TagList = () => {
   const search = Route.useSearch();
