@@ -25,12 +25,11 @@ The application, built with React and TanStack Start, features a responsive, car
      *   Assign multiple tags to a single note for powerful, multi-dimensional organization.
 *   **Real-Time Sync Across Devices:** Built on the Convex real-time database, notes are automatically and instantly synced across all logged-in sessions.
 
-* **Exclusive AI Capabilities (Available for Live Demo)** This project also includes a seamless integration with the Google Gemini API. These premium features are available to be demonstrated in a live walkthrough:
+* **Exclusive AI Capabilities (Available for Live Demo)**
+This project includes a seamless integration with the Google Gemini API to create a smart, context-aware writing assistant. These premium features are available to be demonstrated in a live walkthrough:
+    *   **Intelligent Tag Suggestions:** The AI analyzes the content of a note and suggests relevant tags. It intelligently prioritizes the user's existing tags but will also create new ones, providing personalized and efficient organization.
     *   **One-Click Summarization:** Generate a concise summary of long notes.
     *   **Action-Item Extraction:** Automatically create a Markdown checklist from unstructured text.
-
-* **Upcoming Features (In Development)**
-    *   AI-Powered Tag Suggestions
 
 ## 4. Tech Stack
 
