@@ -1,13 +1,22 @@
 import { TagWithCheckedStatus } from '@/types/tag.ts';
-import { X } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 import { FormEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 type TagInputPopoverProps = {
   onClose: () => void;
   onTagAdd: (tag: string) => void;
   onTagCheck: (tagId: string, checked: boolean) => void;
+  onAiTagSuggest: (tags: string[]) => Promise<string[]>;
   tags: TagWithCheckedStatus[];
 };
+
+const mockSuggestedTags = [
+  'project-alpha',
+  'work',
+  'marketing-plan',
+  'performance',
+  'meeting-notes',
+];
 
 export const TagInputPopover = ({
   onClose,
@@ -87,7 +96,45 @@ export const TagInputPopover = ({
         >
           Add
         </button>
+        <button
+          type="button"
+          onClick={() => {}}
+          className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-600"
+          title="Suggest tags with AI"
+        >
+          <Sparkles size={16} />
+        </button>
       </form>
+      <div className="mt-3 border-t pt-2 dark:border-zinc-600">
+        <h4 className="mb-2 px-1 text-xs font-bold text-zinc-500 uppercase dark:text-zinc-400">
+          Suggested Tags
+        </h4>
+        <div className="flex flex-wrap gap-2">
+          {mockSuggestedTags.map((suggestedTag) => {
+            const existingTag = tags.find((tag) => tag.name === suggestedTag);
+            const isSelected = !existingTag ? false : existingTag.checked;
+
+            return (
+              <button
+                key={suggestedTag}
+                onClick={() => {
+                  if (existingTag)
+                    toggleTagCheck(existingTag.id, !existingTag.checked);
+                  else onTagAdd(suggestedTag);
+                }}
+                type="button"
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
+                  isSelected
+                    ? 'bg-blue-600 text-white hover:bg-blue-500'
+                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-600'
+                } `}
+              >
+                {suggestedTag}
+              </button>
+            );
+          })}
+        </div>
+      </div>
       {filteredAllTags.length > 0 ? (
         <div className="mt-3 border-t pt-2 dark:border-zinc-600">
           <h4 className="mb-1 px-1 text-xs font-bold text-zinc-500 uppercase dark:text-zinc-400">
