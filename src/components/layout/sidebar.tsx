@@ -1,5 +1,5 @@
 import { Logout } from '@/components/layout/logout.tsx';
-import { TagList } from '@/components/layout/tag-list.tsx';
+import { TagList } from '@/components/layout/tag/tag-list.tsx';
 import { NoteCategory } from '@/types/note-category.ts';
 import { Link, useSearch } from '@tanstack/react-router';
 import { Archive, Home, Trash2 } from 'lucide-react';

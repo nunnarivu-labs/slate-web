@@ -1,10 +1,10 @@
-import { Route } from '@/routes/_auth/notes/$category/route';
+import { TagListItem } from '@/components/layout/tag/tag-list-item.tsx';
+import { Route } from '@/routes/_auth/notes/$category/route.tsx';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
-import { Tag } from 'lucide-react';
 import { useCallback, useEffect } from 'react';
 
-import { api } from '../../../convex/_generated/api';
+import { api } from '../../../../convex/_generated/api';
 
 export const TagList = () => {
   const search = Route.useSearch();
@@ -57,26 +57,9 @@ export const TagList = () => {
       <nav>
         <ul>
           {allTagsQuery.isSuccess
-            ? allTagsQuery.data.map((tag) => {
-                const isSelected = search.tags?.includes(tag.id) ?? false;
-
-                return (
-                  <li key={tag.id} className="mb-1">
-                    <button
-                      type="button"
-                      onClick={() => onTagClick(tag.id)}
-                      className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800 ${
-                        isSelected
-                          ? 'bg-blue-100 font-semibold text-blue-600 dark:bg-blue-900/50 dark:text-blue-400'
-                          : ''
-                      } `}
-                    >
-                      <Tag size={20} />
-                      <span>{tag.name}</span>
-                    </button>
-                  </li>
-                );
-              })
+            ? allTagsQuery.data.map((tag) => (
+                <TagListItem tag={tag} onTagClick={onTagClick} key={tag.id} />
+              ))
             : null}
         </ul>
       </nav>

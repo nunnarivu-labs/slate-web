@@ -168,6 +168,41 @@ export const updateTags = mutation({
     await doUpdateTags(ctx, { tags: args.tags, noteId: args.noteId }),
 });
 
+export const editTagName = mutation({
+  args: { id: v.id('tags'), newName: v.string() },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+    const tag = await ctx.db.get(args.id);
+
+    if (tag && tag.userId === user._id) {
+      await ctx.db.patch(args.id, { name: args.newName });
+    }
+  },
+});
+
+export const deleteTag = mutation({
+  args: { id: v.id('tags') },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+    const tag = await ctx.db.get(args.id);
+
+    if (!tag) return;
+
+    if (tag.userId === user._id) {
+      const tagNotes = await ctx.db
+        .query('tagNote')
+        .withIndex('by_tag_id', (q) => q.eq('tagId', args.id))
+        .collect();
+
+      await Promise.all(
+        tagNotes.map(async (tagNote) => await ctx.db.delete(tagNote._id)),
+      );
+
+      await ctx.db.delete(args.id);
+    }
+  },
+});
+
 export const deleteAllMessages = internalMutation({
   handler: async (ctx) => {
     const deletedNotes = await ctx.db
