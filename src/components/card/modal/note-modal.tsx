@@ -3,7 +3,7 @@ import { SummaryDisplay } from '@/components/card/modal/summary-display.tsx';
 import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
 import { ContentEditor } from '@/components/content/content-editor.tsx';
 import { Markdown } from '@/components/content/markdown.tsx';
-import { extractActionItems, summarize } from '@/data/ai.ts';
+import { extractActionItems, suggestTags, summarize } from '@/data/ai.ts';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
@@ -57,6 +57,7 @@ export const NoteModal = ({
 
   const summarizeFn = useServerFn(summarize);
   const extractActionItemsFn = useServerFn(extractActionItems);
+  const suggestTagsFn = useServerFn(suggestTags);
 
   const params = Route.useParams();
 
@@ -292,6 +293,20 @@ export const NoteModal = ({
     }
   }, [note.content, extractActionItemsFn]);
 
+  const handleSuggestTags = useCallback(
+    async (tags: string[]) => {
+      const content = await suggestTagsFn({
+        data: {
+          note: note.content,
+          tags,
+        },
+      });
+
+      return content.tags;
+    },
+    [note.content, uiTags, suggestTagsFn],
+  );
+
   const onInsertAiContent = useCallback(
     (content: string) => {
       setNote((prev) => ({ ...prev, content: prev.content + content }));
@@ -396,6 +411,7 @@ export const NoteModal = ({
                 tags={uiTags}
                 onTagAdd={addNewTag}
                 onTagCheck={toggleTagCheck}
+                onAiTagSuggest={handleSuggestTags}
               />
             )}
           </div>
