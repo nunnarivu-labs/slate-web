@@ -1,5 +1,7 @@
+import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { TagWithCheckedStatus } from '@/types/tag.ts';
-import { Sparkles, X } from 'lucide-react';
+import { useRouteContext } from '@tanstack/react-router';
+import { Loader2, Sparkles, X } from 'lucide-react';
 import { FormEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 type TagInputPopoverProps = {
@@ -10,21 +12,20 @@ type TagInputPopoverProps = {
   tags: TagWithCheckedStatus[];
 };
 
-const mockSuggestedTags = [
-  'project-alpha',
-  'work',
-  'marketing-plan',
-  'performance',
-  'meeting-notes',
-];
-
 export const TagInputPopover = ({
   onClose,
   tags,
   onTagAdd,
   onTagCheck,
+  onAiTagSuggest,
 }: TagInputPopoverProps) => {
+  const { isGuestUser } = useRouteContext({
+    from: '/_auth/notes/$category/$id',
+  });
+
   const [tag, setTag] = useState('');
+  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
 
   const tagInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +42,15 @@ export const TagInputPopover = ({
     if (!tag) return false;
     return tags.some((t) => t.name === tag);
   }, [tags, tag]);
+
+  const suggestTags = useCallback(async () => {
+    try {
+      setIsAiProcessing(true);
+      setSuggestedTags(await onAiTagSuggest(tags.map((t) => t.name)));
+    } finally {
+      setIsAiProcessing(false);
+    }
+  }, [onAiTagSuggest, tags]);
 
   const addNewTag = useCallback(
     (e: FormEvent) => {
@@ -96,45 +106,52 @@ export const TagInputPopover = ({
         >
           Add
         </button>
-        <button
-          type="button"
-          onClick={() => {}}
-          className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-600"
-          title="Suggest tags with AI"
-        >
-          <Sparkles size={16} />
-        </button>
+        {!isGuestUser && (
+          <NoteModalIcon
+            onClick={suggestTags}
+            disabled={isAiProcessing}
+            tooltip="Suggest tags with AI"
+          >
+            {isAiProcessing ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Sparkles size={16} />
+            )}
+          </NoteModalIcon>
+        )}
       </form>
-      <div className="mt-3 border-t pt-2 dark:border-zinc-600">
-        <h4 className="mb-2 px-1 text-xs font-bold text-zinc-500 uppercase dark:text-zinc-400">
-          Suggested Tags
-        </h4>
-        <div className="flex flex-wrap gap-2">
-          {mockSuggestedTags.map((suggestedTag) => {
-            const existingTag = tags.find((tag) => tag.name === suggestedTag);
-            const isSelected = !existingTag ? false : existingTag.checked;
+      {suggestedTags.length > 0 ? (
+        <div className="mt-3 border-t pt-2 dark:border-zinc-600">
+          <h4 className="mb-2 px-1 text-xs font-bold text-zinc-500 uppercase dark:text-zinc-400">
+            Suggested Tags
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {suggestedTags.map((suggestedTag) => {
+              const existingTag = tags.find((tag) => tag.name === suggestedTag);
+              const isSelected = !existingTag ? false : existingTag.checked;
 
-            return (
-              <button
-                key={suggestedTag}
-                onClick={() => {
-                  if (existingTag)
-                    toggleTagCheck(existingTag.id, !existingTag.checked);
-                  else onTagAdd(suggestedTag);
-                }}
-                type="button"
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  isSelected
-                    ? 'bg-blue-600 text-white hover:bg-blue-500'
-                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-600'
-                } `}
-              >
-                {suggestedTag}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={suggestedTag}
+                  onClick={() => {
+                    if (existingTag)
+                      toggleTagCheck(existingTag.id, !existingTag.checked);
+                    else onTagAdd(suggestedTag);
+                  }}
+                  type="button"
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
+                    isSelected
+                      ? 'bg-blue-600 text-white hover:bg-blue-500'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-600'
+                  } `}
+                >
+                  {suggestedTag}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : null}
       {filteredAllTags.length > 0 ? (
         <div className="mt-3 border-t pt-2 dark:border-zinc-600">
           <h4 className="mb-1 px-1 text-xs font-bold text-zinc-500 uppercase dark:text-zinc-400">
