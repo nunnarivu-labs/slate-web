@@ -58,12 +58,7 @@ export const TagList = () => {
         <ul>
           {allTagsQuery.isSuccess
             ? allTagsQuery.data.map((tag) => (
-                <TagListItem
-                  currentTag={tag}
-                  onTagClick={onTagClick}
-                  key={tag.id}
-                  onDeleteTag={() => {}}
-                />
+                <TagListItem tag={tag} onTagClick={onTagClick} key={tag.id} />
               ))
             : null}
         </ul>
