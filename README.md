@@ -20,7 +20,9 @@ The application, built with React and TanStack Start, features a responsive, car
 
 *   **Intuitive Card-Based Interface:** A responsive, grid-based layout for a clean and visual way to view, create, and edit notes.
 *   **Rich Text Formatting with Smart Markdown:** Notes are automatically rendered as formatted HTML, keeping the editing experience simple while allowing for powerful formatting.
-*   **Flexible Tag-Based Organization:** A flexible tagging system for powerful, multi-dimensional organization.
+*   **Flexible Tag-Based Organization:** Instead of rigid folders, Slate uses a flexible tagging system.
+     *   **Full Tag Management:** Tags can be edited or deleted, with changes instantly cascading across all associated notes for a seamless and intuitive organizational experience.
+     *   Assign multiple tags to a single note for powerful, multi-dimensional organization.
 *   **Real-Time Sync Across Devices:** Built on the Convex real-time database, notes are automatically and instantly synced across all logged-in sessions.
 
 #### Exclusive AI Capabilities (Available for Live Demo)
