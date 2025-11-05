@@ -1,5 +1,4 @@
 import { ClerkProvider, useAuth } from '@clerk/tanstack-react-start';
-import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import {
   HeadContent,
@@ -7,11 +6,9 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';
 
 interface MyRouterContext {
@@ -32,18 +29,6 @@ const RootDocument = ({ children }: { children: React.ReactNode }) => {
           </head>
           <body className="min-h-screen bg-zinc-100 dark:bg-zinc-900">
             {children}
-            <TanStackDevtools
-              config={{
-                position: 'bottom-right',
-              }}
-              plugins={[
-                {
-                  name: 'Tanstack Router',
-                  render: <TanStackRouterDevtoolsPanel />,
-                },
-                TanStackQueryDevtools,
-              ]}
-            />
             <Scripts />
           </body>
         </html>
