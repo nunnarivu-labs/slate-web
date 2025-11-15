@@ -45,7 +45,7 @@ export const useSaveNote = () => {
         tags,
       });
     } else {
-      if (isNoteDirty) {
+      if (isNoteDirty || action !== 'save') {
         await updateNoteMutation({
           id: note.id as Id<'notes'>,
           note: {
