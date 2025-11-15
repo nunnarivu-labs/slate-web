@@ -4,6 +4,8 @@
 
 > Slate is a modern note-taking web app that combines the simplicity of Google Keep with powerful, unobtrusive features like rich Markdown support and a flexible tagging system, all powered by a real-time backend.
 
+https://github.com/user-attachments/assets/c532a5ac-25bb-43dd-9f08-411e5e4afd5a
+
 ---
 
 ## 1. Project Goal
