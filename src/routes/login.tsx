@@ -55,8 +55,8 @@ const LoginPage = () => {
 
     setDisableSignInButton(true);
 
-    const guestEmail = 'johnsonabraham@nunnarivulabs.in';
-    const guestPassword = 'XkeX5?qo@N$k9YyJ';
+    const guestEmail = 'johnsonabraham0812.work@gmail.com';
+    const guestPassword = 'edAe$#DHory6nBEB';
 
     try {
       const result = await signIn.create({
