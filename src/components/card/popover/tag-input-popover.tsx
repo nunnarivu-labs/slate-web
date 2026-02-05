@@ -1,6 +1,5 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { TagWithCheckedStatus } from '@/types/tag.ts';
-import { useRouteContext } from '@tanstack/react-router';
 import { Loader2, Sparkles, X } from 'lucide-react';
 import { FormEvent, useCallback, useMemo, useRef, useState } from 'react';
 
@@ -19,10 +18,6 @@ export const TagInputPopover = ({
   onTagCheck,
   onAiTagSuggest,
 }: TagInputPopoverProps) => {
-  const { isGuestUser } = useRouteContext({
-    from: '/_auth/notes/$category/$id',
-  });
-
   const [tag, setTag] = useState('');
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   const [isAiProcessing, setIsAiProcessing] = useState(false);
@@ -96,7 +91,7 @@ export const TagInputPopover = ({
           value={tag}
           onChange={(e) => setTag(e.target.value)}
           placeholder="e.g., work, ideas"
-          className="w-full flex-grow rounded-md bg-zinc-100 px-2 py-1 text-sm text-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:text-zinc-100"
+          className="w-full grow rounded-md bg-zinc-100 px-2 py-1 text-sm text-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:text-zinc-100"
           autoFocus
         />
         <button
@@ -106,19 +101,17 @@ export const TagInputPopover = ({
         >
           Add
         </button>
-        {!isGuestUser && (
-          <NoteModalIcon
-            onClick={suggestTags}
-            disabled={isAiProcessing}
-            tooltip="Suggest tags with AI"
-          >
-            {isAiProcessing ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Sparkles size={16} />
-            )}
-          </NoteModalIcon>
-        )}
+        <NoteModalIcon
+          onClick={suggestTags}
+          disabled={isAiProcessing}
+          tooltip="Suggest tags with AI"
+        >
+          {isAiProcessing ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Sparkles size={16} />
+          )}
+        </NoteModalIcon>
       </form>
       {suggestedTags.length > 0 ? (
         <div className="mt-3 border-t pt-2 dark:border-zinc-600">

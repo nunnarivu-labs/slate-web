@@ -23,7 +23,6 @@ export const Route = createFileRoute('/_auth')({
       });
     return {
       userId,
-      isGuestUser: userId === import.meta.env.VITE_GUEST_USER_ID,
     };
   },
 
