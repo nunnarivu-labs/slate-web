@@ -7,7 +7,7 @@ import {
   useRouter,
   useSearch,
 } from '@tanstack/react-router';
-import { KeyRound, Loader2, LogIn, User } from 'lucide-react';
+import { KeyRound, Loader2, LogIn } from 'lucide-react';
 import { FormEvent, useCallback, useState } from 'react';
 import { z } from 'zod';
 
@@ -47,33 +47,6 @@ const LoginPage = () => {
     },
     [email, password, signIn, setActive, navigate],
   );
-
-  const handleGuestLogin = useCallback(async () => {
-    if (!signIn || !setActive) {
-      return;
-    }
-
-    setDisableSignInButton(true);
-
-    const guestEmail = 'johnsonabraham0812.work@gmail.com';
-    const guestPassword = 'edAe$#DHory6nBEB';
-
-    try {
-      const result = await signIn.create({
-        identifier: guestEmail,
-        password: guestPassword,
-      });
-
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        await router.invalidate();
-        return;
-      }
-    } finally {
-      setDisableSignInButton(false);
-      await navigate({ to: '/', search: { tags: search.tags } });
-    }
-  }, [signIn, setActive, navigate, router, search.tags]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-100 p-4 dark:bg-zinc-900">
@@ -148,19 +121,6 @@ const LoginPage = () => {
                   <LogIn className="h-4 w-4" />
                 )}
                 {disableSignInButton ? 'Signing In...' : 'Sign In'}
-              </button>
-              <button
-                disabled={disableSignInButton}
-                type="button"
-                onClick={handleGuestLogin}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
-              >
-                {disableSignInButton ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <User className="h-4 w-4" />
-                )}
-                Log in as Guest
               </button>
             </div>
           </div>
