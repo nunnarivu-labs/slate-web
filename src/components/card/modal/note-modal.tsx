@@ -323,14 +323,14 @@ export const NoteModal = ({
           onInsert={onInsertAiContent}
         />
       ) : null}
-      <div className="flex min-h-0 flex-grow flex-col p-4">
+      <div className="flex min-h-0 grow flex-col p-4">
         {!previewMode && (
           <input
             type="text"
             value={note.title}
             onChange={handleTitleChange}
             placeholder="Title"
-            className="mb-4 w-full flex-shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
+            className="mb-4 w-full shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
           />
         )}
         {previewMode && note.title && (
