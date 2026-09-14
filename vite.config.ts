@@ -13,7 +13,17 @@ const config = defineConfig({
     }),
     tailwindcss(),
     tanstackStart(),
-    netlify(),
+    // Netlify's local Edge Functions runtime currently passes a Deno flag that
+    // is no longer supported by the installed Deno version. TanStack Start
+    // server functions continue to run through Vite, so only disable that
+    // optional Netlify emulation during local development.
+    netlify({
+      dev: {
+        edgeFunctions: {
+          enabled: false,
+        },
+      },
+    }),
     viteReact(),
   ],
 });
