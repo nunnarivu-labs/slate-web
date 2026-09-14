@@ -9,25 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteRouteImport } from './routes/_auth/route'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthNotesIndexRouteImport } from './routes/_auth/notes/index'
 import { Route as AuthNotesCategoryRouteRouteImport } from './routes/_auth/notes/$category/route'
 import { Route as AuthNotesCategoryIdRouteImport } from './routes/_auth/notes/$category/$id'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthNotesIndexRoute = AuthNotesIndexRouteImport.update({
@@ -50,7 +50,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/notes/$category': typeof AuthNotesCategoryRouteRouteWithChildren
-  '/notes': typeof AuthNotesIndexRoute
+  '/notes/': typeof AuthNotesIndexRoute
   '/notes/$category/$id': typeof AuthNotesCategoryIdRoute
 }
 export interface FileRoutesByTo {
@@ -72,11 +72,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/login'
-    | '/notes/$category'
-    | '/notes'
-    | '/notes/$category/$id'
+    '/' | '/login' | '/notes/$category' | '/notes/' | '/notes/$category/$id'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/login' | '/notes/$category' | '/notes' | '/notes/$category/$id'
   id:
@@ -97,20 +93,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -118,10 +100,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_auth/notes/': {
       id: '/_auth/notes/'
       path: '/notes'
-      fullPath: '/notes'
+      fullPath: '/notes/'
       preLoaderRoute: typeof AuthNotesIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
