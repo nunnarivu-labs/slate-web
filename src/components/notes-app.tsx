@@ -1,6 +1,7 @@
 import { AddNoteCard } from '@/components/card/add-note-card.tsx';
 import { NoteCard } from '@/components/card/note-card.tsx';
 import { Loader } from '@/components/loader.tsx';
+import { MasonryGrid } from '@/components/masonry-grid.tsx';
 import { Route } from '@/routes/_auth/notes/$category/route.tsx';
 import { convexQuery } from '@convex-dev/react-query';
 import { useQuery } from '@tanstack/react-query';
@@ -39,7 +40,7 @@ export const NotesApp = () => {
             }
           />
         </div>
-        <div className="col-auto grid grid-cols-2 justify-center gap-4 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5">
+        <MasonryGrid>
           {notes.map((note) => (
             <NoteCard
               key={note.id}
@@ -53,7 +54,7 @@ export const NotesApp = () => {
               }
             />
           ))}
-        </div>
+        </MasonryGrid>
       </div>
     );
   }
