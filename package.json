@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev:all": "node scripts/dev-all.mjs",
+    "docker": "docker compose up",
     "dev": "vite dev --port 5173 --host",
     "convex": "npx convex dev",
     "build": "vite build",
