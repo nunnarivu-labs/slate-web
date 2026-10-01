@@ -28,6 +28,8 @@ import {
 import {
   ChangeEvent,
   RefObject,
+  ViewTransition,
+  startTransition,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -161,7 +163,8 @@ export const NoteModal = ({
     setIsDirty(true);
   };
 
-  const handlePreviewModeToggle = () => setPreviewMode((prev) => !prev);
+  const handlePreviewModeToggle = () =>
+    startTransition(() => setPreviewMode((prev) => !prev));
 
   useImperativeHandle(
     ref,
@@ -264,7 +267,7 @@ export const NoteModal = ({
       const content = await summarizeFn({ data: { note: note.content } });
 
       if (content) {
-        setAiContent(content);
+        startTransition(() => setAiContent(content));
       }
     } finally {
       setIsAiProcessing(false);
@@ -281,7 +284,7 @@ export const NoteModal = ({
       });
 
       if (content) {
-        setAiContent(content);
+        startTransition(() => setAiContent(content));
       }
     } finally {
       setIsAiProcessing(false);
@@ -305,7 +308,8 @@ export const NoteModal = ({
   const onInsertAiContent = useCallback(
     (content: string) => {
       setNote((prev) => ({ ...prev, content: prev.content + content }));
-      setAiContent('');
+      setIsDirty(true);
+      startTransition(() => setAiContent(''));
 
       focusEnd();
     },
@@ -317,38 +321,49 @@ export const NoteModal = ({
   return (
     <>
       {aiContent ? (
-        <SummaryDisplay
-          summaryText={aiContent}
-          onClose={() => setAiContent('')}
-          onInsert={onInsertAiContent}
-        />
+        <ViewTransition
+          default="none"
+          enter="note-ai-panel"
+          exit="note-ai-panel"
+        >
+          <SummaryDisplay
+            summaryText={aiContent}
+            onClose={() => startTransition(() => setAiContent(''))}
+            onInsert={onInsertAiContent}
+          />
+        </ViewTransition>
       ) : null}
-      <div className="flex min-h-0 grow flex-col p-4">
-        {!previewMode && (
-          <input
-            type="text"
-            value={note.title}
-            onChange={handleTitleChange}
-            placeholder="Title"
-            className="mb-4 w-full shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
-          />
-        )}
-        {previewMode && note.title && (
-          <h3 className="mb-4 font-semibold text-zinc-800 dark:text-zinc-200">
-            {note.title}
-          </h3>
-        )}
-        {previewMode ? (
-          <Markdown md={note.content} className="md-preview overflow-y-auto" />
-        ) : (
-          <ContentEditor
-            ref={textareaRef}
-            content={note.content}
-            onChange={handleContentChange}
-            placeholder="Take a note..."
-          />
-        )}
-      </div>
+      <ViewTransition default="none" update="note-editor">
+        <div className="flex min-h-0 grow flex-col p-4">
+          {!previewMode && (
+            <input
+              type="text"
+              value={note.title}
+              onChange={handleTitleChange}
+              placeholder="Title"
+              className="mb-4 w-full shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
+            />
+          )}
+          {previewMode && note.title && (
+            <h3 className="mb-4 font-semibold text-zinc-800 dark:text-zinc-200">
+              {note.title}
+            </h3>
+          )}
+          {previewMode ? (
+            <Markdown
+              md={note.content}
+              className="md-preview overflow-y-auto"
+            />
+          ) : (
+            <ContentEditor
+              ref={textareaRef}
+              content={note.content}
+              onChange={handleContentChange}
+              placeholder="Take a note..."
+            />
+          )}
+        </div>
+      </ViewTransition>
       <div className="flex items-center justify-between p-2">
         <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
           {note.category !== 'active' && (

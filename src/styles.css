@@ -99,6 +99,34 @@ body {
   }
 }
 
+::view-transition-group(.notes-category),
+::view-transition-group(.note-ai-panel),
+::view-transition-group(.note-editor) {
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-new(.notes-category),
+::view-transition-new(.note-ai-panel) {
+  animation: note-fade-in 180ms ease-out both;
+}
+
+::view-transition-old(.notes-category),
+::view-transition-old(.note-ai-panel) {
+  animation: note-fade-out 180ms ease-out both;
+}
+
+::view-transition-old(.note-editor),
+::view-transition-new(.note-editor) {
+  animation-duration: 180ms;
+}
+
+/* Inner modal snapshots must stay above the stationary modal and backdrop. */
+::view-transition-group(.note-ai-panel),
+::view-transition-group(.note-editor) {
+  z-index: 3;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
   ::view-transition-old(*),
