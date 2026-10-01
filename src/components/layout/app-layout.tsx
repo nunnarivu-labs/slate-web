@@ -23,7 +23,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           className="fixed inset-0 z-10 bg-black/50 md:hidden"
         />
       )}
-      <div className="flex min-w-0 flex-grow flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex-shrink-0 border-zinc-200 p-4 dark:border-zinc-800">
           <button
             onClick={() => toggleSidebar()}
@@ -33,7 +33,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             <Menu size={24} />
           </button>
         </header>
-        <main className="flex-grow overflow-y-auto">{children}</main>
+        <main className="min-h-0 w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable_both-edges]">
+          {children}
+        </main>
       </div>
     </div>
   );
