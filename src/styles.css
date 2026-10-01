@@ -17,3 +17,92 @@ body {
 .md-preview {
   padding: 1rem;
 }
+
+/* Keep the page stationary while individual cards and overlays animate. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(.note-card-enter),
+::view-transition-group(.note-card-exit),
+::view-transition-group(.note-card-update),
+::view-transition-group(.note-backdrop),
+::view-transition-group(.note-modal-enter),
+::view-transition-group(.note-modal-exit) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-new(.note-card-enter) {
+  animation: note-enter 200ms ease-out both;
+}
+
+::view-transition-old(.note-card-exit) {
+  animation: note-exit 150ms ease-in both;
+}
+
+::view-transition-old(.note-card-update),
+::view-transition-new(.note-card-update) {
+  animation-duration: 200ms;
+}
+
+/* The overlay snapshots must stay above every moving card. */
+::view-transition-group(.note-backdrop) {
+  z-index: 1;
+}
+
+::view-transition-group(.note-modal-enter),
+::view-transition-group(.note-modal-exit) {
+  z-index: 2;
+}
+
+::view-transition-new(.note-backdrop) {
+  animation: note-fade-in 200ms ease-out both;
+}
+
+::view-transition-old(.note-backdrop) {
+  animation: note-fade-out 150ms ease-in both;
+}
+
+::view-transition-new(.note-modal-enter) {
+  animation: note-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(.note-modal-exit) {
+  animation: note-exit 150ms ease-in both;
+}
+
+@keyframes note-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes note-exit {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
+@keyframes note-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes note-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

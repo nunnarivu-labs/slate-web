@@ -1,4 +1,10 @@
-import { Children, ReactNode, useLayoutEffect, useRef } from 'react';
+import {
+  Children,
+  ReactNode,
+  ViewTransition,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 type MasonryGridProps = {
   children: ReactNode;
@@ -63,7 +69,13 @@ export const MasonryGrid = ({ children }: MasonryGridProps) => {
       className="relative grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
     >
       {Children.map(children, (child) => (
-        <div>{child}</div>
+        <ViewTransition
+          enter="note-card-enter"
+          exit="note-card-exit"
+          update="note-card-update"
+        >
+          <div>{child}</div>
+        </ViewTransition>
       ))}
     </div>
   );
