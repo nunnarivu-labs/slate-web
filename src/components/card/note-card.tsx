@@ -9,7 +9,7 @@ type NoteCardProps = {
 export const NoteCard = ({ note, onClick }: NoteCardProps) => (
   <button
     onClick={onClick}
-    className="flex max-h-96 min-h-12 max-w-72 min-w-36 cursor-pointer break-inside-avoid flex-col overflow-hidden rounded-lg border border-zinc-300 bg-white p-4 text-left break-words transition-shadow hover:shadow-lg dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600"
+    className="flex max-h-96 min-h-12 w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-lg border border-zinc-300 bg-white p-4 text-left break-words transition-shadow hover:shadow-lg dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600"
   >
     {note.title && (
       <h3 className="mb-4 font-semibold text-zinc-800 dark:text-zinc-200">
