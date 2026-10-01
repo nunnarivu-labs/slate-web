@@ -42,3 +42,15 @@ This project includes a seamless integration with the Google Gemini API to creat
 *   **Routing & State Management:** TanStack Router, TanStack Query
 *   **AI (Live Demo):** Google Gemini
 *   **Deployment:** Netlify
+
+## 5. Local Development
+
+With Docker running, dependencies installed, and `.env.local` configured, start the full local stack on macOS or Linux:
+
+```sh
+npm run dev:all
+```
+
+This waits for the Docker services to be ready, then runs Convex and Vite together. Press **Ctrl+C** to stop both processes and the Docker Compose services. Your Docker data is preserved. If either development process exits, the rest of the stack is stopped as well.
+
+The individual `npm run convex` and `npm run dev` commands remain available.
