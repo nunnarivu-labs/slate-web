@@ -60,7 +60,7 @@ export const suggestTags = createServerFn({ method: 'POST' })
       ? new OpenAI({ baseURL, apiKey })
       : new OpenAI({ apiKey });
 
-    const response = await client.responses.parse({
+    const params = {
       model: process.env.AI_MODEL!,
       instructions: intelligentTagsSuggestionPrompt,
       input: JSON.stringify({
@@ -70,11 +70,22 @@ export const suggestTags = createServerFn({ method: 'POST' })
       text: {
         format: zodTextFormat(suggestedTagsSchema, 'suggested_tags'),
       },
-    });
+    };
 
-    if (!response.output_parsed) {
-      throw new Error('The model did not return a complete tag suggestion.');
+    if (baseURL) {
+      const response = await client.responses.create(params);
+      const result = response.output_text.match(/\[.*?]/);
+
+      if (!result)
+        throw new Error('The model did not return a complete tag suggestion.');
+
+      return { tags: JSON.parse(result[0]) };
+    } else {
+      const response = await client.responses.parse(params);
+
+      if (!response.output_parsed)
+        throw new Error('The model did not return a complete tag suggestion.');
+
+      return response.output_parsed;
     }
-
-    return response.output_parsed;
   });
