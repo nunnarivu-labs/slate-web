@@ -9,6 +9,7 @@
  */
 
 import type * as crons from "../crons.js";
+import type * as searchText from "../searchText.js";
 import type * as taskHelpers from "../taskHelpers.js";
 import type * as tasks from "../tasks.js";
 
@@ -20,6 +21,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   crons: typeof crons;
+  searchText: typeof searchText;
   taskHelpers: typeof taskHelpers;
   tasks: typeof tasks;
 }>;

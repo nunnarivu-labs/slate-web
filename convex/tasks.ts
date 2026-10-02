@@ -1,9 +1,13 @@
 import { docToNote, docToTag } from '@/utils/convex-type-converters.ts';
+import { normalizeSearchQuery } from '@/utils/search-query.ts';
+import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
+import { internal } from './_generated/api';
 import { Id } from './_generated/dataModel';
 import { internalMutation, mutation, query } from './_generated/server';
 import { draftNoteSchema, tagsArg } from './schema.ts';
+import { buildSearchText } from './searchText';
 import {
   updateTags as doUpdateTags,
   getNote,
@@ -62,6 +66,90 @@ export const fetchNotes = query({
   },
 });
 
+// Run tasks:backfillSearchText with {} from the dashboard once. Each batch
+// schedules the next; rerunning safely skips notes that are already indexed.
+export const backfillSearchText = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+    scanned: v.optional(v.number()),
+    indexed: v.optional(v.number()),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ complete: boolean; scanned: number; indexed: number }> => {
+    const batch = await ctx.db.query('notes').paginate({
+      cursor: args.cursor ?? null,
+      numItems: 100,
+      maximumBytesRead: 2_000_000,
+    });
+    const missing = batch.page.filter((note) => note.searchText === undefined);
+    await Promise.all(
+      missing.map((note) =>
+        ctx.db.patch(note._id, {
+          searchText: buildSearchText(note.title, note.content),
+        }),
+      ),
+    );
+    const scanned = (args.scanned ?? 0) + batch.page.length;
+    const indexed = (args.indexed ?? 0) + missing.length;
+    if (!batch.isDone) {
+      await ctx.scheduler.runAfter(0, internal.tasks.backfillSearchText, {
+        cursor: batch.continueCursor,
+        scanned,
+        indexed,
+      });
+    }
+    console.info(
+      `Search backfill ${batch.isDone ? 'complete' : 'in progress'}: ${scanned} notes scanned, ${indexed} indexed.`,
+    );
+    return { complete: batch.isDone, scanned, indexed };
+  },
+});
+
+export const searchNotes = query({
+  args: {
+    query: v.string(),
+    category: v.union(
+      v.literal('active'),
+      v.literal('archive'),
+      v.literal('trash'),
+    ),
+    tagIds: v.optional(v.array(v.id('tags'))),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+    const queryText = normalizeSearchQuery(args.query);
+    if (!queryText) return { page: [], isDone: true, continueCursor: '' };
+    const matches = await ctx.db
+      .query('notes')
+      .withSearchIndex('search_notes', (q) =>
+        q
+          .search('searchText', queryText)
+          .eq('userId', user._id)
+          .eq('category', args.category),
+      )
+      .paginate(args.paginationOpts);
+    const selectedTags = new Set(args.tagIds ?? []);
+    // Preserve the existing tag filter's "any selected tag" behavior. Filtering
+    // each page preserves relevance and the continuation cursor for later matches.
+    const page = selectedTags.size
+      ? (
+          await Promise.all(
+            matches.page.map(async (note) => {
+              const tags = await getNoteTagsData(ctx, note._id);
+              return tags.some((tag) => selectedTags.has(tag.tagId))
+                ? docToNote(note)
+                : null;
+            }),
+          )
+        ).filter((note) => note !== null)
+      : matches.page.map(docToNote);
+    return { ...matches, page };
+  },
+});
+
 export const fetchNote = query({
   args: { id: v.id('notes') },
   handler: async (ctx, args) => {
@@ -83,6 +171,7 @@ export const saveNote = mutation({
 
     const noteId = await ctx.db.insert('notes', {
       ...args.note,
+      searchText: buildSearchText(args.note.title, args.note.content),
       userId: user._id,
       updatedAt: Date.now(),
     });
@@ -108,6 +197,7 @@ export const updateNote = mutation({
 
     await ctx.db.replace(args.id, {
       ...args.note,
+      searchText: buildSearchText(args.note.title, args.note.content),
       userId: user._id,
       updatedAt: Date.now(),
     });

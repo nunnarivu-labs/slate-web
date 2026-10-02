@@ -3,6 +3,7 @@ import { ReactNode, useState } from 'react';
 
 import { NoteMoveUndoProvider } from '../feedback/note-move-undo.tsx';
 import { NewNoteButton } from './new-note-button.tsx';
+import { NoteSearch } from './note-search.tsx';
 import { Sidebar } from './sidebar.tsx';
 
 interface AppLayoutProps {
@@ -29,18 +30,19 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         )}
         <div className="relative flex min-w-0 flex-1 flex-col">
           <header
-            className={`pointer-events-none absolute inset-x-0 top-0 z-[1] flex h-14 items-center justify-between px-4 transition-[background-color,backdrop-filter] duration-200 motion-reduce:transition-none md:h-16 md:px-8 ${isScrolled ? 'bg-white/65 backdrop-blur-xl dark:bg-zinc-950/65' : 'bg-transparent'}`}
+            className={`pointer-events-none absolute inset-x-0 top-0 z-[1] flex h-14 items-center justify-between gap-2 px-4 transition-[background-color,backdrop-filter] duration-200 motion-reduce:transition-none md:h-16 md:px-8 ${isScrolled ? 'bg-white/65 backdrop-blur-xl dark:bg-zinc-950/65' : 'bg-transparent'}`}
           >
             <button
               type="button"
               aria-label="Toggle menu"
               aria-expanded={isSidebarOpen}
               onClick={() => toggleSidebar()}
-              className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-500 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-500 dark:text-zinc-400 dark:hover:bg-zinc-800"
               title="Toggle Menu"
             >
               <Menu size={24} />
             </button>
+            <NoteSearch />
             <NewNoteButton />
           </header>
           <main

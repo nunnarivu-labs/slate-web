@@ -2,6 +2,10 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_auth/notes/')({
   validateSearch: (rawSearch) => ({
+    q:
+      typeof rawSearch.q === 'string'
+        ? rawSearch.q.trim().slice(0, 256) || undefined
+        : undefined,
     tags: rawSearch.tags ? (rawSearch.tags as string[]) : undefined,
   }),
 
@@ -9,7 +13,7 @@ export const Route = createFileRoute('/_auth/notes/')({
     throw redirect({
       to: '/notes/$category',
       params: { category: 'active' },
-      search: { tags: search.tags },
+      search: { tags: search.tags, q: search.q },
     });
   },
 });

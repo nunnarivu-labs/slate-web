@@ -23,7 +23,7 @@ export const NewNoteButton = () => {
           search,
         })
       }
-      className="pointer-events-auto inline-flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-2.5 text-sm font-medium text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
+      className="pointer-events-auto inline-flex h-10 min-w-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-2.5 text-sm font-medium text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
     >
       <Plus size={18} aria-hidden="true" />
       <span className="hidden sm:inline">New note</span>
