@@ -1,4 +1,5 @@
 import { NoteModal } from '@/components/card/modal/note-modal.tsx';
+import { useNoteCloseHighlight } from '@/components/feedback/note-close-highlight.tsx';
 import { Loader } from '@/components/loader.tsx';
 import { useSaveNote } from '@/hooks/use-save-note.ts';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
@@ -24,6 +25,8 @@ export const NoteModalContainer = () => {
   const params = Route.useParams();
   const navigate = useNavigate();
   const search = useSearch({ from: '/_auth/notes/$category' });
+  const { highlightNote } = useNoteCloseHighlight();
+  const savedNoteId = useRef<string | undefined>(undefined);
 
   const [isSaving, setIsSaving] = useState(false);
   const [visibility, setVisibility] = useState<'opening' | 'open' | 'closed'>(
@@ -40,6 +43,11 @@ export const NoteModalContainer = () => {
   useEffect(() => {
     if (visibility !== 'closed' || isClosing) return;
 
+    if (savedNoteId.current) {
+      highlightNote(savedNoteId.current);
+      savedNoteId.current = undefined;
+    }
+
     // Keep the route mounted until React has committed the animated removal.
     // Passive effects normally run after the view transition finishes; without
     // browser support this navigates immediately, with no timer to wait out.
@@ -48,7 +56,7 @@ export const NoteModalContainer = () => {
       params: { category: params.category },
       search,
     });
-  }, [visibility, isClosing, navigate, params.category, search]);
+  }, [visibility, isClosing, navigate, params.category, search, highlightNote]);
 
   const noteModalRef = useRef<NoteModalRef>(null);
 
@@ -79,7 +87,12 @@ export const NoteModalContainer = () => {
 
       setIsSaving(true);
       try {
-        await saveNote({ note, tags, action, isNoteDirty: isDirty });
+        savedNoteId.current = await saveNote({
+          note,
+          tags,
+          action,
+          isNoteDirty: isDirty,
+        });
         startClosing(() => setVisibility('closed'));
       } catch (error) {
         setIsSaving(false);

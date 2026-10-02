@@ -278,6 +278,34 @@ body {
   min-height: 7rem;
 }
 
+/* An overlay highlights the returned note without changing its grid size. */
+.note-close-highlight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--color-blue-400);
+  background: color-mix(in srgb, var(--color-blue-400) 12%, transparent);
+  animation: note-close-highlight 1600ms ease-out both;
+}
+
+@keyframes note-close-highlight {
+  0%,
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-close-highlight {
+    animation: none;
+  }
+}
+
 .note-card-actions {
   opacity: 0;
   pointer-events: none;
