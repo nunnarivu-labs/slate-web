@@ -9,7 +9,7 @@ type MarkdownProps = {
 
 export const Markdown = ({ md, className }: MarkdownProps) => (
   <div
-    className={`prose dark:prose-invert grow resize-none text-left ${className ?? ''}`}
+    className={`note-content markdown-content prose dark:prose-invert grow resize-none text-left ${className ?? ''}`}
   >
     <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
       {md}

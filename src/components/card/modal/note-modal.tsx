@@ -1,7 +1,10 @@
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
 import { SummaryDisplay } from '@/components/card/modal/summary-display.tsx';
 import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
-import { ContentEditor } from '@/components/content/content-editor.tsx';
+import {
+  ContentEditor,
+  ContentEditorRef,
+} from '@/components/content/content-editor.tsx';
 import { Markdown } from '@/components/content/markdown.tsx';
 import { extractActionItems, suggestTags, summarize } from '@/data/ai.ts';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
@@ -60,7 +63,7 @@ export const NoteModal = ({
 
   const aiMenuRef = useRef<HTMLDivElement>(null);
   const tagsPopoverRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<ContentEditorRef>(null);
 
   const [isTagInputOpen, setIsTagInputOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -120,20 +123,6 @@ export const NoteModal = ({
     }
   }, [allTagsQuery.isSuccess, noteTagsQuery.isSuccess, noteTagsQuery.data]);
 
-  const focusEnd = useCallback(() => {
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(
-        note.content.length,
-        note.content.length,
-      );
-    }
-  }, [note.content]);
-
-  useEffect(() => {
-    focusEnd();
-  }, []);
-
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -169,7 +158,12 @@ export const NoteModal = ({
   useImperativeHandle(
     ref,
     () => ({
-      note,
+      get note() {
+        return {
+          ...note,
+          content: editorRef.current?.getMarkdown() ?? note.content,
+        };
+      },
       isDirty,
       tags: tagsWithStatus,
     }),
@@ -305,16 +299,11 @@ export const NoteModal = ({
     [note.content, uiTags, suggestTagsFn],
   );
 
-  const onInsertAiContent = useCallback(
-    (content: string) => {
-      setNote((prev) => ({ ...prev, content: prev.content + content }));
-      setIsDirty(true);
-      startTransition(() => setAiContent(''));
-
-      focusEnd();
-    },
-    [focusEnd],
-  );
+  const onInsertAiContent = useCallback((content: string) => {
+    setPreviewMode(false);
+    editorRef.current?.appendMarkdown(content);
+    startTransition(() => setAiContent(''));
+  }, []);
 
   const isNoteTooShort = note.content.length < 100;
 
@@ -349,19 +338,23 @@ export const NoteModal = ({
               {note.title}
             </h3>
           )}
-          {previewMode ? (
+          {previewMode && (
             <Markdown
               md={note.content}
               className="md-preview overflow-y-auto"
             />
-          ) : (
+          )}
+          <div
+            className={previewMode ? 'hidden' : 'flex min-h-0 grow flex-col'}
+          >
             <ContentEditor
-              ref={textareaRef}
+              ref={editorRef}
               content={note.content}
               onChange={handleContentChange}
+              autofocusEnd
               placeholder="Take a note..."
             />
-          )}
+          </div>
         </div>
       </ViewTransition>
       <div className="flex items-center justify-between p-2">
