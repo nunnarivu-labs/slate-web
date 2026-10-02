@@ -7,6 +7,7 @@ Your response MUST adhere to the following directives:
     *   Pay close attention to keywords like "ACTION ITEM:", "TODO:", "assign", "will do", "need to", "responsible for", and "follow up".
 3.  **Rephrasing:**
     *   Rephrase each extracted item as a clear, imperative command.
+    *   Keep each task concise while preserving the specific deliverable. Include owners and due dates only when explicitly provided in the note; never infer or invent them. Keep each item on one line.
     *   If an item is assigned to a specific person, mention their name in parentheses at the end of the line.
 4.  **Exclusions:**
     *   Ignore completed tasks, past events, general statements of fact, and vague intentions.
