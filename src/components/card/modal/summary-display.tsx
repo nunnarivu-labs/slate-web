@@ -41,8 +41,8 @@ export const SummaryDisplay = ({
           <X size={16} />
         </button>
       </div>
-      <div className="prose prose-sm dark:prose-invert max-h-60 overflow-y-auto pr-2 text-zinc-700 dark:text-zinc-300">
-        <Markdown md={summaryText} />
+      <div className="max-h-60 overflow-y-auto pr-2 text-zinc-700 dark:text-zinc-300">
+        <Markdown md={summaryText} className="prose-sm" />
       </div>
       <div className="mt-4 flex items-center gap-4">
         <button
