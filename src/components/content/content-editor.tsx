@@ -1,3 +1,4 @@
+import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut';
 import { closeHistory } from '@tiptap/pm/history';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import type { Editor } from '@tiptap/react';
@@ -45,6 +46,15 @@ function FormattingToolbar({ editor }: { editor: Editor }) {
   const [linkOpen, setLinkOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
+
+  useKeyboardShortcut(
+    'Escape',
+    () => {
+      setLinkOpen(false);
+      editor.commands.focus();
+    },
+    { scope: 'overlay', enabled: linkOpen, allowTyping: true, priority: 40 },
+  );
 
   const state = useEditorState({
     editor,
@@ -178,6 +188,7 @@ function FormattingToolbar({ editor }: { editor: Editor }) {
       </div>
       {linkOpen && (
         <form
+          data-shortcut-overlay
           className="mt-2 flex flex-wrap items-center gap-2"
           onSubmit={(event) => {
             event.preventDefault();
@@ -200,13 +211,6 @@ function FormattingToolbar({ editor }: { editor: Editor }) {
             onChange={(event) => {
               setUrl(event.target.value);
               setError('');
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') {
-                event.stopPropagation();
-                setLinkOpen(false);
-                editor.commands.focus();
-              }
             }}
             placeholder="https://example.com"
             className="min-w-0 flex-1 rounded border border-zinc-300 bg-transparent px-2 py-1 text-sm dark:border-zinc-600"

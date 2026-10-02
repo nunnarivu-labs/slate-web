@@ -1,3 +1,4 @@
+import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { Portal } from './portal.tsx';
@@ -36,8 +37,26 @@ export const DropdownMenu = ({ trigger, children }: DropdownMenuProps) => {
 
     document.addEventListener('mousedown', handleClickOutside);
 
+    useKeyboardShortcut(
+      'Escape',
+      () => {
+        setIsOpen(false);
+        triggerRef.current?.querySelector('button')?.focus();
+      },
+      { scope: 'overlay', enabled: isOpen, allowTyping: true, priority: 30 },
+    );
+
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
+
+  useKeyboardShortcut(
+    'Escape',
+    () => {
+      setIsOpen(false);
+      triggerRef.current?.querySelector('button')?.focus();
+    },
+    { scope: 'overlay', enabled: isOpen, allowTyping: true, priority: 30 },
+  );
 
   return (
     <div className="relative">
@@ -48,6 +67,7 @@ export const DropdownMenu = ({ trigger, children }: DropdownMenuProps) => {
         <Portal>
           <div
             ref={menuRef}
+            data-shortcut-overlay
             style={{ top: `${position.top}px`, left: `${position.left}px` }}
             className="fixed z-50 w-32 -translate-y-full rounded-md border bg-white p-1 shadow-lg dark:border-zinc-600 dark:bg-zinc-700"
             onClick={() => setIsOpen(false)}

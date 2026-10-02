@@ -1,9 +1,11 @@
+import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut';
 import { Menu } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
 import { NoteMoveUndoProvider } from '../feedback/note-move-undo.tsx';
 import { NewNoteButton } from './new-note-button.tsx';
 import { NoteSearch } from './note-search.tsx';
+import { ShortcutHelp } from './shortcut-help';
 import { Sidebar } from './sidebar.tsx';
 
 interface AppLayoutProps {
@@ -17,6 +19,11 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const toggleSidebar = (toggle?: boolean) => {
     setIsSidebarOpen(toggle ?? !isSidebarOpen);
   };
+
+  useKeyboardShortcut('Escape', () => setIsSidebarOpen(false), {
+    scope: 'list',
+    enabled: isSidebarOpen,
+  });
 
   return (
     <NoteMoveUndoProvider>
@@ -43,6 +50,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
               <Menu size={24} />
             </button>
             <NoteSearch />
+            <ShortcutHelp />
             <NewNoteButton />
           </header>
           <main
