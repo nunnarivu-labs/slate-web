@@ -110,7 +110,7 @@ export const NoteModalContainer = () => {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="flex h-[80vh] w-full max-w-4xl scale-100 flex-col rounded-lg bg-white shadow-2xl dark:bg-zinc-800"
+            className="flex h-[80vh] w-full max-w-6xl scale-100 flex-col rounded-lg bg-white shadow-2xl dark:bg-zinc-800"
           >
             {params.id === 'new' && (
               <NoteModal

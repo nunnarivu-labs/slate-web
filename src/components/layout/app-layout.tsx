@@ -1,6 +1,7 @@
 import { Menu } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
+import { NewNoteButton } from './new-note-button.tsx';
 import { Sidebar } from './sidebar.tsx';
 
 interface AppLayoutProps {
@@ -9,13 +10,14 @@ interface AppLayoutProps {
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const toggleSidebar = (toggle?: boolean) => {
     setIsSidebarOpen(toggle ?? !isSidebarOpen);
   };
 
   return (
-    <div className="relative flex h-screen bg-white dark:bg-zinc-950">
+    <div className="relative flex h-dvh bg-white dark:bg-zinc-950">
       <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
       {isSidebarOpen && (
         <div
@@ -23,17 +25,26 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           className="fixed inset-0 z-10 bg-black/50 md:hidden"
         />
       )}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex-shrink-0 border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        <header
+          className={`pointer-events-none absolute inset-x-0 top-0 z-[1] flex h-14 items-center justify-between px-4 transition-[background-color,backdrop-filter] duration-200 motion-reduce:transition-none md:h-16 md:px-8 ${isScrolled ? 'bg-white/65 backdrop-blur-xl dark:bg-zinc-950/65' : 'bg-transparent'}`}
+        >
           <button
+            type="button"
+            aria-label="Toggle menu"
+            aria-expanded={isSidebarOpen}
             onClick={() => toggleSidebar()}
-            className="rounded-md p-2 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-500 dark:text-zinc-400 dark:hover:bg-zinc-800"
             title="Toggle Menu"
           >
             <Menu size={24} />
           </button>
+          <NewNoteButton />
         </header>
-        <main className="min-h-0 w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable_both-edges]">
+        <main
+          onScroll={(event) => setIsScrolled(event.currentTarget.scrollTop > 0)}
+          className="min-h-0 w-full min-w-0 flex-1 [scrollbar-gutter:stable_both-edges] overflow-x-hidden overflow-y-auto"
+        >
           {children}
         </main>
       </div>

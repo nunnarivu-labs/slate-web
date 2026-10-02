@@ -1,5 +1,9 @@
+import {
+  AiPanel,
+  type AiTab,
+  type SummaryLength,
+} from '@/components/card/modal/ai-panel.tsx';
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
-import { SummaryDisplay } from '@/components/card/modal/summary-display.tsx';
 import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
 import {
   ContentEditor,
@@ -75,7 +79,16 @@ export const NoteModal = ({
   const [isAiMenuOpen, setIsAiMenuOpen] = useState(false);
   const [isAiProcessing, setIsAiProcessing] = useState(false);
 
-  const [aiContent, setAiContent] = useState('');
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
+  const [aiTab, setAiTab] = useState<AiTab>('summary');
+  const [summaryLength, setSummaryLength] = useState<SummaryLength>('brief');
+  const [summaries, setSummaries] = useState<
+    Partial<Record<SummaryLength, string>>
+  >({});
+  const [actionItems, setActionItems] = useState('');
+  const [processingKey, setProcessingKey] = useState('');
+  const [aiErrors, setAiErrors] = useState<Record<string, string>>({});
+  const aiRequestPending = useRef(false);
 
   const [note, setNote] = useState<Note>(
     currentNote
@@ -126,10 +139,14 @@ export const NoteModal = ({
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose('save');
+        if (isAiPanelOpen) {
+          startTransition(() => setIsAiPanelOpen(false));
+        } else {
+          onClose('save');
+        }
       }
     },
-    [onClose],
+    [onClose, isAiPanelOpen],
   );
 
   useEffect(() => {
@@ -253,37 +270,78 @@ export const NoteModal = ({
     [uiTags, tagsWithStatus],
   );
 
-  const handleSummarize = useCallback(async () => {
-    setIsAiMenuOpen(false);
-    setIsAiProcessing(true);
-
-    try {
-      const content = await summarizeFn({ data: { note: note.content } });
-
-      if (content) {
-        startTransition(() => setAiContent(content));
+  const generateAiResult = useCallback(
+    async (tab: AiTab, length: SummaryLength = summaryLength) => {
+      if (aiRequestPending.current) return;
+      aiRequestPending.current = true;
+      const key = tab === 'summary' ? length : 'actions';
+      setIsAiProcessing(true);
+      setProcessingKey(key);
+      setAiErrors((prev) => ({ ...prev, [key]: '' }));
+      try {
+        const content =
+          tab === 'summary'
+            ? await summarizeFn({
+                data: {
+                  note: editorRef.current?.getMarkdown() ?? note.content,
+                  length,
+                },
+              })
+            : await extractActionItemsFn({
+                data: {
+                  note: editorRef.current?.getMarkdown() ?? note.content,
+                },
+              });
+        if (!content?.trim()) throw new Error('Empty result');
+        if (tab === 'summary')
+          setSummaries((prev) => ({ ...prev, [length]: content }));
+        else setActionItems(content);
+      } catch {
+        setAiErrors((prev) => ({
+          ...prev,
+          [key]: 'Could not generate a result. Please try again.',
+        }));
+      } finally {
+        aiRequestPending.current = false;
+        setIsAiProcessing(false);
+        setProcessingKey('');
       }
-    } finally {
-      setIsAiProcessing(false);
-    }
-  }, [note.content, summarizeFn]);
+    },
+    [note.content, summarizeFn, extractActionItemsFn, summaryLength],
+  );
 
-  const handleExtractActionItems = useCallback(async () => {
+  // If the user switches tabs during a request, generate the newly selected
+  // result after that request finishes instead of leaving an empty tab.
+  useEffect(() => {
+    const key = aiTab === 'summary' ? summaryLength : 'actions';
+    const result = aiTab === 'summary' ? summaries[summaryLength] : actionItems;
+    if (isAiPanelOpen && !isAiProcessing && !result && !aiErrors[key]) {
+      void generateAiResult(aiTab);
+    }
+  }, [
+    isAiPanelOpen,
+    isAiProcessing,
+    aiTab,
+    summaryLength,
+    summaries,
+    actionItems,
+    aiErrors,
+    generateAiResult,
+  ]);
+
+  const openAiTab = (tab: AiTab) => {
     setIsAiMenuOpen(false);
-    setIsAiProcessing(true);
-
-    try {
-      const content = await extractActionItemsFn({
-        data: { note: note.content },
-      });
-
-      if (content) {
-        startTransition(() => setAiContent(content));
-      }
-    } finally {
-      setIsAiProcessing(false);
+    setAiTab(tab);
+    startTransition(() => setIsAiPanelOpen(true));
+    if (!(tab === 'summary' ? summaries[summaryLength] : actionItems)) {
+      void generateAiResult(tab);
     }
-  }, [note.content, extractActionItemsFn]);
+  };
+
+  const changeSummaryLength = (length: SummaryLength) => {
+    setSummaryLength(length);
+    if (!summaries[length]) void generateAiResult('summary', length);
+  };
 
   const handleSuggestTags = useCallback(
     async (tags: string[]) => {
@@ -302,165 +360,185 @@ export const NoteModal = ({
   const onInsertAiContent = useCallback((content: string) => {
     setPreviewMode(false);
     editorRef.current?.appendMarkdown(content);
-    startTransition(() => setAiContent(''));
+    setIsDirty(true);
   }, []);
 
   const isNoteTooShort = note.content.length < 100;
 
   return (
-    <>
-      {aiContent ? (
+    <div className="relative flex min-h-0 flex-1">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <ViewTransition default="none" update="note-editor">
+          <div className="flex min-h-0 grow flex-col p-4">
+            {!previewMode && (
+              <input
+                id="note-modal-title"
+                type="text"
+                value={note.title}
+                onChange={handleTitleChange}
+                placeholder="Title"
+                className="mb-4 w-full shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
+              />
+            )}
+            {previewMode && note.title && (
+              <h3
+                id="note-modal-title"
+                className="mb-4 font-semibold text-zinc-800 dark:text-zinc-200"
+              >
+                {note.title}
+              </h3>
+            )}
+            {previewMode && (
+              <Markdown
+                md={note.content}
+                className="md-preview overflow-y-auto"
+              />
+            )}
+            <div
+              className={previewMode ? 'hidden' : 'flex min-h-0 grow flex-col'}
+            >
+              <ContentEditor
+                ref={editorRef}
+                content={note.content}
+                onChange={handleContentChange}
+                autofocusEnd
+                placeholder="Take a note..."
+              />
+            </div>
+          </div>
+        </ViewTransition>
+        <div className="flex items-center justify-between p-2">
+          <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
+            {note.category !== 'active' && (
+              <NoteModalIcon
+                disabled={isNoteEmpty}
+                onClick={() => onClose('active')}
+                tooltip="Active"
+              >
+                <Home size={20} />
+              </NoteModalIcon>
+            )}
+            {note.category !== 'archive' && (
+              <NoteModalIcon
+                disabled={isNoteEmpty}
+                onClick={() => onClose('archive')}
+                tooltip="Archive"
+              >
+                <Archive size={20} />
+              </NoteModalIcon>
+            )}
+            {note.category !== 'trash' && (
+              <NoteModalIcon
+                disabled={isNoteEmpty}
+                onClick={() => onClose('trash')}
+                tooltip="Trash"
+              >
+                <Trash size={20} />
+              </NoteModalIcon>
+            )}
+            <NoteModalIcon
+              disabled={isNoteEmpty}
+              onClick={handlePreviewModeToggle}
+              tooltip="Preview Mode"
+            >
+              {previewMode ? (
+                <ToggleRight size={20} className="text-green-600" />
+              ) : (
+                <ToggleLeft size={20} />
+              )}
+            </NoteModalIcon>
+            <div ref={tagsPopoverRef} className="relative">
+              <NoteModalIcon
+                disabled={isNoteEmpty}
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  setIsTagInputOpen((prev) => !prev);
+                }}
+                tooltip="Manage Tags"
+              >
+                <Tag size={20} />
+              </NoteModalIcon>
+              {isTagInputOpen && (
+                <TagInputPopover
+                  onClose={() => setIsTagInputOpen(false)}
+                  tags={uiTags}
+                  onTagAdd={addNewTag}
+                  onTagCheck={toggleTagCheck}
+                  onAiTagSuggest={handleSuggestTags}
+                />
+              )}
+            </div>
+            <div ref={aiMenuRef} className="relative">
+              <NoteModalIcon
+                onClick={() => setIsAiMenuOpen((prev) => !prev)}
+                disabled={isAiProcessing}
+                tooltip="AI Actions"
+              >
+                {isAiProcessing ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <Sparkles size={20} />
+                )}
+              </NoteModalIcon>
+              {isAiMenuOpen ? (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute bottom-full left-1/2 mb-2 w-56 -translate-x-1/2 rounded-lg border bg-white p-2 shadow-xl md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
+                >
+                  <button
+                    onClick={() => openAiTab('summary')}
+                    disabled={isNoteTooShort}
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                  >
+                    <FileText size={16} />
+                    <span>Summarize note</span>
+                  </button>
+                  <button
+                    onClick={() => openAiTab('actions')}
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                  >
+                    <CheckSquare size={16} />
+                    <span>Extract action items</span>
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <button
+            onClick={() => onClose('save')}
+            className="cursor-pointer rounded px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+      {isAiPanelOpen && (
         <ViewTransition
           default="none"
           enter="note-ai-panel"
           exit="note-ai-panel"
         >
-          <SummaryDisplay
-            summaryText={aiContent}
-            onClose={() => startTransition(() => setAiContent(''))}
+          <AiPanel
+            tab={aiTab}
+            onTabChange={openAiTab}
+            summaryLength={summaryLength}
+            onSummaryLengthChange={changeSummaryLength}
+            summary={summaries[summaryLength] ?? ''}
+            actionItems={actionItems}
+            isProcessing={isAiProcessing}
+            isLoading={
+              processingKey ===
+              (aiTab === 'summary' ? summaryLength : 'actions')
+            }
+            error={
+              aiErrors[aiTab === 'summary' ? summaryLength : 'actions'] ?? ''
+            }
+            onRegenerate={() => void generateAiResult(aiTab)}
+            onClose={() => startTransition(() => setIsAiPanelOpen(false))}
             onInsert={onInsertAiContent}
           />
         </ViewTransition>
-      ) : null}
-      <ViewTransition default="none" update="note-editor">
-        <div className="flex min-h-0 grow flex-col p-4">
-          {!previewMode && (
-            <input
-              type="text"
-              value={note.title}
-              onChange={handleTitleChange}
-              placeholder="Title"
-              className="mb-4 w-full shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
-            />
-          )}
-          {previewMode && note.title && (
-            <h3 className="mb-4 font-semibold text-zinc-800 dark:text-zinc-200">
-              {note.title}
-            </h3>
-          )}
-          {previewMode && (
-            <Markdown
-              md={note.content}
-              className="md-preview overflow-y-auto"
-            />
-          )}
-          <div
-            className={previewMode ? 'hidden' : 'flex min-h-0 grow flex-col'}
-          >
-            <ContentEditor
-              ref={editorRef}
-              content={note.content}
-              onChange={handleContentChange}
-              autofocusEnd
-              placeholder="Take a note..."
-            />
-          </div>
-        </div>
-      </ViewTransition>
-      <div className="flex items-center justify-between p-2">
-        <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
-          {note.category !== 'active' && (
-            <NoteModalIcon
-              disabled={isNoteEmpty}
-              onClick={() => onClose('active')}
-              tooltip="Active"
-            >
-              <Home size={20} />
-            </NoteModalIcon>
-          )}
-          {note.category !== 'archive' && (
-            <NoteModalIcon
-              disabled={isNoteEmpty}
-              onClick={() => onClose('archive')}
-              tooltip="Archive"
-            >
-              <Archive size={20} />
-            </NoteModalIcon>
-          )}
-          {note.category !== 'trash' && (
-            <NoteModalIcon
-              disabled={isNoteEmpty}
-              onClick={() => onClose('trash')}
-              tooltip="Trash"
-            >
-              <Trash size={20} />
-            </NoteModalIcon>
-          )}
-          <NoteModalIcon
-            disabled={isNoteEmpty}
-            onClick={handlePreviewModeToggle}
-            tooltip="Preview Mode"
-          >
-            {previewMode ? (
-              <ToggleRight size={20} className="text-green-600" />
-            ) : (
-              <ToggleLeft size={20} />
-            )}
-          </NoteModalIcon>
-          <div ref={tagsPopoverRef} className="relative">
-            <NoteModalIcon
-              disabled={isNoteEmpty}
-              onClick={(ev) => {
-                ev.stopPropagation();
-                setIsTagInputOpen((prev) => !prev);
-              }}
-              tooltip="Manage Tags"
-            >
-              <Tag size={20} />
-            </NoteModalIcon>
-            {isTagInputOpen && (
-              <TagInputPopover
-                onClose={() => setIsTagInputOpen(false)}
-                tags={uiTags}
-                onTagAdd={addNewTag}
-                onTagCheck={toggleTagCheck}
-                onAiTagSuggest={handleSuggestTags}
-              />
-            )}
-          </div>
-          <div ref={aiMenuRef} className="relative">
-            <NoteModalIcon
-              onClick={() => setIsAiMenuOpen((prev) => !prev)}
-              disabled={isAiProcessing}
-              tooltip="AI Actions"
-            >
-              {isAiProcessing ? (
-                <Loader2 size={20} className="animate-spin" />
-              ) : (
-                <Sparkles size={20} />
-              )}
-            </NoteModalIcon>
-            {isAiMenuOpen ? (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="absolute bottom-full left-1/2 mb-2 w-56 -translate-x-1/2 rounded-lg border bg-white p-2 shadow-xl md:translate-x-0 dark:border-zinc-600 dark:bg-zinc-700"
-              >
-                <button
-                  onClick={handleSummarize}
-                  disabled={isNoteTooShort}
-                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-zinc-600"
-                >
-                  <FileText size={16} />
-                  <span>Summarize note</span>
-                </button>
-                <button
-                  onClick={handleExtractActionItems}
-                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
-                >
-                  <CheckSquare size={16} />
-                  <span>Extract action items</span>
-                </button>
-              </div>
-            ) : null}
-          </div>
-        </div>
-        <button
-          onClick={() => onClose('save')}
-          className="cursor-pointer rounded px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
-        >
-          Close
-        </button>
-      </div>
-    </>
+      )}
+    </div>
   );
 };

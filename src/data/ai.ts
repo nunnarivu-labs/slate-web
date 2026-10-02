@@ -11,7 +11,9 @@ const suggestedTagsSchema = z.object({
 });
 
 export const summarize = createServerFn({ method: 'POST' })
-  .inputValidator((data: { note: string }) => data)
+  .inputValidator(
+    (data: { note: string; length?: 'brief' | 'detailed' }) => data,
+  )
   .handler(async ({ data }) => {
     const baseURL = process.env.AI_API_BASE_URL;
     const apiKey = process.env.AI_API_KEY!;
@@ -23,7 +25,7 @@ export const summarize = createServerFn({ method: 'POST' })
     const response = await client.responses.create({
       model: process.env.AI_MODEL!,
       input: data.note,
-      instructions: summarizePrompt,
+      instructions: summarizePrompt(data.length),
     });
 
     return response.output_text;

@@ -1,4 +1,3 @@
-import { AddNoteCard } from '@/components/card/add-note-card.tsx';
 import { NoteCard } from '@/components/card/note-card.tsx';
 import { Loader } from '@/components/loader.tsx';
 import { MasonryGrid } from '@/components/masonry-grid.tsx';
@@ -50,20 +49,9 @@ export const NotesApp = () => {
   } else {
     return (
       <div
-        className="p-4 md:p-8"
+        className="px-4 pt-20 pb-6 md:px-8 md:pt-22"
         aria-busy={notesQuery.isFetching || collection !== renderedCollection}
       >
-        <div className="mb-8 flex">
-          <AddNoteCard
-            onClick={() =>
-              navigate({
-                to: '/notes/$category/$id',
-                params: { category: params.category, id: 'new' },
-                search,
-              })
-            }
-          />
-        </div>
         <ViewTransition
           key={renderedCollection?.category}
           default="none"
