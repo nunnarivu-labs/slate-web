@@ -94,3 +94,41 @@ it('handles the different checklist DOM structures without inherited list paddin
     editor.destroy();
   }
 });
+
+it('keeps live editor checkboxes beside their text, including after checkbox updates', () => {
+  const host = document.createElement('div');
+  document.body.append(host);
+  document.head.innerHTML = `<style>${spacingStyles}</style>`;
+  const editor = new Editor({
+    element: host,
+    extensions: createEditorExtensions(),
+    editorProps: { attributes: { class: 'note-content tiptap' } },
+    contentType: 'markdown',
+    content: '- [ ] First task\n- [x] Second task\n  - [ ] Nested task',
+  });
+  try {
+    const checkLayout = () => {
+      const items = host.querySelectorAll('li[data-checked]');
+      expect(items.length).toBe(3);
+      for (const item of items) {
+        expect(getComputedStyle(item).display).toBe('flex');
+        expect(getComputedStyle(item).alignItems).toBe('flex-start');
+        expect(
+          getComputedStyle(item.querySelector(':scope > label')!).flex,
+        ).toBe('0 0 auto');
+        expect(
+          getComputedStyle(item.querySelector(':scope > div')!).minWidth,
+        ).toBe('0');
+      }
+    };
+    checkLayout();
+    editor.commands.setTextSelection(3);
+    editor.commands.updateAttributes('taskItem', { checked: true });
+    expect(
+      host.querySelector('li[data-checked]')?.getAttribute('data-checked'),
+    ).toBe('true');
+    checkLayout();
+  } finally {
+    editor.destroy();
+  }
+});

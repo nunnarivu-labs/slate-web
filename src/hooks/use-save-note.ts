@@ -1,3 +1,4 @@
+import { useNoteMoveUndo } from '@/components/feedback/note-move-undo.tsx';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
@@ -16,6 +17,7 @@ type SaveNoteArgs = {
 
 export const useSaveNote = () => {
   const isNewNote = Route.useParams().id === 'new';
+  const offerUndo = useNoteMoveUndo();
 
   const saveNoteMutation = useMutation(api.tasks.saveNote);
   const updateNoteMutation = useMutation(api.tasks.updateNote);
@@ -31,16 +33,16 @@ export const useSaveNote = () => {
       return;
     }
 
-    if (action !== 'save') {
-      note.category = action;
-    }
+    const previousCategory = note.category;
+    const category = action === 'save' ? note.category : action;
+    let savedNoteId = note.id as Id<'notes'>;
 
     if (isNewNote) {
-      await saveNoteMutation({
+      savedNoteId = await saveNoteMutation({
         note: {
           title: note.title,
           content: note.content,
-          category: note.category,
+          category,
         },
         tags,
       });
@@ -51,13 +53,20 @@ export const useSaveNote = () => {
           note: {
             title: note.title,
             content: note.content,
-            category: note.category,
+            category,
           },
           tags,
         });
       } else if (tags.some((tag) => tag.status !== 'ALREADY_ADDED')) {
         await updateTagsMutation({ noteId: note.id as Id<'notes'>, tags });
       }
+    }
+
+    if (
+      (action === 'archive' || action === 'trash') &&
+      action !== previousCategory
+    ) {
+      offerUndo({ noteId: savedNoteId, previousCategory, category: action });
     }
   };
 };
