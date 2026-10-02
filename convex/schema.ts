@@ -39,11 +39,8 @@ export const tagsArg = v.array(
 
 export default defineSchema({
   notes: defineTable(noteSchema)
-    .index('by_user_id_category_and_updated_at', [
-      'userId',
-      'category',
-      'updatedAt',
-    ])
+    // Convex appends _creationTime to indexes, keeping newest notes first.
+    .index('by_user_id_and_category', ['userId', 'category'])
     .index('by_category_and_updated_at', ['category', 'updatedAt'])
     .searchIndex('search_notes', {
       searchField: 'searchText',

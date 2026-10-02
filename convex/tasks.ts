@@ -49,14 +49,14 @@ export const fetchNotes = query({
           note && note.userId === user._id && note.category === args.category,
       ) as NonNullable<(typeof allNotes)[number]>[];
 
-      filteredNotes.sort((a, b) => b.updatedAt - a.updatedAt);
+      filteredNotes.sort((a, b) => b._creationTime - a._creationTime);
 
       return filteredNotes.map(docToNote);
     }
 
     const notes = await ctx.db
       .query('notes')
-      .withIndex('by_user_id_category_and_updated_at', (q) =>
+      .withIndex('by_user_id_and_category', (q) =>
         q.eq('userId', user._id).eq('category', args.category),
       )
       .order('desc')

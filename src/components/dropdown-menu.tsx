@@ -37,15 +37,6 @@ export const DropdownMenu = ({ trigger, children }: DropdownMenuProps) => {
 
     document.addEventListener('mousedown', handleClickOutside);
 
-    useKeyboardShortcut(
-      'Escape',
-      () => {
-        setIsOpen(false);
-        triggerRef.current?.querySelector('button')?.focus();
-      },
-      { scope: 'overlay', enabled: isOpen, allowTyping: true, priority: 30 },
-    );
-
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 

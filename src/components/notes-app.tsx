@@ -1,4 +1,5 @@
 import { NoteCard } from '@/components/card/note-card.tsx';
+import { useNoteCloseHighlight } from '@/components/feedback/note-close-highlight.tsx';
 import { useNoteMoveUndo } from '@/components/feedback/note-move-undo.tsx';
 import { Loader } from '@/components/loader.tsx';
 import { MasonryGrid } from '@/components/masonry-grid.tsx';
@@ -17,6 +18,7 @@ import { ViewTransition, useDeferredValue, useEffect, useState } from 'react';
 import { api } from '../../convex/_generated/api';
 
 export const NotesApp = () => {
+  const { highlightedNoteId } = useNoteCloseHighlight();
   const navigate = useNavigate();
   const moveNote = useMutation(api.tasks.moveNote);
   const offerUndo = useNoteMoveUndo();
@@ -220,6 +222,7 @@ export const NotesApp = () => {
               <NoteCard
                 key={note.id}
                 note={note}
+                highlighted={note.id === highlightedNoteId}
                 onMove={(category) => handleMove(note, category)}
                 onClick={() =>
                   navigate({

@@ -1,13 +1,14 @@
+import { NoteCloseHighlightProvider } from '@/components/feedback/note-close-highlight.tsx';
 import { NotesApp } from '@/components/notes-app.tsx';
 import { NoteCategory } from '@/types/note-category.ts';
 import { isValidNoteCategory } from '@/utils/note-categoty-params.ts';
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
 const NotesRoute = () => (
-  <>
+  <NoteCloseHighlightProvider>
     <NotesApp />
     <Outlet />
-  </>
+  </NoteCloseHighlightProvider>
 );
 
 export const Route = createFileRoute('/_auth/notes/$category')({

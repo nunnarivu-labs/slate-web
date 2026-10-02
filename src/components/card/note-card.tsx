@@ -9,9 +9,15 @@ type NoteCardProps = {
   note: Note;
   onClick: () => void;
   onMove: (category: NoteCategory) => Promise<void>;
+  highlighted?: boolean;
 };
 
-export const NoteCard = ({ note, onClick, onMove }: NoteCardProps) => {
+export const NoteCard = ({
+  note,
+  onClick,
+  onMove,
+  highlighted,
+}: NoteCardProps) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -53,6 +59,9 @@ export const NoteCard = ({ note, onClick, onMove }: NoteCardProps) => {
 
   return (
     <div className="note-card relative flex w-full min-w-0 flex-col overflow-hidden rounded-lg border border-zinc-300 bg-white text-left break-words transition-shadow hover:shadow-lg dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600">
+      {highlighted && (
+        <div aria-hidden="true" className="note-close-highlight" />
+      )}
       <button
         type="button"
         onClick={onClick}

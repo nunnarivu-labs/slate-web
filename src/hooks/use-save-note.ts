@@ -68,5 +68,7 @@ export const useSaveNote = () => {
     ) {
       offerUndo({ noteId: savedNoteId, previousCategory, category: action });
     }
+
+    return savedNoteId;
   };
 };
