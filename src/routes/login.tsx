@@ -42,7 +42,10 @@ const LoginPage = () => {
         }
       } finally {
         setDisableSignInButton(false);
-        await navigate({ to: '/', search: { tags: search.tags } });
+        await navigate({
+          to: '/',
+          search: { tags: search.tags, q: undefined },
+        });
       }
     },
     [email, password, signIn, setActive, navigate],
@@ -145,7 +148,7 @@ export const Route = createFileRoute('/login')({
       throw redirect({
         to: search.redirect ?? '/notes/$category',
         params: { category: 'active' },
-        search: { tags: search.tags },
+        search: { tags: search.tags, q: undefined },
       });
   },
 });

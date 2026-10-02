@@ -15,6 +15,8 @@ export const noteSchema = {
   ...draftNoteSchema,
   userId: v.id('users'),
   updatedAt: v.float64(),
+  // Optional during migration; every new save supplies this field.
+  searchText: v.optional(v.string()),
 };
 
 export const userSchema = { authProviderUserId: v.string() };
@@ -42,7 +44,11 @@ export default defineSchema({
       'category',
       'updatedAt',
     ])
-    .index('by_category_and_updated_at', ['category', 'updatedAt']),
+    .index('by_category_and_updated_at', ['category', 'updatedAt'])
+    .searchIndex('search_notes', {
+      searchField: 'searchText',
+      filterFields: ['userId', 'category'],
+    }),
 
   users: defineTable(userSchema).index('by_auth_provider_user_id', [
     'authProviderUserId',
