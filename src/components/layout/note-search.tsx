@@ -1,3 +1,7 @@
+import {
+  shortcutHint,
+  useKeyboardShortcut,
+} from '@/hooks/use-keyboard-shortcut';
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -39,6 +43,12 @@ export function NoteSearch() {
       resetScroll: true,
     });
   };
+  const focusSearch = () => {
+    setExpanded(true);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  };
+  useKeyboardShortcut('mod+k', focusSearch, { scope: 'list' });
+
   const clear = () => {
     setValue('');
     commit('');
@@ -50,10 +60,8 @@ export function NoteSearch() {
         type="button"
         aria-label="Search notes"
         aria-expanded={expanded}
-        onClick={() => {
-          setExpanded(true);
-          requestAnimationFrame(() => inputRef.current?.focus());
-        }}
+        onClick={focusSearch}
+        title={`Search notes (${shortcutHint('K')})`}
         className={`${expanded ? 'hidden' : 'flex sm:hidden'} h-10 w-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-500 dark:text-zinc-400 dark:hover:bg-zinc-800`}
       >
         <Search size={20} />
@@ -70,6 +78,7 @@ export function NoteSearch() {
         <input
           ref={inputRef}
           type="search"
+          title={`Search notes (${shortcutHint('K')})`}
           aria-label="Search notes"
           placeholder={`Search ${params.category} notes`}
           value={value}
@@ -82,7 +91,9 @@ export function NoteSearch() {
           }}
           onKeyDown={(event) => {
             if (event.key === 'Escape') {
+              if (event.repeat || event.nativeEvent.isComposing) return;
               event.preventDefault();
+              event.stopPropagation();
               clear();
               setExpanded(false);
             }

@@ -60,7 +60,9 @@ export const TagListItemEdit = ({ tag, onEditDone }: TagListItemEditProps) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       await validateAndSubmit();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === 'Escape' && !e.repeat && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      e.stopPropagation();
       onEditDone();
     }
   };

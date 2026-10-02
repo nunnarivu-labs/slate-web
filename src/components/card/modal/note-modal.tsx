@@ -11,6 +11,10 @@ import {
 } from '@/components/content/content-editor.tsx';
 import { Markdown } from '@/components/content/markdown.tsx';
 import { extractActionItems, suggestTags, summarize } from '@/data/ai.ts';
+import {
+  shortcutHint,
+  useKeyboardShortcut,
+} from '@/hooks/use-keyboard-shortcut';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
@@ -136,28 +140,44 @@ export const NoteModal = ({
     }
   }, [allTagsQuery.isSuccess, noteTagsQuery.isSuccess, noteTagsQuery.data]);
 
-  const handleKeyDown = useCallback(
-    async (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (isAiPanelOpen) {
-          startTransition(() => setIsAiPanelOpen(false));
-        } else {
-          onClose('save');
-        }
-      }
+  useKeyboardShortcut(
+    'Escape',
+    () => {
+      if (isAiPanelOpen) startTransition(() => setIsAiPanelOpen(false));
+      else onClose('save');
     },
-    [onClose, isAiPanelOpen],
+    { scope: 'editor', allowTyping: true, priority: 10 },
   );
-
+  const closeTagMenu = () => {
+    setIsTagInputOpen(false);
+    tagsPopoverRef.current?.querySelector('button')?.focus();
+  };
+  const closeAiMenu = () => {
+    setIsAiMenuOpen(false);
+    aiMenuRef.current?.querySelector('button')?.focus();
+  };
+  useKeyboardShortcut('Escape', closeTagMenu, {
+    scope: 'overlay',
+    enabled: isTagInputOpen,
+    allowTyping: true,
+    priority: 30,
+  });
+  useKeyboardShortcut('Escape', closeAiMenu, {
+    scope: 'overlay',
+    enabled: isAiMenuOpen,
+    allowTyping: true,
+    priority: 30,
+  });
+  useKeyboardShortcut('mod+enter', () => onClose('save'), {
+    scope: 'editor',
+    allowTyping: true,
+  });
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', handleKeyDown);
-
     return () => {
       document.body.style.overflow = 'auto';
-      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown]);
+  }, []);
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNote((prev) => ({ ...prev, title: e.target.value }));
@@ -171,6 +191,12 @@ export const NoteModal = ({
 
   const handlePreviewModeToggle = () =>
     startTransition(() => setPreviewMode((prev) => !prev));
+
+  useKeyboardShortcut('mod+shift+p', handlePreviewModeToggle, {
+    scope: 'editor',
+    allowTyping: true,
+    enabled: !isNoteEmpty,
+  });
 
   useImperativeHandle(
     ref,
@@ -439,7 +465,7 @@ export const NoteModal = ({
             <NoteModalIcon
               disabled={isNoteEmpty}
               onClick={handlePreviewModeToggle}
-              tooltip="Preview Mode"
+              tooltip={`Preview Mode (${shortcutHint('Shift + P')})`}
             >
               {previewMode ? (
                 <ToggleRight size={20} className="text-green-600" />
@@ -447,11 +473,16 @@ export const NoteModal = ({
                 <ToggleLeft size={20} />
               )}
             </NoteModalIcon>
-            <div ref={tagsPopoverRef} className="relative">
+            <div
+              ref={tagsPopoverRef}
+              data-shortcut-overlay={isTagInputOpen ? '' : undefined}
+              className="relative"
+            >
               <NoteModalIcon
                 disabled={isNoteEmpty}
                 onClick={(ev) => {
                   ev.stopPropagation();
+                  setIsAiMenuOpen(false);
                   setIsTagInputOpen((prev) => !prev);
                 }}
                 tooltip="Manage Tags"
@@ -468,9 +499,16 @@ export const NoteModal = ({
                 />
               )}
             </div>
-            <div ref={aiMenuRef} className="relative">
+            <div
+              ref={aiMenuRef}
+              data-shortcut-overlay={isAiMenuOpen ? '' : undefined}
+              className="relative"
+            >
               <NoteModalIcon
-                onClick={() => setIsAiMenuOpen((prev) => !prev)}
+                onClick={() => {
+                  setIsTagInputOpen(false);
+                  setIsAiMenuOpen((prev) => !prev);
+                }}
                 disabled={isAiProcessing}
                 tooltip="AI Actions"
               >
@@ -506,6 +544,7 @@ export const NoteModal = ({
           </div>
           <button
             onClick={() => onClose('save')}
+            title={`Save and close (${shortcutHint('Enter')})`}
             className="cursor-pointer rounded px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
           >
             Close
