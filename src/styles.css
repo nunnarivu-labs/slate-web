@@ -53,6 +53,26 @@ body {
   z-index: 2;
 }
 
+/* Keep notifications out of the page snapshot and above animated overlays.
+   A DOM z-index alone cannot raise them above view-transition snapshots. */
+.note-notifications {
+  view-transition-name: note-notifications;
+}
+
+::view-transition-group(note-notifications) {
+  z-index: 4;
+  animation: none;
+}
+
+::view-transition-old(note-notifications) {
+  display: none;
+}
+
+::view-transition-new(note-notifications) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 ::view-transition-new(.note-backdrop) {
   animation: note-fade-in 200ms ease-out both;
 }
@@ -251,4 +271,35 @@ body {
 .tiptap li[data-type='taskItem'] > div {
   flex: 1;
   min-width: 0;
+}
+
+/* Fade the card content beneath hover actions without reserving a footer. */
+.note-card {
+  min-height: 7rem;
+}
+
+.note-card-actions {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.note-card:hover .note-card-actions,
+.note-card:focus-within .note-card-actions,
+.note-card-actions[aria-busy='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 767px), (hover: none), (pointer: coarse) {
+  .note-card {
+    min-height: 3rem;
+  }
+
+  .note-card-open {
+    padding-bottom: 1rem;
+  }
+
+  .note-card-actions {
+    display: none;
+  }
 }

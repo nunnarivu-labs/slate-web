@@ -1,4 +1,5 @@
 import { NoteCard } from '@/components/card/note-card.tsx';
+import { useNoteMoveUndo } from '@/components/feedback/note-move-undo.tsx';
 import { Loader } from '@/components/loader.tsx';
 import { MasonryGrid } from '@/components/masonry-grid.tsx';
 import { Route } from '@/routes/_auth/notes/$category/route.tsx';
@@ -8,12 +9,27 @@ import { convexQuery } from '@convex-dev/react-query';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { Id } from 'convex/_generated/dataModel';
+import { useMutation } from 'convex/react';
 import { ViewTransition, useDeferredValue, useState } from 'react';
 
 import { api } from '../../convex/_generated/api';
 
 export const NotesApp = () => {
   const navigate = useNavigate();
+  const moveNote = useMutation(api.tasks.moveNote);
+  const offerUndo = useNoteMoveUndo();
+  const handleMove = async (note: Note, category: NoteCategory) => {
+    const previousCategory = await moveNote({
+      id: note.id as Id<'notes'>,
+      category,
+    });
+    if (
+      previousCategory !== category &&
+      (category === 'archive' || category === 'trash')
+    ) {
+      offerUndo({ noteId: note.id as Id<'notes'>, previousCategory, category });
+    }
+  };
   const params = Route.useParams();
   const search = Route.useSearch();
 
@@ -63,6 +79,7 @@ export const NotesApp = () => {
               <NoteCard
                 key={note.id}
                 note={note}
+                onMove={(category) => handleMove(note, category)}
                 onClick={() =>
                   navigate({
                     to: '/notes/$category/$id',

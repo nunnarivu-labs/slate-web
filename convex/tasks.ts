@@ -116,6 +116,54 @@ export const updateNote = mutation({
   },
 });
 
+// Card quick actions change only the category, preserving concurrent edits.
+export const moveNote = mutation({
+  args: {
+    id: v.id('notes'),
+    category: v.union(
+      v.literal('active'),
+      v.literal('archive'),
+      v.literal('trash'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+    const note = await getNote(ctx, { noteId: args.id, userId: user._id });
+    if (note.category !== args.category) {
+      await ctx.db.patch(args.id, {
+        category: args.category,
+        updatedAt: Date.now(),
+      });
+    }
+    return note.category;
+  },
+});
+
+// Restore only the category so Undo never rolls back content or tag edits.
+export const undoNoteMove = mutation({
+  args: {
+    id: v.id('notes'),
+    previousCategory: v.union(
+      v.literal('active'),
+      v.literal('archive'),
+      v.literal('trash'),
+    ),
+    expectedCategory: v.union(v.literal('archive'), v.literal('trash')),
+  },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+    const note = await getNote(ctx, { noteId: args.id, userId: user._id });
+    if (note.category === args.previousCategory) return true;
+    // A later move from another tab/device takes precedence over an old Undo.
+    if (note.category !== args.expectedCategory) return false;
+    await ctx.db.patch(args.id, {
+      category: args.previousCategory,
+      updatedAt: Date.now(),
+    });
+    return true;
+  },
+});
+
 export const deleteNote = mutation({
   args: { id: v.id('notes') },
   handler: async (ctx, args) => {

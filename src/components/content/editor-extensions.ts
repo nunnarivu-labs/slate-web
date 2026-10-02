@@ -9,7 +9,12 @@ export const createEditorExtensions = (placeholder = '') => [
     link: { openOnClick: false, HTMLAttributes: { target: null, rel: null } },
   }),
   TaskList,
-  TaskItem.configure({ nested: true }),
+  TaskItem.configure({
+    nested: true,
+    // The live checkbox node view does not inherit renderHTML's data-type.
+    // Keep its task-item styles identical to the serialized editor markup.
+    HTMLAttributes: { 'data-type': 'taskItem' },
+  }),
   Placeholder.configure({ placeholder }),
   Markdown.configure({ markedOptions: { gfm: true, breaks: true } }),
 ];
