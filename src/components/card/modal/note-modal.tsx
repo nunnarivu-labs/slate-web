@@ -4,6 +4,7 @@ import {
   type SummaryLength,
 } from '@/components/card/modal/ai-panel.tsx';
 import { NoteModalIcon } from '@/components/card/modal/note-modal-icon.tsx';
+import { NoteTimestamps } from '@/components/card/modal/note-timestamps.tsx';
 import { TagInputPopover } from '@/components/card/popover/tag-input-popover.tsx';
 import {
   ContentEditor,
@@ -401,7 +402,7 @@ export const NoteModal = ({
             </div>
           </div>
         </ViewTransition>
-        <div className="flex items-center justify-between p-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 p-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
             {note.category !== 'active' && (
               <NoteModalIcon
@@ -499,13 +500,21 @@ export const NoteModal = ({
               ) : null}
             </div>
           </div>
-          <button
-            onClick={() => onClose('save')}
-            title={`Save and close (${shortcutHint('Enter')})`}
-            className="cursor-pointer rounded px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
-          >
-            Close
-          </button>
+          <div className="ml-auto flex min-w-0 items-center gap-2">
+            {currentNote && (
+              <NoteTimestamps
+                createdAt={currentNote.createdAt}
+                updatedAt={currentNote.updatedAt}
+              />
+            )}
+            <button
+              onClick={() => onClose('save')}
+              title={`Save and close (${shortcutHint('Enter')})`}
+              className="cursor-pointer rounded px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
       {isAiPanelOpen && (

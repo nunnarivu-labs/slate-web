@@ -5,4 +5,6 @@ export type Note = {
   title: string;
   content: string;
   category: NoteCategory;
+  readonly createdAt?: number;
+  readonly updatedAt?: number;
 };

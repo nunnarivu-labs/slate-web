@@ -8,6 +8,8 @@ export const docToNote = (doc: Doc<'notes'>): Note => ({
   title: doc.title,
   content: doc.content,
   category: doc.category,
+  createdAt: doc._creationTime,
+  updatedAt: doc.updatedAt,
 });
 
 export const docToTag = (doc: Doc<'tags'>): Tag => ({

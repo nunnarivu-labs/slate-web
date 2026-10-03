@@ -36,6 +36,37 @@ Object.defineProperties(Range.prototype, {
 });
 afterEach(cleanup);
 
+it('keeps the saved timestamp unchanged while editing the title', () => {
+  const updatedAt = Date.now() - 7_200_000;
+  render(
+    <NoteModal
+      ref={createRef<NoteModalRef>()}
+      onClose={vi.fn()}
+      note={{
+        id: 'test',
+        title: 'Example',
+        content: 'Body',
+        category: 'active',
+        createdAt: updatedAt - 86_400_000,
+        updatedAt,
+      }}
+    />,
+  );
+  const time = screen.getByText('Updated 2 hours ago');
+  fireEvent.change(screen.getByPlaceholderText('Title'), {
+    target: { value: 'Edited title' },
+  });
+  expect(time.getAttribute('datetime')).toBe(new Date(updatedAt).toISOString());
+  expect(time.textContent).toBe('Updated 2 hours ago');
+});
+
+it('does not show timestamps for a new note', () => {
+  const { container } = render(
+    <NoteModal ref={createRef<NoteModalRef>()} onClose={vi.fn()} note={null} />,
+  );
+  expect(container.querySelector('time')).toBeNull();
+});
+
 it.each([
   { key: 'Enter', keyCode: 13, metaKey: true },
   { key: 'Enter', keyCode: 13, ctrlKey: true },
