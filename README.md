@@ -116,8 +116,7 @@ Tempo. The metrics from this check are synthetic; restart LGTM with fresh storag
 if you need a clean measurement baseline.
 
 Telemetry captures operation names, model names, duration, outcomes, token counts,
-HTTP method/status and URLs, complete AI inputs and instructions, provider responses,
-parsed results, and exception messages/stacks. Content appears in traces and logs;
+HTTP method/status and URLs, generated results, and exception messages/stacks. Content appears in traces and logs;
 metric labels contain only operation/model/outcome/token type. API keys and auth
 headers are not explicitly collected. AI latency covers the complete operation,
 including SDK retries and result parsing. Server spans cover middleware/handler
@@ -158,3 +157,23 @@ AI requests and changes no notes; the check endpoint is available only in dev.
 Navigation/search durations measure router resolution, and note saves measure the
 user-facing operation; they do not measure Convex's internal execution. Convex
 instrumentation and log/metric collection are intentionally left out.
+
+### Telemetry user identity
+
+User-related logs and traces include `user.id` when Clerk identity is available.
+Server identity comes from authenticated Clerk request context and is isolated
+per request. Browser identity follows sign-in/sign-out; operation completion
+records retain the identity captured when the operation began. Early page-load
+events and anonymous requests can omit the attribute. User IDs are not added to
+metric labels or provider resources.
+
+In Loki, use `{service_name="slate"} | user_id="user_…"`.
+In Tempo, use `{ resource.service.name = "slate" && span.user.id = "user_…" }`.
+Restart Vite and reload the page after changing telemetry initialization.
+
+AI completion logs include the action, requested model, provider-reported model
+when available, outcome, duration, user identity and token usage. If usage is not
+returned, `gen_ai.usage.available=false` is recorded and counts are omitted.
+Prompts, input payloads and raw provider responses are no longer captured by AI
+telemetry; generated results and errors remain available. Metrics contain only
+aggregate counts/durations and operation/model/outcome labels.

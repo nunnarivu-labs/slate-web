@@ -15,20 +15,13 @@ try {
     .getTracer('slate.telemetry-check')
     .startActiveSpan('telemetry.check', async (span) => {
       try {
-        const result = await observeAi(
-          'summarize',
-          async (recordUsage) => {
-            recordUsage(
-              { input_tokens: 10, output_tokens: 5 },
-              { output_text: 'ok' },
-            );
-            return 'ok';
-          },
-          {
-            input: { note: 'Synthetic note for telemetry verification.' },
-            instructions: 'Synthetic summary instruction.',
-          },
-        );
+        const result = await observeAi('summarize', async (recordUsage) => {
+          recordUsage(
+            { input_tokens: 10, output_tokens: 5 },
+            'synthetic-model',
+          );
+          return 'ok';
+        });
         if (result !== 'ok')
           throw new Error('Successful operation result changed.');
 

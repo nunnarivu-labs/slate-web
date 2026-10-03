@@ -8,8 +8,12 @@ import {
 } from '@tanstack/react-router';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { useEffect } from 'react';
 
-import { startBrowserTelemetry } from '../observability/browser';
+import {
+  setBrowserTelemetryUser,
+  startBrowserTelemetry,
+} from '../observability/browser';
 import appCss from '../styles.css?url';
 
 interface MyRouterContext {
@@ -17,11 +21,21 @@ interface MyRouterContext {
   convexClient: ConvexReactClient;
 }
 
+const TelemetryUser = () => {
+  const { isLoaded, userId } = useAuth();
+  useEffect(() => {
+    setBrowserTelemetryUser(isLoaded ? userId : undefined);
+    return () => setBrowserTelemetryUser(undefined);
+  }, [isLoaded, userId]);
+  return null;
+};
+
 const RootDocument = ({ children }: { children: React.ReactNode }) => {
   const context = Route.useRouteContext();
 
   return (
     <ClerkProvider>
+      <TelemetryUser />
       <ConvexProviderWithClerk client={context.convexClient} useAuth={useAuth}>
         <html lang="en">
           <head>

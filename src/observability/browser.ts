@@ -28,9 +28,12 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 
+import { userAttributes, userSpanProcessor } from './user';
+
 type BrowserTelemetry = ReturnType<typeof createBrowserTelemetry>;
 const state = globalThis as typeof globalThis & {
   slateBrowserTelemetry?: BrowserTelemetry;
+  slateTelemetryUserId?: string;
 };
 
 function createBrowserTelemetry() {
@@ -44,6 +47,7 @@ function createBrowserTelemetry() {
   const provider = new WebTracerProvider({
     resource,
     spanProcessors: [
+      userSpanProcessor(() => state.slateTelemetryUserId),
       new BatchSpanProcessor(
         new OTLPTraceExporter({ url: `${endpoint}/traces` }),
         { scheduledDelayMillis: 1000 },
@@ -93,7 +97,11 @@ function createBrowserTelemetry() {
     const span = provider
       .getTracer('slate.browser')
       .startSpan('browser.error', {
-        attributes: { 'error.source': source, 'url.full': location.href },
+        attributes: {
+          ...userAttributes(state.slateTelemetryUserId),
+          'error.source': source,
+          'url.full': location.href,
+        },
       });
     span.recordException(exception);
     span.setStatus({ code: SpanStatusCode.ERROR, message: exception.message });
@@ -103,6 +111,7 @@ function createBrowserTelemetry() {
       severityText: 'ERROR',
       body: exception.message,
       attributes: {
+        ...userAttributes(state.slateTelemetryUserId),
         'error.source': source,
         'exception.stacktrace': exception.stack ?? '',
         'url.full': location.href,
@@ -135,6 +144,7 @@ function createBrowserTelemetry() {
       severityNumber: SeverityNumber.INFO,
       body: 'Web vital',
       attributes: {
+        ...userAttributes(state.slateTelemetryUserId),
         'vital.name': metric.name,
         'vital.value': metric.value,
         'vital.rating': metric.rating,
@@ -169,6 +179,11 @@ export function startBrowserTelemetry() {
   return (state.slateBrowserTelemetry ??= createBrowserTelemetry());
 }
 
+export function setBrowserTelemetryUser(userId?: string | null) {
+  if (typeof window !== 'undefined')
+    state.slateTelemetryUserId = userId || undefined;
+}
+
 export function browserLog(
   body: string,
   attributes: Attributes = {},
@@ -176,7 +191,10 @@ export function browserLog(
 ) {
   state.slateBrowserTelemetry?.logger.emit({
     body,
-    attributes,
+    attributes: {
+      ...attributes,
+      ...userAttributes(state.slateTelemetryUserId),
+    },
     severityNumber: error ? SeverityNumber.ERROR : SeverityNumber.INFO,
     severityText: error ? 'ERROR' : 'INFO',
   });
@@ -191,9 +209,17 @@ export function beginBrowserOperation(
     return {
       finish: (_outcome: string, _result?: unknown, _error?: unknown) => {},
     };
+  // Preserve the initiating user even if auth changes before completion.
+  const operationAttributes = {
+    ...attributes,
+    ...userAttributes(state.slateTelemetryUserId),
+  };
   const span = telemetry.provider
     .getTracer('slate.browser')
-    .startSpan(name, { kind: SpanKind.CLIENT, attributes });
+    .startSpan(name, {
+      kind: SpanKind.CLIENT,
+      attributes: operationAttributes,
+    });
   const started = performance.now();
   let ended = false;
   return {
@@ -203,7 +229,7 @@ export function beginBrowserOperation(
       ended = true;
       const seconds = (performance.now() - started) / 1000;
       const details: Attributes = {
-        ...attributes,
+        ...operationAttributes,
         outcome,
         'duration.seconds': seconds,
       };

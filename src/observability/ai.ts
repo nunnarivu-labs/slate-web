@@ -1,14 +1,21 @@
-import { SpanStatusCode, metrics, trace } from '@opentelemetry/api';
+import {
+  type Attributes,
+  SpanStatusCode,
+  metrics,
+  trace,
+} from '@opentelemetry/api';
 import { SeverityNumber, logs } from '@opentelemetry/api-logs';
+
+import { requestUserAttributes } from './user.ts';
 
 type Operation = 'summarize' | 'extract_action_items' | 'suggest_tags';
 type Usage = { input_tokens: number; output_tokens: number };
 
 export async function observeAi<T>(
   operation: Operation,
-  run: (recordUsage: (usage?: Usage, response?: unknown) => void) => Promise<T>,
-  request?: { input: unknown; instructions: string },
+  run: (recordUsage: (usage?: Usage, model?: string) => void) => Promise<T>,
 ): Promise<T> {
+  const identity = requestUserAttributes();
   const attributes = {
     'ai.operation': operation,
     'gen_ai.request.model': process.env.AI_MODEL || 'unknown',
@@ -22,27 +29,22 @@ export async function observeAi<T>(
   return trace.getTracer('slate.ai').startActiveSpan(
     `ai.${operation}`,
     {
-      attributes,
+      attributes: { ...attributes, ...identity },
     },
     async (span) => {
       const started = performance.now();
       let outcome = 'success';
-      const details: Record<string, string> = {};
-      if (span.isRecording() && request) {
-        details['gen_ai.input'] = JSON.stringify(request.input);
-        details['gen_ai.instructions'] = request.instructions;
-        span.setAttributes(details);
-      }
-      const recordUsage = (usage?: Usage, response?: unknown) => {
-        if (span.isRecording() && response !== undefined) {
-          details['gen_ai.response'] = JSON.stringify(response);
-          span.setAttribute('gen_ai.response', details['gen_ai.response']);
+      const details: Attributes = { 'gen_ai.usage.available': false };
+      const recordUsage = (usage?: Usage, model?: string) => {
+        if (model) {
+          details['gen_ai.response.model'] = model;
+          span.setAttribute('gen_ai.response.model', model);
         }
         if (!usage) return;
-        span.setAttributes({
-          'gen_ai.usage.input_tokens': usage.input_tokens,
-          'gen_ai.usage.output_tokens': usage.output_tokens,
-        });
+        details['gen_ai.usage.available'] = true;
+        details['gen_ai.usage.input_tokens'] = usage.input_tokens;
+        details['gen_ai.usage.output_tokens'] = usage.output_tokens;
+        span.setAttributes(details);
         tokens.add(usage.input_tokens, {
           ...attributes,
           'token.type': 'input',
@@ -83,7 +85,12 @@ export async function observeAi<T>(
             outcome === 'error' ? SeverityNumber.ERROR : SeverityNumber.INFO,
           severityText: outcome === 'error' ? 'ERROR' : 'INFO',
           body: `AI operation ${outcome}`,
-          attributes: { ...completed, ...details, 'duration.seconds': elapsed },
+          attributes: {
+            ...completed,
+            ...details,
+            ...identity,
+            'duration.seconds': elapsed,
+          },
         });
         span.end();
       }

@@ -12,6 +12,8 @@ import {
   createStart,
 } from '@tanstack/react-start';
 
+import { withTelemetryUser } from './observability/server-user';
+
 const telemetryMiddleware = createMiddleware().server(
   async ({ request, handlerType, next }) => {
     const parent = propagation.extract(context.active(), request.headers, {
@@ -53,12 +55,24 @@ const telemetryMiddleware = createMiddleware().server(
   },
 );
 
+// Global request middleware runs before Start's AsyncLocalStorage context exists.
+// Clerk passes its verified auth accessor directly through middleware context.
+const telemetryIdentityMiddleware = createMiddleware().server(
+  ({ context: requestContext, next }) =>
+    withTelemetryUser(requestContext, () => next()),
+);
+
 const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === 'serverFn',
 });
 
 export const startInstance = createStart(() => {
   return {
-    requestMiddleware: [telemetryMiddleware, clerkMiddleware(), csrfMiddleware],
+    requestMiddleware: [
+      telemetryMiddleware,
+      clerkMiddleware(),
+      telemetryIdentityMiddleware,
+      csrfMiddleware,
+    ],
   };
 });
