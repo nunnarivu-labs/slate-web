@@ -1,6 +1,19 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+@layer base {
+  button:not(:disabled):not([aria-disabled='true']),
+  [role='button']:not(:disabled):not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role='button'][aria-disabled='true'],
+  button[aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+}
+
 body {
   @apply m-0;
   font-family:
@@ -166,6 +179,14 @@ body {
 /* Shared rhythm for the editor, previews, cards, and AI summaries. */
 .note-content {
   line-height: 1.6;
+}
+
+.tiptap a {
+  cursor: text;
+}
+
+[data-link-navigation] .tiptap a[href]:not([href='']) {
+  cursor: pointer;
 }
 
 .note-content p {

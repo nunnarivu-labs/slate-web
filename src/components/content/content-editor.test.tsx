@@ -7,7 +7,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { Editor } from '@tiptap/react';
-import { createRef, useState } from 'react';
+import { createRef } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -24,27 +24,41 @@ Object.defineProperties(Range.prototype, {
 
 afterEach(cleanup);
 
-function Harness({ initial = 'Original note' }: { initial?: string }) {
-  const [content, setContent] = useState(initial);
-  const [preview, setPreview] = useState(false);
-  return (
-    <>
-      <button onClick={() => setPreview(!preview)}>Toggle preview</button>
-      <div hidden={preview}>
-        <ContentEditor content={content} onChange={setContent} />
-      </div>
-      {preview && <Markdown md={content} />}
-      <output>{content}</output>
-    </>
-  );
-}
-
 describe('Markdown editor', () => {
   it('keeps inline HTML literal in browser previews', () => {
     const view = render(<Markdown md={'before <em>literal</em> after'} />);
     expect(view.container.textContent).toBe('before <em>literal</em> after');
     expect(view.container.querySelector('em')).toBeNull();
   });
+
+  it.each([{ metaKey: true }, { ctrlKey: true }])(
+    'opens editor links with a modifier click ($metaKey, $ctrlKey)',
+    async (modifier) => {
+      const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+      try {
+        render(
+          <ContentEditor
+            content="[Example](https://example.com)"
+            onChange={vi.fn()}
+          />,
+        );
+        const editor = await screen.findByRole('textbox', {
+          name: 'Note content',
+        });
+        const link = editor.querySelector('a')!;
+        fireEvent.click(link);
+        expect(open).not.toHaveBeenCalled();
+        fireEvent.click(link, modifier);
+        expect(open).toHaveBeenCalledExactlyOnceWith(
+          'https://example.com/',
+          '_blank',
+          'noopener,noreferrer',
+        );
+      } finally {
+        open.mockRestore();
+      }
+    },
+  );
   it('inserts empty tables, manages rows and columns, and preserves Markdown', async () => {
     const ref = createRef<ContentEditorRef>();
     render(<ContentEditor ref={ref} content="" onChange={vi.fn()} />);
@@ -149,28 +163,6 @@ describe('Markdown editor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Redo' }));
     await waitFor(() =>
       expect(ref.current?.getMarkdown()).toContain('Summary'),
-    );
-  });
-
-  it('keeps formatting and undo history while the editor is hidden for preview', async () => {
-    render(<Harness />);
-    await screen.findByRole('textbox', { name: 'Note content' });
-    fireEvent.click(screen.getByRole('button', { name: 'Heading' }));
-    await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toContain(
-        '## Original note',
-      ),
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Toggle preview' }));
-    expect(
-      screen.getByRole('heading', { name: 'Original note' }),
-    ).toBeDefined();
-    fireEvent.click(screen.getByRole('button', { name: 'Toggle preview' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
-    await waitFor(() =>
-      expect(screen.getByRole('status').textContent?.trim()).toBe(
-        'Original note',
-      ),
     );
   });
 

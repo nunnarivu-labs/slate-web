@@ -9,7 +9,6 @@ import {
   ContentEditor,
   ContentEditorRef,
 } from '@/components/content/content-editor.tsx';
-import { Markdown } from '@/components/content/markdown.tsx';
 import { extractActionItems, suggestTags, summarize } from '@/data/ai.ts';
 import {
   shortcutHint,
@@ -32,8 +31,6 @@ import {
   Loader2,
   Sparkles,
   Tag,
-  ToggleLeft,
-  ToggleRight,
   Trash,
 } from 'lucide-react';
 import {
@@ -75,7 +72,6 @@ export const NoteModal = ({
 
   const [isTagInputOpen, setIsTagInputOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const [previewMode, setPreviewMode] = useState(false);
 
   const [uiTags, setUiTags] = useState<TagWithCheckedStatus[]>([]);
   const [tagsWithStatus, setTagsWithStatus] = useState<TagWithStatus[]>([]);
@@ -188,15 +184,6 @@ export const NoteModal = ({
     setNote((prev) => ({ ...prev, content: md ?? '' }));
     setIsDirty(true);
   };
-
-  const handlePreviewModeToggle = () =>
-    startTransition(() => setPreviewMode((prev) => !prev));
-
-  useKeyboardShortcut('mod+shift+p', handlePreviewModeToggle, {
-    scope: 'editor',
-    allowTyping: true,
-    enabled: !isNoteEmpty,
-  });
 
   useImperativeHandle(
     ref,
@@ -384,7 +371,6 @@ export const NoteModal = ({
   );
 
   const onInsertAiContent = useCallback((content: string) => {
-    setPreviewMode(false);
     editorRef.current?.appendMarkdown(content);
     setIsDirty(true);
   }, []);
@@ -396,33 +382,15 @@ export const NoteModal = ({
       <div className="flex min-w-0 flex-1 flex-col">
         <ViewTransition default="none" update="note-editor">
           <div className="note-modal-content flex min-h-0 grow flex-col p-4">
-            {!previewMode && (
-              <input
-                id="note-modal-title"
-                type="text"
-                value={note.title}
-                onChange={handleTitleChange}
-                placeholder="Title"
-                className="mb-4 w-full shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
-              />
-            )}
-            {previewMode && note.title && (
-              <h3
-                id="note-modal-title"
-                className="mb-4 font-semibold text-zinc-800 dark:text-zinc-200"
-              >
-                {note.title}
-              </h3>
-            )}
-            {previewMode && (
-              <Markdown
-                md={note.content}
-                className="md-preview overflow-y-auto"
-              />
-            )}
-            <div
-              className={previewMode ? 'hidden' : 'flex min-h-0 grow flex-col'}
-            >
+            <input
+              id="note-modal-title"
+              type="text"
+              value={note.title}
+              onChange={handleTitleChange}
+              placeholder="Title"
+              className="mb-4 w-full shrink-0 bg-transparent text-lg font-semibold text-zinc-800 outline-none dark:text-zinc-200"
+            />
+            <div className="flex min-h-0 grow flex-col">
               <ContentEditor
                 ref={editorRef}
                 content={note.content}
@@ -462,17 +430,6 @@ export const NoteModal = ({
                 <Trash size={20} />
               </NoteModalIcon>
             )}
-            <NoteModalIcon
-              disabled={isNoteEmpty}
-              onClick={handlePreviewModeToggle}
-              tooltip={`Preview Mode (${shortcutHint('Shift + P')})`}
-            >
-              {previewMode ? (
-                <ToggleRight size={20} className="text-green-600" />
-              ) : (
-                <ToggleLeft size={20} />
-              )}
-            </NoteModalIcon>
             <div
               ref={tagsPopoverRef}
               data-shortcut-overlay={isTagInputOpen ? '' : undefined}

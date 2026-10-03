@@ -21,7 +21,7 @@ The application, built with React and TanStack Start, features a responsive, car
 ## 3. Key Features
 
 - **Intuitive Card-Based Interface:** A responsive, grid-based layout for a clean and visual way to view, create, and edit notes.
-- **Rich Text Editing with Markdown Storage:** A Tiptap editor provides bold, italic, strikethrough, headings, lists, checklists, links, quotes, and code formatting, plus undo and redo. Notes are saved as Markdown and displayed as formatted content in cards and previews. Switching to preview preserves the editor's undo history.
+- **Rich Text Editing with Markdown Storage:** A Tiptap editor provides bold, italic, strikethrough, headings, lists, checklists, links, quotes, and code formatting, plus undo and redo. Notes are saved as Markdown. A single formatted editor supports tables, and Tiptap renders note cards and AI results. Cmd/Ctrl-click opens links while editing.
 - **Flexible Tag-Based Organization:** Instead of rigid folders, Slate uses a flexible tagging system.
   - **Full Tag Management:** Tags can be edited or deleted, with changes instantly cascading across all associated notes for a seamless and intuitive organizational experience.
   - Assign multiple tags to a single note for powerful, multi-dimensional organization.
@@ -62,9 +62,9 @@ AI features use `AI_API_KEY` and `AI_MODEL` from `.env.local`. Set `AI_API_BASE_
 
 ## 6. Editor Behavior and Checks
 
-The editor runs in the browser and initializes after hydration. Note cards and previews support server rendering. Formatting changes are serialized to Markdown and saved through the existing Convex note flow; opening an untouched note preserves its original Markdown. Press **Enter** for a new paragraph or **Shift+Enter** for a line break.
+The editor runs in the browser and initializes after hydration. Note cards and AI results support server rendering. Formatting changes are serialized to Markdown and saved through the existing Convex note flow; opening an untouched note preserves its original Markdown. Press **Enter** for a new paragraph or **Shift+Enter** for a line break.
 
-The toolbar supports common note formatting. Tables and images do not currently have editor extensions or toolbar controls. Editing Markdown with unsupported structures may normalize or lose those structures.
+The toolbar supports common note formatting and table insertion, row and column controls, and deletion. Images remain unsupported. Editing Markdown with unsupported structures may normalize or lose those structures.
 
 Run the integration tests, TypeScript checks, and production build with:
 
@@ -74,4 +74,4 @@ npx tsc --noEmit
 npm run build
 ```
 
-Tests cover Markdown round trips, checklist state, AI insertion and undo/redo, preview switching, server rendering, and shared spacing between edit and readonly modes.
+Tests cover Markdown round trips, checklist state, AI insertion and undo/redo, table editing, server rendering, and shared spacing between the editor and static content.

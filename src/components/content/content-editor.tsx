@@ -251,6 +251,23 @@ export const ContentEditor = ({
   autofocusEnd = false,
   placeholder = '',
 }: ContentEditorProps) => {
+  const [linkNavigation, setLinkNavigation] = useState(false);
+
+  useEffect(() => {
+    const updateModifier = (event: KeyboardEvent) => {
+      setLinkNavigation(event.metaKey || event.ctrlKey);
+    };
+    const reset = () => setLinkNavigation(false);
+    window.addEventListener('keydown', updateModifier);
+    window.addEventListener('keyup', updateModifier);
+    window.addEventListener('blur', reset);
+    return () => {
+      window.removeEventListener('keydown', updateModifier);
+      window.removeEventListener('keyup', updateModifier);
+      window.removeEventListener('blur', reset);
+    };
+  }, []);
+
   // Keep untouched Markdown verbatim; serialize only actual document edits.
   const published = useRef(content);
 
@@ -264,6 +281,22 @@ export const ContentEditor = ({
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
     editorProps: {
+      handleDOMEvents: {
+        click: (view, event) => {
+          if (event.button !== 0) return false;
+          const link =
+            event.target instanceof Element ? event.target.closest('a') : null;
+          if (!link || !view.dom.contains(link)) return false;
+          event.preventDefault();
+          if (
+            !(event.metaKey || event.ctrlKey) ||
+            !/^(https?:|mailto:|tel:)$/.test(link.protocol)
+          )
+            return false;
+          window.open(link.href, '_blank', 'noopener,noreferrer');
+          return true;
+        },
+      },
       attributes: {
         role: 'textbox',
         'aria-label': 'Note content',
@@ -320,7 +353,12 @@ export const ContentEditor = ({
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col text-zinc-800 dark:text-zinc-200">
+    <div
+      data-link-navigation={linkNavigation ? '' : undefined}
+      onMouseMove={(event) => setLinkNavigation(event.metaKey || event.ctrlKey)}
+      onMouseLeave={() => setLinkNavigation(false)}
+      className="flex min-h-0 flex-1 flex-col text-zinc-800 dark:text-zinc-200"
+    >
       {editor && <FormattingToolbar editor={editor} />}
       <div className="min-h-0 flex-1 overflow-y-auto">
         <EditorContent editor={editor} className="min-h-full" />

@@ -62,7 +62,7 @@ it.each([
   expect(onClose).toHaveBeenCalledExactlyOnceWith('save');
   expect(ref.current?.note?.content).toBe('Original body');
 });
-it('toggles preview and saves in a dialog, without stealing editor undo', () => {
+it('keeps one editor view and saves without stealing editor undo', () => {
   const onClose = vi.fn();
   render(
     <div role="dialog" aria-modal="true">
@@ -80,7 +80,9 @@ it('toggles preview and saves in a dialog, without stealing editor undo', () => 
   );
   const title = screen.getByPlaceholderText('Title');
   fireEvent.keyDown(title, { key: 'p', ctrlKey: true, shiftKey: true });
-  expect(screen.getByTestId('preview').textContent).toBe('Note body');
+  expect(screen.queryByTestId('preview')).toBeNull();
+  expect(screen.getByLabelText('Note content').textContent).toBe('Note body');
+  expect(screen.queryByText(/Preview Mode/)).toBeNull();
   fireEvent.keyDown(document, { key: 'p', metaKey: true, shiftKey: true });
   expect(screen.queryByTestId('preview')).toBeNull();
   fireEvent.keyDown(screen.getByLabelText('Note content'), {

@@ -1,8 +1,10 @@
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Editor } from '@tiptap/react';
 import { readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, expect, it } from 'vitest';
 
+import { ContentEditor } from './content-editor';
 import { createEditorExtensions } from './editor-extensions';
 import { Markdown } from './markdown';
 
@@ -12,8 +14,35 @@ const styles = readFileSync('src/styles.css', 'utf8');
 const spacingStyles = styles.slice(styles.indexOf('/* Shared rhythm'));
 
 afterEach(() => {
+  cleanup();
   document.body.innerHTML = '';
   document.head.innerHTML = '';
+});
+
+it('changes the link cursor for modifier hover and resets on release, exit, and window blur', async () => {
+  document.head.innerHTML = `<style>${spacingStyles}</style>`;
+  render(
+    <ContentEditor
+      content="[Example](https://example.com)"
+      onChange={() => {}}
+    />,
+  );
+  const editor = await screen.findByRole('textbox', { name: 'Note content' });
+  const link = editor.querySelector('a')!;
+  const cursor = () => getComputedStyle(link).cursor;
+  expect(cursor()).toBe('text');
+  fireEvent.keyDown(window, { key: 'Meta', metaKey: true });
+  expect(cursor()).toBe('pointer');
+  fireEvent.keyUp(window, { key: 'Meta' });
+  expect(cursor()).toBe('text');
+  fireEvent.mouseMove(link, { ctrlKey: true });
+  expect(cursor()).toBe('pointer');
+  fireEvent.blur(window);
+  expect(cursor()).toBe('text');
+  fireEvent.mouseMove(link, { metaKey: true });
+  expect(cursor()).toBe('pointer');
+  fireEvent.mouseLeave(link);
+  expect(cursor()).toBe('text');
 });
 
 it('uses matching spacing for headings, prose, lists, quotes, and code in both renderers', () => {

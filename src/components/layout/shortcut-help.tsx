@@ -11,7 +11,6 @@ const shortcuts = [
   [shortcutHint('K'), 'Search notes', 'Notes list'],
   [shortcutHint('Shift + Enter'), 'New note', 'Notes list, except Trash'],
   [shortcutHint('Enter'), 'Save and close', 'Note editor'],
-  [shortcutHint('Shift + P'), 'Toggle preview', 'Nonempty note editor'],
   ['Escape', 'Close the topmost menu, panel, or modal', 'Everywhere'],
   ['?', 'Keyboard shortcuts', 'When not typing'],
 ];
