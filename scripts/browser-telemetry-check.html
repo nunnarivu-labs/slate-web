@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Slate telemetry check</title>
+  </head>
+  <body>
+    <h1>Browser telemetry check</h1>
+    <p id="result">Running synthetic checks. No notes will be changed.</p>
+    <script type="module">
+      import { trace } from '@opentelemetry/api';
+
+      import {
+        observeBrowser,
+        startBrowserTelemetry,
+      } from '/src/observability/browser.ts';
+
+      const telemetry = startBrowserTelemetry();
+      try {
+        let traceId;
+        await observeBrowser('browser.telemetry.check', async () => {
+          traceId = trace.getActiveSpan().spanContext().traceId;
+          const response = await fetch('/login');
+          if (!response.ok)
+            throw new Error(`Login page returned ${response.status}`);
+          return 'Synthetic fetch succeeded';
+        });
+        telemetry.reportError(
+          new Error('Synthetic browser telemetry check error'),
+          'telemetry.check',
+        );
+        await telemetry.flush();
+        document.getElementById('result').textContent =
+          `Checks complete. Browser/server trace ID: ${traceId}. Sent synthetic browser traces, logs, and metrics.`;
+      } catch (error) {
+        document.getElementById('result').textContent =
+          `Check failed: ${error.message}`;
+      }
+    </script>
+  </body>
+</html>

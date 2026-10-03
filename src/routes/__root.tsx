@@ -9,6 +9,7 @@ import {
 import { ConvexReactClient } from 'convex/react';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
 
+import { startBrowserTelemetry } from '../observability/browser';
 import appCss from '../styles.css?url';
 
 interface MyRouterContext {
@@ -38,6 +39,8 @@ const RootDocument = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  onCatch: (error) =>
+    startBrowserTelemetry()?.reportError(error, 'react.router'),
   head: () => ({
     meta: [
       {

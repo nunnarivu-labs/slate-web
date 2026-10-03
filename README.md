@@ -75,3 +75,86 @@ npm run build
 ```
 
 Tests cover Markdown round trips, checklist state, AI insertion and undo/redo, table editing, server rendering, and shared spacing between the editor and static content.
+
+## 7. Local Observability
+
+With `grafana/otel-lgtm` exposing port 4318, `npm run dev` (and `npm run dev:all`)
+exports server traces, AI metrics, and AI logs to `http://localhost:4318`.
+Restart Vite after adding this setup. The SDK initializes only for development;
+the production build does not initialize an exporter.
+
+Optional `.env.local` settings:
+
+```dotenv
+OTEL_ENABLED=true
+SLATE_OTEL_SERVICE_NAME=slate
+SLATE_OTEL_ENDPOINT=http://localhost:4318
+```
+
+Set `OTEL_ENABLED=false` to disable local export. Shell environment settings take
+precedence over `.env.local`. The endpoint is the base OTLP HTTP URL; the SDK
+appends `/v1/traces`, `/v1/metrics`, and `/v1/logs`.
+Slate deliberately uses `SLATE_OTEL_*` for its service name and destination:
+some IDEs/dev tools inject generic `OTEL_SERVICE_NAME` and
+`OTEL_EXPORTER_OTLP_ENDPOINT` settings that point to their own telemetry collector.
+The startup message shows Slate's effective destination. Restart the Vite process
+after changing these settings, because providers persist across config reloads.
+
+Open Grafana at http://localhost:3000 and use Explore:
+
+- **Tempo:** find service `slate`. Server request spans contain child AI spans
+  named `ai.summarize`, `ai.extract_action_items`, or `ai.suggest_tags`.
+- **Prometheus:** search for `slate_ai` metrics: requests by operation/outcome,
+  duration histograms in seconds, and input/output token counts when returned by
+  the provider. Metrics export every five seconds.
+- **Loki:** filter `{service_name="slate"}` for browser and AI completion/error logs.
+  Logs carry the active trace and span IDs for correlation.
+
+Run `npm run telemetry:check` to send a synthetic success and failure, with sample
+token counts, without calling the AI provider. Look up the printed trace ID in
+Tempo. The metrics from this check are synthetic; restart LGTM with fresh storage
+if you need a clean measurement baseline.
+
+Telemetry captures operation names, model names, duration, outcomes, token counts,
+HTTP method/status and URLs, complete AI inputs and instructions, provider responses,
+parsed results, and exception messages/stacks. Content appears in traces and logs;
+metric labels contain only operation/model/outcome/token type. API keys and auth
+headers are not explicitly collected. AI latency covers the complete operation,
+including SDK retries and result parsing. Server spans cover middleware/handler
+execution, not the time to finish sending a streamed response. Handled server-function
+errors may use HTTP 200; the child AI span and its outcome metric identify AI failures.
+
+### Frontend telemetry
+
+Browser and server telemetry share service `slate`. The resource attribute
+`slate.runtime` distinguishes `browser` and `server`; `SLATE_OTEL_SERVICE_NAME`
+configures the name for both runtimes. Browser telemetry sends OTLP through Vite's
+same-origin `/__otel/v1` proxy to the existing LGTM collector. No collector CORS
+configuration or additional containers are required. Reload the page after
+restarting Vite; `OTEL_ENABLED=false` also disables browser instrumentation.
+
+- **Traces:** document loads, router navigation, same-origin fetch requests, note
+  saves (including archive/trash through the save flow), search navigation, and AI
+  operations. Same-origin fetch requests propagate trace context to the TanStack
+  server, allowing browser and server spans to appear in one trace.
+- **Logs:** operation outcomes/duration/results, note save inputs, search terms,
+  Web Vitals, uncaught errors, unhandled promise rejections, and errors caught by
+  the router's React boundary. Error records include messages and stacks.
+- **Metrics:** operation counts and duration histograms, browser error counts,
+  and Web Vitals (CLS, FCP, INP, LCP, TTFB). Metrics export every five seconds.
+  Web Vitals emit when their measurements become available; some finalize when
+  the page becomes hidden. Content and URLs are not metric labels.
+
+In Tempo use `{ resource.service.name = "slate" }`, or add
+`&& resource.slate.runtime = "browser"` inside the braces to filter by runtime.
+In Loki use `{service_name="slate"}`; append `| slate_runtime="browser"` when
+you need only browser logs. In Prometheus search for metrics beginning with
+`slate_browser`.
+
+With Vite running, open `/__telemetry-check` for a synthetic browser-to-server fetch
+and browser error. The page prints the trace ID to inspect in Tempo. It makes no
+AI requests and changes no notes; the check endpoint is available only in dev.
+
+Navigation/search durations measure router resolution, and note saves measure the
+user-facing operation; they do not measure Convex's internal execution. Convex
+instrumentation and log/metric collection are intentionally left out.

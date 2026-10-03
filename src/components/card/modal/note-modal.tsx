@@ -15,6 +15,7 @@ import {
   shortcutHint,
   useKeyboardShortcut,
 } from '@/hooks/use-keyboard-shortcut';
+import { observeBrowser } from '@/observability/browser';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteModalRef } from '@/types/note-modal-ref.ts';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
@@ -293,19 +294,22 @@ export const NoteModal = ({
       setProcessingKey(key);
       setAiErrors((prev) => ({ ...prev, [key]: '' }));
       try {
-        const content =
-          tab === 'summary'
-            ? await summarizeFn({
-                data: {
-                  note: editorRef.current?.getMarkdown() ?? note.content,
-                  length,
-                },
-              })
-            : await extractActionItemsFn({
-                data: {
-                  note: editorRef.current?.getMarkdown() ?? note.content,
-                },
-              });
+        const content = await observeBrowser(
+          `browser.ai.${tab === 'summary' ? 'summarize' : 'extract_action_items'}`,
+          () =>
+            tab === 'summary'
+              ? summarizeFn({
+                  data: {
+                    note: editorRef.current?.getMarkdown() ?? note.content,
+                    length,
+                  },
+                })
+              : extractActionItemsFn({
+                  data: {
+                    note: editorRef.current?.getMarkdown() ?? note.content,
+                  },
+                }),
+        );
         if (!content?.trim()) throw new Error('Empty result');
         if (tab === 'summary')
           setSummaries((prev) => ({ ...prev, [length]: content }));
@@ -359,12 +363,14 @@ export const NoteModal = ({
 
   const handleSuggestTags = useCallback(
     async (tags: string[]) => {
-      const content = await suggestTagsFn({
-        data: {
-          note: note.content,
-          tags,
-        },
-      });
+      const content = await observeBrowser('browser.ai.suggest_tags', () =>
+        suggestTagsFn({
+          data: {
+            note: note.content,
+            tags,
+          },
+        }),
+      );
 
       return content.tags;
     },
