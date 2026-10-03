@@ -76,7 +76,7 @@ export const NoteCard = ({
         {note.content && (
           <div
             ref={previewRef}
-            className={`max-h-56 w-full overflow-hidden ${isTruncated ? '[mask-image:linear-gradient(to_bottom,black_70%,transparent)]' : ''}`}
+            className={`max-h-112 w-full overflow-hidden ${isTruncated ? '[mask-image:linear-gradient(to_bottom,black_70%,transparent)]' : ''}`}
           >
             <div ref={contentRef}>
               <Markdown md={note.content} />

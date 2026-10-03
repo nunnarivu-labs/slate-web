@@ -14,6 +14,10 @@ body {
   max-width: 100ch !important;
 }
 
+.note-modal-content .prose {
+  max-width: none !important;
+}
+
 /* Keep the page stationary while individual cards and overlays animate. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -275,7 +279,7 @@ body {
 
 /* Fade the card content beneath hover actions without reserving a footer. */
 .note-card {
-  min-height: 7rem;
+  min-height: 14rem;
 }
 
 /* An overlay highlights the returned note without changing its grid size. */
@@ -320,7 +324,7 @@ body {
 
 @media (max-width: 767px), (hover: none), (pointer: coarse) {
   .note-card {
-    min-height: 3rem;
+    min-height: 6rem;
   }
 
   .note-card-open {

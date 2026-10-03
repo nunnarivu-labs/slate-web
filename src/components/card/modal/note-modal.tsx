@@ -395,7 +395,7 @@ export const NoteModal = ({
     <div className="relative flex min-h-0 flex-1">
       <div className="flex min-w-0 flex-1 flex-col">
         <ViewTransition default="none" update="note-editor">
-          <div className="flex min-h-0 grow flex-col p-4">
+          <div className="note-modal-content flex min-h-0 grow flex-col p-4">
             {!previewMode && (
               <input
                 id="note-modal-title"
