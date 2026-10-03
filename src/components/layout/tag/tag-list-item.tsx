@@ -3,7 +3,7 @@ import { TagListItemEdit } from '@/components/layout/tag/tag-list-item-edit.tsx'
 import { Route } from '@/routes/_auth/notes/$category/route.tsx';
 import { Tag as TagType } from '@/types/tag.ts';
 import { useMutation } from 'convex/react';
-import { MoreHorizontal, Tag } from 'lucide-react';
+import { MoreHorizontal, Pencil, Tag, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import { api } from '../../../../convex/_generated/api';
@@ -12,9 +12,14 @@ import { Id } from '../../../../convex/_generated/dataModel';
 type TagListItemProps = {
   tag: TagType;
   onTagClick: (tagId: string) => void;
+  inlineActions?: boolean;
 };
 
-export const TagListItem = ({ tag, onTagClick }: TagListItemProps) => {
+export const TagListItem = ({
+  tag,
+  onTagClick,
+  inlineActions = false,
+}: TagListItemProps) => {
   const deleteTagMutation = useMutation(api.tasks.deleteTag);
 
   const search = Route.useSearch();
@@ -40,31 +45,59 @@ export const TagListItem = ({ tag, onTagClick }: TagListItemProps) => {
       ) : (
         <button
           type="button"
+          aria-pressed={isSelected}
           onClick={() => onTagClick(tag.id)}
-          className={`flex flex-grow items-center gap-3 py-1 ${isSelected ? 'font-semibold text-blue-600 dark:text-blue-400' : 'text-zinc-600 dark:text-zinc-400'} `}
+          className={`flex min-w-0 flex-grow items-center gap-3 py-1 text-left ${isSelected ? 'font-semibold text-blue-600 dark:text-blue-400' : 'text-zinc-600 dark:text-zinc-400'} `}
         >
-          <Tag size={20} />
-          <span>{tag.name}</span>
+          <Tag size={20} className="shrink-0" />
+          <span className="break-words">{tag.name}</span>
         </button>
       )}
-      <DropdownMenu trigger={menuTrigger}>
-        <button
-          onClick={() => setIsEditing(true)}
-          className="w-full rounded px-2 py-1 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
-        >
-          Edit
-        </button>
-        {!isSelected && (
+      {inlineActions ? (
+        !isEditing && (
+          <div className="ml-2 flex shrink-0 gap-1">
+            <button
+              type="button"
+              aria-label={`Edit ${tag.name}`}
+              title="Edit tag"
+              onClick={() => setIsEditing(true)}
+              className="rounded p-1.5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-blue-500 dark:hover:bg-zinc-700"
+            >
+              <Pencil size={14} />
+            </button>
+            <button
+              type="button"
+              aria-label={`Delete ${tag.name}`}
+              title="Delete tag"
+              onClick={() =>
+                void deleteTagMutation({ id: tag.id as Id<'tags'> })
+              }
+              className="rounded p-1.5 text-zinc-500 hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-blue-500 dark:hover:bg-zinc-700"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )
+      ) : (
+        <DropdownMenu trigger={menuTrigger}>
           <button
-            onClick={async () =>
-              await deleteTagMutation({ id: tag.id as Id<'tags'> })
-            }
-            className="w-full rounded px-2 py-1 text-left text-sm text-red-500 hover:bg-zinc-100 dark:hover:bg-zinc-600"
+            onClick={() => setIsEditing(true)}
+            className="w-full rounded px-2 py-1 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-600"
           >
-            Delete
+            Edit
           </button>
-        )}
-      </DropdownMenu>
+          {!isSelected && (
+            <button
+              onClick={async () =>
+                await deleteTagMutation({ id: tag.id as Id<'tags'> })
+              }
+              className="w-full rounded px-2 py-1 text-left text-sm text-red-500 hover:bg-zinc-100 dark:hover:bg-zinc-600"
+            >
+              Delete
+            </button>
+          )}
+        </DropdownMenu>
+      )}
     </li>
   );
 };

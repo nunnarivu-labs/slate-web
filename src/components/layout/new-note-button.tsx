@@ -32,10 +32,9 @@ export const NewNoteButton = () => {
       }
       disabled={params.category === 'trash'}
       onClick={createNote}
-      className="pointer-events-auto inline-flex h-10 min-w-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-2.5 text-sm font-medium text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
+      className="new-note-floating pointer-events-auto absolute right-6 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-20 inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/25 transition-colors hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-40 md:right-8"
     >
-      <Plus size={18} aria-hidden="true" />
-      <span className="hidden sm:inline">New note</span>
+      <Plus size={26} aria-hidden="true" />
     </button>
   );
 };

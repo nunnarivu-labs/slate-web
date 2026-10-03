@@ -90,6 +90,39 @@ body {
   mix-blend-mode: normal;
 }
 
+/* Keep tag filtering controls visible above the changing note grid. */
+.tag-dropdown-panel {
+  view-transition-name: tag-dropdown-panel;
+}
+
+.profile-menu-panel {
+  view-transition-name: profile-menu-panel;
+}
+
+.new-note-floating {
+  view-transition-name: new-note-floating;
+}
+
+::view-transition-group(tag-dropdown-panel),
+::view-transition-group(profile-menu-panel),
+::view-transition-group(new-note-floating) {
+  z-index: 1;
+  animation: none;
+}
+
+::view-transition-old(tag-dropdown-panel),
+::view-transition-old(profile-menu-panel),
+::view-transition-old(new-note-floating) {
+  display: none;
+}
+
+::view-transition-new(tag-dropdown-panel),
+::view-transition-new(profile-menu-panel),
+::view-transition-new(new-note-floating) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 ::view-transition-new(.note-backdrop) {
   animation: note-fade-in 200ms ease-out both;
 }
@@ -364,6 +397,11 @@ body {
 .note-card:focus-within .note-card-actions,
 .note-card-actions[aria-busy='true'] {
   opacity: 1;
+}
+
+.note-card:hover .note-card-actions button,
+.note-card:focus-within .note-card-actions button,
+.note-card-actions[aria-busy='true'] button {
   pointer-events: auto;
 }
 

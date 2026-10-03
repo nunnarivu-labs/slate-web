@@ -151,7 +151,7 @@ export function NoteMoveUndoProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-label="Notifications"
-        className="note-notifications pointer-events-none fixed inset-x-4 bottom-4 z-[60] flex max-h-[50dvh] flex-col gap-2 overflow-y-auto pb-[env(safe-area-inset-bottom)] sm:left-auto sm:w-96"
+        className="note-notifications pointer-events-none fixed inset-x-4 bottom-24 z-[60] flex max-h-[50dvh] flex-col gap-2 overflow-y-auto pb-[env(safe-area-inset-bottom)] sm:left-auto sm:w-96"
       >
         {notices.map((notice) => (
           <UndoToast key={notice.id} notice={notice} onDismiss={dismiss} />

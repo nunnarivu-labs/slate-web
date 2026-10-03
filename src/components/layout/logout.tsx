@@ -19,8 +19,9 @@ export const Logout = ({ onLogout }: LogoutProps) => {
   return (
     <div>
       <button
+        type="button"
         onClick={handleLogout}
-        className="flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+        className="flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-zinc-600 hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-blue-500 dark:text-zinc-400 dark:hover:bg-zinc-800"
       >
         <LogOut size={20} />
         <span>Logout</span>

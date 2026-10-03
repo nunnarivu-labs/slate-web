@@ -6,7 +6,7 @@ import { useCallback, useEffect } from 'react';
 
 import { api } from '../../../../convex/_generated/api';
 
-export const TagList = () => {
+export const TagList = ({ dropdown = false }: { dropdown?: boolean }) => {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -50,7 +50,13 @@ export const TagList = () => {
   );
 
   return (
-    <div className="mt-4 min-h-0 grow overflow-y-auto border-t border-zinc-200 pt-4 dark:border-zinc-700">
+    <div
+      className={
+        dropdown
+          ? 'max-h-80 overflow-y-auto'
+          : 'mt-4 min-h-0 grow overflow-y-auto border-t border-zinc-200 pt-4 dark:border-zinc-700'
+      }
+    >
       <h3 className="mb-2 px-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
         Tags
       </h3>
@@ -58,11 +64,26 @@ export const TagList = () => {
         <ul>
           {allTagsQuery.isSuccess
             ? allTagsQuery.data.map((tag) => (
-                <TagListItem tag={tag} onTagClick={onTagClick} key={tag.id} />
+                <TagListItem
+                  tag={tag}
+                  onTagClick={onTagClick}
+                  key={tag.id}
+                  inlineActions={dropdown}
+                />
               ))
             : null}
         </ul>
       </nav>
+      {dropdown &&
+        (!allTagsQuery.isSuccess ? (
+          <p role="status" className="px-3 py-4 text-sm text-zinc-500">
+            Loading tags…
+          </p>
+        ) : allTagsQuery.data.length === 0 ? (
+          <p className="px-3 py-4 text-sm text-zinc-500">
+            No tags yet. Add tags from a note.
+          </p>
+        ) : null)}
     </div>
   );
 };

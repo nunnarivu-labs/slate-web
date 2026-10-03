@@ -12,10 +12,28 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { Id } from 'convex/_generated/dataModel';
 import { useMutation, usePaginatedQuery } from 'convex/react';
-import { Search, X } from 'lucide-react';
+import { Archive, FileText, Search, Trash2, X } from 'lucide-react';
 import { ViewTransition, useDeferredValue, useEffect, useState } from 'react';
 
 import { api } from '../../convex/_generated/api';
+
+const emptyStates = {
+  active: {
+    Icon: FileText,
+    title: 'No notes yet',
+    description: 'Create a new note to get started.',
+  },
+  archive: {
+    Icon: Archive,
+    title: 'No archived notes',
+    description: 'Notes you archive will appear here.',
+  },
+  trash: {
+    Icon: Trash2,
+    title: 'Trash is empty',
+    description: 'Notes you move to Trash will appear here.',
+  },
+};
 
 export const NotesApp = () => {
   const { highlightedNoteId } = useNoteCloseHighlight();
@@ -112,6 +130,8 @@ export const NotesApp = () => {
   // Defer external-store updates so React can animate their committed layout.
   const renderedCollection = useDeferredValue(collection);
   const notes = renderedCollection?.notes;
+  const emptyState = emptyStates[params.category];
+  const EmptyIcon = emptyState.Icon;
 
   const isUpdating =
     renderedCollection?.key !== collectionKey ||
@@ -158,7 +178,7 @@ export const NotesApp = () => {
   } else {
     return (
       <div
-        className="px-4 pt-20 pb-6 md:px-8 md:pt-22"
+        className="px-4 pt-4 pb-24 md:px-8"
         aria-busy={isUpdating || isScanningTags}
       >
         {search.q && (
@@ -176,6 +196,24 @@ export const NotesApp = () => {
               <X size={14} />
               Clear
             </button>
+          </div>
+        )}
+        {notes.length === 0 && !isSearching && !isUpdating && (
+          <div
+            role="status"
+            className="flex flex-col items-center gap-3 py-16 text-center"
+          >
+            <EmptyIcon size={32} aria-hidden="true" className="text-zinc-400" />
+            <h2 className="font-medium text-zinc-800 dark:text-zinc-200">
+              {search.tags?.length
+                ? 'No notes with these tags'
+                : emptyState.title}
+            </h2>
+            <p className="max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
+              {search.tags?.length
+                ? 'Try different tags or remove the tag filters.'
+                : emptyState.description}
+            </p>
           </div>
         )}
         {notes.length === 0 &&

@@ -382,7 +382,7 @@ export const NoteModal = ({
     <div className="relative flex min-h-0 flex-1">
       <div className="flex min-w-0 flex-1 flex-col">
         <ViewTransition default="none" update="note-editor">
-          <div className="note-modal-content flex min-h-0 grow flex-col p-4">
+          <div className="note-modal-content flex min-h-0 grow flex-col px-4 pt-4 pb-1">
             <input
               id="note-modal-title"
               type="text"
@@ -402,7 +402,7 @@ export const NoteModal = ({
             </div>
           </div>
         </ViewTransition>
-        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 p-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1 px-2 pt-1 pb-2">
           <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
             {note.category !== 'active' && (
               <NoteModalIcon
