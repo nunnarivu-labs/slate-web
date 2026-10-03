@@ -1,7 +1,7 @@
 import { trace } from '@opentelemetry/api';
 
 import { observeAi } from '../src/observability/ai.ts';
-import { startLocalTelemetry } from './telemetry.ts';
+import { startLocalTelemetry } from '../src/observability/server.ts';
 
 // Exercise real exporters without calling the AI provider or reading any notes.
 const sdk = startLocalTelemetry({
