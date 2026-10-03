@@ -235,25 +235,23 @@ body {
   margin-bottom: 0;
 }
 
-/* Tiptap uses label + div; remark-gfm uses an inline checkbox in the li. */
-.note-content ul[data-type='taskList'],
-.note-content ul.contains-task-list {
+/* Match checklist layout in the live editor and static previews. */
+.note-content ul[data-type='taskList'] {
   list-style: none;
   padding-inline-start: 0;
 }
 
-.note-content li[data-type='taskItem'],
-.note-content li.task-list-item {
+.note-content li[data-type='taskItem'] {
   padding-inline-start: 0;
 }
 
-.tiptap li[data-type='taskItem'] {
+.note-content li[data-type='taskItem'] {
   display: flex;
   align-items: flex-start;
   gap: 0.5em;
 }
 
-.tiptap li[data-type='taskItem'] > label {
+.note-content li[data-type='taskItem'] > label {
   display: flex;
   align-items: center;
   flex: none;
@@ -266,15 +264,41 @@ body {
   margin: 0;
 }
 
-.markdown-content li.task-list-item > input[type='checkbox'],
-.markdown-content li.task-list-item > p > input[type='checkbox'] {
-  margin-inline-end: 0.25em;
-  vertical-align: -0.05em;
-}
-
-.tiptap li[data-type='taskItem'] > div {
+.note-content li[data-type='taskItem'] > div {
   flex: 1;
   min-width: 0;
+}
+
+.note-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.note-content th,
+.note-content td {
+  @apply border border-zinc-300 dark:border-zinc-600;
+  position: relative;
+  min-width: 3rem;
+  padding: 0.5em 0.75em;
+  vertical-align: top;
+}
+
+.note-content th {
+  @apply bg-zinc-100 dark:bg-zinc-700;
+  font-weight: 600;
+}
+
+.note-content th p,
+.note-content td p {
+  min-height: 1.6em;
+}
+
+.tiptap .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-blue-400) 20%, transparent);
 }
 
 /* Fade the card content beneath hover actions without reserving a footer. */
