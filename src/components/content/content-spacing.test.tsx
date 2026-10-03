@@ -67,7 +67,7 @@ it('uses matching spacing for headings, prose, lists, quotes, and code in both r
   }
 });
 
-it('handles the different checklist DOM structures without inherited list padding', () => {
+it('keeps checklists aligned without inherited list padding in editing and previews', () => {
   const content = '- [ ] First\n- [x] Second\n  - [ ] Nested';
   const editor = new Editor({
     extensions: createEditorExtensions(),
@@ -77,9 +77,7 @@ it('handles the different checklist DOM structures without inherited list paddin
   try {
     document.head.innerHTML = `<style>${spacingStyles}</style>`;
     document.body.innerHTML = `<div class="note-content tiptap" id="editing">${editor.getHTML()}</div><div id="reading">${renderToStaticMarkup(<Markdown md={content} />)}</div>`;
-    const lists = document.querySelectorAll(
-      'ul[data-type="taskList"], ul.contains-task-list',
-    );
+    const lists = document.querySelectorAll('ul[data-type="taskList"]');
     expect(lists.length).toBe(4);
     for (const list of lists) {
       expect(getComputedStyle(list).paddingInlineStart).toBe('0');
@@ -128,6 +126,26 @@ it('keeps live editor checkboxes beside their text, including after checkbox upd
       host.querySelector('li[data-checked]')?.getAttribute('data-checked'),
     ).toBe('true');
     checkLayout();
+  } finally {
+    editor.destroy();
+  }
+});
+
+it('keeps empty table cells visible in the editor and preview', () => {
+  const content = '| Header |\n| --- |\n| |';
+  const editor = new Editor({
+    extensions: createEditorExtensions(),
+    contentType: 'markdown',
+    content,
+  });
+  try {
+    document.head.innerHTML = `<style>${spacingStyles}</style>`;
+    document.body.innerHTML = `<div class="note-content tiptap" id="editing">${editor.getHTML()}</div><div id="reading">${renderToStaticMarkup(<Markdown md={content} />)}</div>`;
+    for (const selector of ['#editing td p', '#reading td p']) {
+      expect(
+        getComputedStyle(document.querySelector(selector)!).minHeight,
+      ).toBe('1.6em');
+    }
   } finally {
     editor.destroy();
   }

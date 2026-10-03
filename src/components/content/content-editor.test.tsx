@@ -40,6 +40,81 @@ function Harness({ initial = 'Original note' }: { initial?: string }) {
 }
 
 describe('Markdown editor', () => {
+  it('keeps inline HTML literal in browser previews', () => {
+    const view = render(<Markdown md={'before <em>literal</em> after'} />);
+    expect(view.container.textContent).toBe('before <em>literal</em> after');
+    expect(view.container.querySelector('em')).toBeNull();
+  });
+  it('inserts empty tables, manages rows and columns, and preserves Markdown', async () => {
+    const ref = createRef<ContentEditorRef>();
+    render(<ContentEditor ref={ref} content="" onChange={vi.fn()} />);
+    const textbox = await screen.findByRole('textbox', {
+      name: 'Note content',
+    });
+    const tableAction = (name: string) => {
+      fireEvent.click(screen.getByRole('button', { name: 'Table' }));
+      fireEvent.click(screen.getByRole('button', { name }));
+    };
+    tableAction('Insert table');
+    expect(textbox.querySelectorAll('tr')).toHaveLength(3);
+    expect(textbox.querySelectorAll('th')).toHaveLength(3);
+    tableAction('Add row below');
+    expect(textbox.querySelectorAll('tr')).toHaveLength(4);
+    tableAction('Add column after');
+    expect(textbox.querySelector('tr')?.children).toHaveLength(4);
+    tableAction('Delete column');
+    expect(textbox.querySelector('tr')?.children).toHaveLength(3);
+    tableAction('Delete row');
+    expect(textbox.querySelectorAll('tr')).toHaveLength(3);
+    const saved = ref.current!.getMarkdown();
+    expect(saved).toContain('|');
+    const restored = new Editor({
+      extensions: createEditorExtensions(),
+      contentType: 'markdown',
+      content: saved,
+    });
+    try {
+      expect(restored.getHTML().match(/<tr>/g)).toHaveLength(3);
+    } finally {
+      restored.destroy();
+    }
+    tableAction('Delete table');
+    expect(textbox.querySelector('table')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(textbox.querySelector('table')).not.toBeNull();
+  });
+
+  it('round-trips table cell edits, alignment, and formatting', () => {
+    const source = '| Name | Count |\n| :--- | ---: |\n| **Alice** | 2 |';
+    const editor = new Editor({
+      extensions: createEditorExtensions(),
+      contentType: 'markdown',
+      content: source,
+    });
+    try {
+      let cellPosition = 0;
+      editor.state.doc.descendants((node, pos) => {
+        if (node.type.name === 'text' && node.text === 'Alice')
+          cellPosition = pos;
+      });
+      editor.commands.insertContentAt(
+        { from: cellPosition, to: cellPosition + 5 },
+        'Bob',
+      );
+      const saved = editor.getMarkdown();
+      expect(saved).toContain('Bob');
+      expect(saved).not.toContain('Alice');
+      editor.commands.setContent(saved, {
+        contentType: 'markdown',
+        emitUpdate: false,
+      });
+      expect(editor.getHTML()).toContain('text-align: right');
+      expect(editor.getHTML()).toContain('<strong>Bob</strong>');
+    } finally {
+      editor.destroy();
+    }
+  });
+
   it('preserves untouched source and initializes without marking dirty', async () => {
     const ref = createRef<ContentEditorRef>();
     const onChange = vi.fn();

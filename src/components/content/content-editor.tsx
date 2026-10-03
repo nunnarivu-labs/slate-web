@@ -27,6 +27,7 @@ import {
 import type { RefObject } from 'react';
 
 import { createEditorExtensions } from './editor-extensions';
+import { TableControls } from './table-controls';
 
 export type ContentEditorRef = {
   focusEnd: () => void;
@@ -185,6 +186,7 @@ function FormattingToolbar({ editor }: { editor: Editor }) {
             <Icon size={16} />
           </button>
         ))}
+        <TableControls editor={editor} />
       </div>
       {linkOpen && (
         <form
@@ -274,7 +276,9 @@ export const ContentEditor = ({
       if (autofocusEnd) current.commands.focus('end');
     },
     onUpdate: ({ editor: current }) => {
-      const markdown = current.isEmpty ? '' : current.getMarkdown();
+      // Empty tables still have structure worth saving. The Markdown serializer
+      // already normalizes an actually empty document to an empty string.
+      const markdown = current.getMarkdown();
       published.current = markdown;
       onChangeRef.current(markdown);
     },
