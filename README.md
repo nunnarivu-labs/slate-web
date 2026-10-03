@@ -54,7 +54,9 @@ With Docker running, dependencies installed, and `.env.local` configured, start 
 npm run dev:all
 ```
 
-This waits for the Docker services to be ready, then runs Convex and Vite together. Press **Ctrl+C** to stop both processes and the Docker Compose services. Your Docker data is preserved. If either development process exits, the rest of the stack is stopped as well.
+This waits for the Convex Docker services and Grafana LGTM to be ready, then runs Convex and Vite together. Press **Ctrl+C** to stop both processes, the Docker Compose services, and LGTM if this command started it. An LGTM container that was already running is left running. Your Docker data is preserved. If either development process exits, the rest of the stack is stopped as well.
+
+`dev:all` reuses the container named `grafana-otel-lgtm`, preserving its existing dashboards and telemetry. If missing, it creates one using `grafana/otel-lgtm:latest` with the named volume `slate-lgtm-data` mounted at `/data`. Grafana is available at http://localhost:3000; OTLP uses ports 4317/4318. Containers and volumes are retained on shutdown.
 
 The individual `npm run convex` and `npm run dev` commands remain available.
 
