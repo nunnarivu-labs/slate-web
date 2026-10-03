@@ -2,6 +2,7 @@ import {
   shortcutHint,
   useKeyboardShortcut,
 } from '@/hooks/use-keyboard-shortcut';
+import { observeBrowser } from '@/observability/browser';
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -35,13 +36,18 @@ export function NoteSearch() {
     if (timerRef.current) clearTimeout(timerRef.current);
     const q = text.trim().slice(0, 256) || undefined;
     if (q === currentSearch.current.q) return;
-    void navigate({
-      to: '/notes/$category',
-      params: { category: currentCategory.current },
-      search: { ...currentSearch.current, q },
-      replace: true,
-      resetScroll: true,
-    });
+    void observeBrowser(
+      'note.search',
+      () =>
+        navigate({
+          to: '/notes/$category',
+          params: { category: currentCategory.current },
+          search: { ...currentSearch.current, q },
+          replace: true,
+          resetScroll: true,
+        }),
+      { 'search.query': q ?? '', 'note.category': currentCategory.current },
+    );
   };
   const focusSearch = () => {
     setExpanded(true);

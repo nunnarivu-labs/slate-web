@@ -1,4 +1,5 @@
 import { useNoteMoveUndo } from '@/components/feedback/note-move-undo.tsx';
+import { observeBrowser } from '@/observability/browser';
 import { Route } from '@/routes/_auth/notes/$category/$id.tsx';
 import { NoteSaveActionType } from '@/types/note-save-action.ts';
 import { Note } from '@/types/note.ts';
@@ -24,51 +25,64 @@ export const useSaveNote = () => {
   const deleteNoteMutation = useMutation(api.tasks.deleteNote);
   const updateTagsMutation = useMutation(api.tasks.updateTags);
 
-  return async ({ note, tags, action, isNoteDirty }: SaveNoteArgs) => {
-    const isNoteEmpty = !note.title && !note.content;
+  return async ({ note, tags, action, isNoteDirty }: SaveNoteArgs) =>
+    observeBrowser(
+      'note.save',
+      async () => {
+        const isNoteEmpty = !note.title && !note.content;
 
-    if (isNewNote && isNoteEmpty) return;
-    else if (!isNewNote && isNoteEmpty) {
-      await deleteNoteMutation({ id: note.id as Id<'notes'> });
-      return;
-    }
+        if (isNewNote && isNoteEmpty) return;
+        else if (!isNewNote && isNoteEmpty) {
+          await deleteNoteMutation({ id: note.id as Id<'notes'> });
+          return;
+        }
 
-    const previousCategory = note.category;
-    const category = action === 'save' ? note.category : action;
-    let savedNoteId = note.id as Id<'notes'>;
+        const previousCategory = note.category;
+        const category = action === 'save' ? note.category : action;
+        let savedNoteId = note.id as Id<'notes'>;
 
-    if (isNewNote) {
-      savedNoteId = await saveNoteMutation({
-        note: {
-          title: note.title,
-          content: note.content,
-          category,
-        },
-        tags,
-      });
-    } else {
-      if (isNoteDirty || action !== 'save') {
-        await updateNoteMutation({
-          id: note.id as Id<'notes'>,
-          note: {
-            title: note.title,
-            content: note.content,
-            category,
-          },
-          tags,
-        });
-      } else if (tags.some((tag) => tag.status !== 'ALREADY_ADDED')) {
-        await updateTagsMutation({ noteId: note.id as Id<'notes'>, tags });
-      }
-    }
+        if (isNewNote) {
+          savedNoteId = await saveNoteMutation({
+            note: {
+              title: note.title,
+              content: note.content,
+              category,
+            },
+            tags,
+          });
+        } else {
+          if (isNoteDirty || action !== 'save') {
+            await updateNoteMutation({
+              id: note.id as Id<'notes'>,
+              note: {
+                title: note.title,
+                content: note.content,
+                category,
+              },
+              tags,
+            });
+          } else if (tags.some((tag) => tag.status !== 'ALREADY_ADDED')) {
+            await updateTagsMutation({ noteId: note.id as Id<'notes'>, tags });
+          }
+        }
 
-    if (
-      (action === 'archive' || action === 'trash') &&
-      action !== previousCategory
-    ) {
-      offerUndo({ noteId: savedNoteId, previousCategory, category: action });
-    }
+        if (
+          (action === 'archive' || action === 'trash') &&
+          action !== previousCategory
+        ) {
+          offerUndo({
+            noteId: savedNoteId,
+            previousCategory,
+            category: action,
+          });
+        }
 
-    return savedNoteId;
-  };
+        return savedNoteId;
+      },
+      {
+        'note.action': action,
+        'note.is_new': isNewNote,
+        'operation.input': JSON.stringify({ note, tags, isNoteDirty }),
+      },
+    );
 };

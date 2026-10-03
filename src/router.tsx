@@ -5,11 +5,16 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { ConvexProvider } from 'convex/react';
 
 import * as TanstackQuery from './integrations/tanstack-query/root-provider';
+import {
+  beginBrowserOperation,
+  startBrowserTelemetry,
+} from './observability/browser';
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
 
 // Create a new router instance
 export const getRouter = () => {
+  const telemetry = startBrowserTelemetry();
   const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL!;
   if (!CONVEX_URL) {
     console.error('missing envar VITE_CONVEX_URL');
@@ -46,6 +51,20 @@ export const getRouter = () => {
     router,
     queryClient: queryClient,
   });
+
+  if (telemetry) {
+    let navigation: ReturnType<typeof beginBrowserOperation> | undefined;
+    router.subscribe('onBeforeNavigate', ({ toLocation }) => {
+      navigation?.finish('superseded');
+      navigation = beginBrowserOperation('browser.navigation', {
+        'url.full': toLocation.href,
+      });
+    });
+    router.subscribe('onResolved', () => {
+      navigation?.finish('success');
+      navigation = undefined;
+    });
+  }
 
   return router;
 };
