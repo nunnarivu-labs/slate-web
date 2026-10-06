@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 const cwd = fileURLToPath(new URL('..', import.meta.url));
 const children = new Set();
 let stopping = false;
-let lgtmStarted = false;
+let lgtmManaged = false;
+let keepAlive;
 const lgtmContainer = 'grafana-otel-lgtm';
 
 function run(command, args, capture = false) {
@@ -54,9 +55,9 @@ async function startLgtm() {
     throw new Error(inspect.output || 'Unable to inspect LGTM container');
   if (stopping) return;
   const status = inspect.output.trim();
+  lgtmManaged = true;
   if (status !== 'running') {
     // Reuse existing containers: recreating one could discard its dashboards.
-    lgtmStarted = true;
     const args = status
       ? ['start', lgtmContainer]
       : [
@@ -126,6 +127,7 @@ function signalGroup(child, signal) {
 async function shutdown(code) {
   if (stopping) return;
   stopping = true;
+  clearInterval(keepAlive);
   console.log('\nStopping Docker services…');
   for (const child of children) signalGroup(child, 'SIGTERM');
 
@@ -144,7 +146,7 @@ async function shutdown(code) {
   // Keep containers and the named data volume for the next run.
   const docker = run('docker', ['compose', 'stop']);
   let stopCode = await docker.done;
-  if (lgtmStarted) {
+  if (lgtmManaged) {
     const lgtmStopCode = await run('docker', ['stop', lgtmContainer]).done;
     stopCode ||= lgtmStopCode;
   }
@@ -170,7 +172,9 @@ if (!stopping) {
       await shutdown(1);
     }
     if (!stopping) {
-      console.log('Docker services are ready. Containers will keep running.');
+      console.log('Docker services are ready. Press Ctrl+C to stop them.');
+      // Signal handlers alone do not keep Node's event loop alive.
+      keepAlive = setInterval(() => {}, 60_000);
     }
   }
 }
