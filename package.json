@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "telemetry:check": "node --env-file-if-exists=.env.local scripts/check-telemetry.ts",
-    "dev:all": "node scripts/dev-all.mjs",
-    "docker": "docker compose up",
+    "start-docker": "node scripts/start-docker.mjs",
     "convex": "npx convex dev",
     "dev": "vite dev --port 5173 --host",
     "build": "vite build",

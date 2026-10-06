@@ -126,10 +126,9 @@ function signalGroup(child, signal) {
 async function shutdown(code) {
   if (stopping) return;
   stopping = true;
-  console.log('\nStopping local development services…');
+  console.log('\nStopping Docker services…');
   for (const child of children) signalGroup(child, 'SIGTERM');
 
-  // Target whole process groups so npm's Convex/Vite descendants also stop.
   let timeout;
   await Promise.race([
     Promise.all([...children].map((child) => child.done)),
@@ -145,7 +144,6 @@ async function shutdown(code) {
   // Keep containers and the named data volume for the next run.
   const docker = run('docker', ['compose', 'stop']);
   let stopCode = await docker.done;
-  // Leave an LGTM instance that was already running before dev-all untouched.
   if (lgtmStarted) {
     const lgtmStopCode = await run('docker', ['stop', lgtmContainer]).done;
     stopCode ||= lgtmStopCode;
@@ -172,11 +170,7 @@ if (!stopping) {
       await shutdown(1);
     }
     if (!stopping) {
-      console.log('Starting Convex and Vite. Press Ctrl+C to stop everything.');
-      const convex = run('npm', ['run', 'convex']);
-      const vite = run('npm', ['run', 'dev']);
-      const code = await Promise.race([convex.done, vite.done]);
-      await shutdown(code);
+      console.log('Docker services are ready. Containers will keep running.');
     }
   }
 }
